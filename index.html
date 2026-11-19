@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!-- Content-Security-Policy: only this site, the two pinned three.js files and Google Fonts may load.
      The inline script is allowed by its sha256 hash, which tools/csp_hash.py updates (publish.sh runs it). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-TXoOh5BL9xr243+1oEoK3hPHUpu/0R2/rZwjaE/U3qE='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-LvI6cwi9YfXBuZU+S2vY6ENJPjygenk8JIkntAJgRPQ=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Taipei Zoo 3D English Guide</title>
@@ -434,6 +434,8 @@ body.learning .tourbar{bottom:130px}
      (hashes checked against cdnjs' published SRI and a second CDN, 2026-11-19) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" integrity="sha384-fljlqkjWlmSFjkESkQvm77heIZpoWmXEOzlCA7kOpGUH+95Zk0yGfQieWM2q136E" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<!-- Draco decoder for the compressed models, hosted on this site (three.js r128 files, checked against two CDNs) -->
+<script src="vendor/draco/DRACOLoader.js"></script>
 <script>
 "use strict";
 /* ============================ DATA ============================ */
@@ -835,7 +837,8 @@ function sketchify(m){m.onBeforeCompile=sh=>{sh.fragmentShader=sh.fragmentShader
 function toon(o){return sketchify(new THREE.MeshToonMaterial(Object.assign({gradientMap:TOON_GRAD},o)))}
 const MC={};function mat(c,opts){const k=c+(opts?JSON.stringify(opts):'');if(MC[k])return MC[k];const o={color:c};if(opts&&opts.transparent){o.transparent=true;o.opacity=opts.opacity}const m=toon(o);MC[k]=m;return m}
 const OUTM={};function outlineMat(th){const k=th.toFixed(2);return OUTM[k]||(OUTM[k]=new THREE.ShaderMaterial({uniforms:{th:{value:th}},
- vertexShader:'uniform float th;void main(){vec4 mv=modelViewMatrix*vec4(position,1.0);vec3 n=normalize(normalMatrix*normal);float o=min(th*0.0019*(-mv.z),0.085*th);mv.xyz+=n*o;gl_Position=projectionMatrix*mv;}',
+ // works for normal meshes and for InstancedMesh (habitat plants): instanceMatrix is applied when USE_INSTANCING is defined
+ vertexShader:'uniform float th;void main(){vec4 p=vec4(position,1.0);vec3 nn=normal;\n#ifdef USE_INSTANCING\np=instanceMatrix*p;nn=mat3(instanceMatrix)*nn;\n#endif\nvec4 mv=modelViewMatrix*p;vec3 n=normalize(normalMatrix*nn);float o=min(th*0.0019*(-mv.z),0.085*th);mv.xyz+=n*o;gl_Position=projectionMatrix*mv;}',
  fragmentShader:'void main(){gl_FragColor=vec4(0.169,0.141,0.125,1.0);}',side:THREE.BackSide}))}
 function addOutline(root,th){const list=[];root.traverse(o=>{if(o.isMesh&&!o.isInstancedMesh&&!o.userData.isOutline&&o.material&&!o.material.transparent&&o.material.side!==THREE.DoubleSide&&o.material.type!=='MeshBasicMaterial')list.push(o)});
  list.forEach(m=>{const o=new THREE.Mesh(m.geometry,outlineMat(th||1));o.userData.isOutline=true;o.raycast=function(){};m.add(o)})}
@@ -1130,8 +1133,10 @@ function toonFrom(old){const k=old.color.getHexString()+'|'+old.side+'|'+(old.tr
 function preloadGLB(){
  if(!THREE.GLTFLoader)return Promise.resolve();
  const loader=new THREE.GLTFLoader();
- const urls=[...new Set(A.map(a=>a.m.glb).filter(Boolean))];
+ if(THREE.DRACOLoader){const dr=new THREE.DRACOLoader();dr.setDecoderPath('vendor/draco/');dr.setDecoderConfig({type:'wasm'});loader.setDRACOLoader(dr)}   // models are Draco-compressed
+ const urls=[...new Set(A.map(a=>a.m.glb).filter(Boolean).concat([HAB_URL]))];
  return Promise.all(urls.map(u=>new Promise(res=>loader.load(u,g=>{GLB[u]=g;res()},undefined,e=>{console.warn('GLB load failed, using built-in shape:',u,e);res()}))))}
+const HAB_URL='models/habitat-kit.glb';
 function buildGLB(o){
  const src=GLB[o.glb];const g=new THREE.Group();const m=src.scene.clone(true);
  m.traverse(n=>{if(n.isMesh)n.material=toonFrom(n.material)});
@@ -1226,7 +1231,8 @@ function treeAt(p,type,x,z,s,R){const y=0;const g=new THREE.Group();g.position.s
   case 'bamboo':for(let i=0;i<5;i++){const bx=(R()-.5)*.6,bz=(R()-.5)*.6;limb(g,V(bx,0,bz),V(bx,2.6+R(),bz),.06,'#7aa64a');E(g,'#6a9a3a',.3,.12,.3,bx,2.6,bz,GSL)}break;
   case 'rock':E(g,'#a39c8e',.7,.45,.6,0,.2,0,GSL);break;
  }addOutline(g,.8)}
-function pond(p,x,z,r,c){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,.1,24),mat(c||'#9BCFDD',{roughness:.25}));m.position.set(x,.26,z);p.add(m);return m}
+function pond(p,x,z,r,c){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,.1,24),mat(c||'#9BCFDD',{roughness:.25}));m.position.set(x,.26,z);p.add(m);
+ (p.userData.ponds=p.userData.ponds||[]).push({x,z,r});return m}   // remembered so plants avoid the water and lily pads go on it
 function buildZone(z){
  const g=new THREE.Group();g.position.set(z.x,z.y,z.z);scene.add(g);z.group=g;const R=rng(hashStr(z.id));
  const floor={forest:'#8DB06C',farm:'#BFD58E',rainforest:'#74A35E',desert:'#E8CF9C',outback:'#D7A475',savanna:'#DCC78A',temperate:'#A9C795',aviary:'#A3C9A3',indoor:'#E6DFCF','indoor-green':'#C9DBB5','indoor-ice':'#E3EFF3'}[z.biome];
@@ -1287,6 +1293,7 @@ function labelFadeTick(){
  let op=THREE.MathUtils.clamp((d-w*.7)/(w*1.3),0,1);
  if(fa&&op>.12&&d<ad){_sp.copy(_lp).project(camera);const px=w*innerHeight/(2*d*tv),py=px*s.scale.y/s.scale.x;
   const sx=(_sp.x+1)/2*innerWidth,sy=(1-_sp.y)/2*innerHeight;if(Math.abs(sx-ax)<px/2+30&&Math.abs(sy-ay)<py/2+30)op=.12}
+ if(fa&&s.userData.animalLabel&&s!==fa.obj.lab&&d<9)op=Math.min(op,Math.max(0,(d-4)/5));   // other animals' name signs near the camera step back
  s.material.opacity=op}}
 
 /* ---------- place animals ---------- */
@@ -1302,7 +1309,7 @@ function placeAnimals(){
    const holder=new THREE.Group();holder.position.set(px,.25,pz);holder.rotation.y=-Math.PI/2+(R()-.5)*1.4+(a.m.b==='butterfly'?0:0);holder.add(g);z.group.add(holder);
    const box=new THREE.Box3().setFromObject(holder);const h=box.max.y-box.min.y;const fr=Math.max(box.max.x-box.min.x,box.max.z-box.min.z)/2;
    const sh=new THREE.Mesh(new THREE.CircleGeometry(1,20),new THREE.MeshBasicMaterial({color:'#000',transparent:true,opacity:.16,depthWrite:false}));sh.rotation.x=-Math.PI/2;sh.position.set(px,.27,pz);sh.scale.setScalar(Math.max(.5,fr*.8));z.group.add(sh);
-   const lab=makeLabel(a.n,a.zh,{bg:'#FFFDF7',fg:'#2B2420',w:Math.min(4.2,Math.max(2.8,a.n.length*.16)),small:true});lab.position.set(px,.25+h+.9,pz);lab.visible=false;z.group.add(lab);
+   const lab=makeLabel(a.n,a.zh,{bg:'#FFFDF7',fg:'#2B2420',w:Math.min(4.2,Math.max(2.8,a.n.length*.16)),small:true});lab.position.set(px,.25+h+.9,pz);lab.visible=false;lab.userData.animalLabel=true;z.group.add(lab);
    const ring=new THREE.Mesh(new THREE.TorusGeometry(1,.08,6,32),new THREE.MeshBasicMaterial({color:'#F5C531'}));ring.rotation.x=Math.PI/2;ring.position.set(px,.32,pz);ring.scale.setScalar(Math.max(.8,fr+.3));ring.visible=false;z.group.add(ring);
    holder.traverse(o=>{o.userData.animal=a.id});pickables.push(holder);
    a.obj={holder,g,built,h,fr,lab,ring,ph:R2()*6.28,bounce:0}});
@@ -1325,12 +1332,34 @@ function focusAnimal(a,close){const p=worldPos(a);const h=a.obj.h;
  // fit the animal into the part of the screen the card leaves free (phones: top ~55%; desktop: left ~70%)
  const tv=Math.tan(THREE.MathUtils.degToRad(camera.fov/2)),th2=tv*camera.aspect;
  const dv=h*1.9/(2*tv*(isPhone()?.55:1)),dh=(a.obj.fr||1)*2.8/(2*th2*(isPhone()?1:.7));
- const dc=Math.max(2.4,dv,dh);const d=close?dc:Math.max(5,dc*1.6);
+ const dc=Math.max(2.4,dv,dh);let d=close?dc:Math.max(5,dc*1.6);
  // look at the animal's face: models face +X inside their holder, view from a 3/4 front angle
- a.obj.holder.getWorldQuaternion(_q);const f=V(1,0,0).applyQuaternion(_q);const th=Math.atan2(f.x,f.z)+.55;
+ a.obj.holder.getWorldQuaternion(_q);const f=V(1,0,0).applyQuaternion(_q);let th=Math.atan2(f.x,f.z)+.55;
  const bx=new THREE.Box3().setFromObject(a.obj.g);const cy=Math.min((bx.min.y+bx.max.y)/2,p.y+h*.6);
+ const phi=close?1.0:1.05,tgt=V(p.x,cy,p.z);
+ // like a game camera: if trees, bushes or rocks would hide the animal, try other angles, else move in front of them
+ const v=clearView(a,tgt,d,phi,th);th=v.th;d=v.d;
  cam.hold=a;if(NAV&&NAV.playing&&NAV.follow){NAV.follow=false;updNavbar()}
- flyTo(V(p.x,cy,p.z),d,close?1.0:1.05,th,close?900:1300)}
+ flyTo(tgt,d,phi,th,close?900:1300)}
+const VB={};const _vr=new THREE.Raycaster();
+function viewBlockers(z){if(VB[z.id])return VB[z.id];const list=[];   // solid scenery in this area + the forest around it (not animals, glass domes, labels, floor)
+ z.group.traverse(o=>{if((o.isMesh||o.isInstancedMesh)&&!o.userData.animal&&!o.userData.isOutline&&!o.userData.zone&&o.material&&!o.material.transparent&&o.material.type!=='MeshBasicMaterial')list.push(o)});
+ world.children.forEach(o=>{if(o.isInstancedMesh)list.push(o)});return VB[z.id]=list}
+/* sight lines from 9 points on the animal (its box centre and 8 corners pulled 25% inward: head, tail, feet, back)
+   to the camera; any hit = blocked. Returns how far the nearest obstacle is from the animal, or Infinity when clear. */
+const _ab=new THREE.Box3(),_ac=new THREE.Vector3();
+function viewHit(a,tgt,dir,d,objs){const cp=tgt.clone().addScaledVector(dir,d);_ab.setFromObject(a.obj.g);_ab.getCenter(_ac);
+ const pts=[_ac.clone()];for(const x of [_ab.min.x,_ab.max.x])for(const y of [_ab.min.y,_ab.max.y])for(const z of [_ab.min.z,_ab.max.z])pts.push(V(x,y,z).lerp(_ac,.25));
+ let first=Infinity;
+ for(const s of pts){const v=cp.clone().sub(s);const len=v.length();_vr.set(s,v.normalize());_vr.far=len;
+  const hit=_vr.intersectObjects(objs,false).find(h=>h.distance>.15);if(hit)first=Math.min(first,hit.distance+s.distanceTo(tgt)*.5)}
+ return first}
+function viewDir(phi,th){return V(Math.sin(phi)*Math.sin(th),Math.cos(phi),Math.sin(phi)*Math.cos(th))}
+function clearView(a,tgt,d,phi,th0){const objs=viewBlockers(ZI[a.z]);let best={th:th0,d:d,free:0};
+ for(const dt of [0,.5,-.5,1,-1,1.6,-1.6,2.4,-2.4,3.14]){const th=th0+dt;const hit=viewHit(a,tgt,viewDir(phi,th),d,objs);
+  if(hit===Infinity)return {th,d};                           // nothing in the way
+  if(hit>best.free)best={th,d:Math.max(1.6,hit-.6),free:hit}}
+ return {th:best.th,d:best.d}}                               // every angle blocked: stand in front of the nearest obstacle
 /* shift the picture away from the open info card so the focused animal stays in the free area */
 const VOFF={x:0,y:0,tx:0,ty:0};
 function updViewOffset(){const open=!$('cardWrap').classList.contains('collapsed');VOFF.tx=0;VOFF.ty=0;
@@ -2090,7 +2119,7 @@ function loop(){requestAnimationFrame(loop);const t=clock.getElapsedTime();const
  feedTick(dt,t);viewOffsetTick(dt);
  if(NAV)navTick(dt,t);
  if(WALK.on)walkTick(dt,t);
- applyCam();perfTick(dt);
+ applyCam();perfTick(dt);habitatLodTick();
  for(const a of A){const o=a.obj;if(!o.holder.parent.visible)continue;const near=camera.position.distanceTo(o.holder.getWorldPosition(tmpV));
   if(near<70||o.bounce>0)o.built.update(t,o.ph);          // far-away animals are too small to see moving
   const olOn=near<55||current===a;if(o.outlines&&o.olOn!==olOn){o.olOn=olOn;o.outlines.forEach(m=>m.visible=olOn)}   // outlines only up close
@@ -2135,6 +2164,68 @@ function mergeStatic(root,skip){root.updateMatrixWorld(true);const inv=new THREE
   if(g.ol){const ol=new THREE.Mesh(mesh.geometry,g.ol);ol.userData.isOutline=true;ol.raycast=function(){};ol.matrixAutoUpdate=false;mesh.add(ol)}
   g.items.forEach(it=>it.o.parent.remove(it.o))}
  return [before,after]}
+/* ============================ HABITATS ============================
+   Plants, rocks and ground cover from models/habitat-kit.glb (blender/make_habitat.py), placed per habitat.
+   One InstancedMesh per plant type per area (all copies drawn at once). Small ground cover is only drawn up close.
+   Recipe entries: [kit asset, copies per square unit, kind]   kind: 'big' = drawn from afar with outline,
+   'ground' = colour patches always drawn, otherwise small cover hidden when far away. */
+const HAB_RECIPES={
+ forest:[['grass',.3],['grass_dark',.15],['fern',.05],['fern_dark',.04],['flower_white',.03],['flower_yellow',.02],['mushrooms',.015],['bamboo',.004,'big'],['bush',.012,'big'],['log',.004,'big'],['stump',.004,'big'],['rock',.01,'big'],['patch_green',.012,'ground']],
+ farm:[['grass',.35],['flower_red',.05],['flower_yellow',.05],['flower_white',.04],['flower_pink',.03],['sunflower',.015],['haybale',.006,'big'],['bush_flower',.008,'big'],['patch_dirt',.012,'ground']],
+ rainforest:[['grass_dark',.2],['fern',.06],['fern_dark',.06],['bigleaf',.025,'big'],['palm_small',.008,'big'],['mushrooms',.01],['flower_pink',.015],['flower_red',.01],['log',.004,'big'],['patch_green',.012,'ground']],
+ desert:[['grass_dry',.12],['cactus',.01,'big'],['cactus_barrel',.015,'big'],['bush_dry',.01,'big'],['rock',.015,'big'],['rock_flat',.01,'big'],['patch_sand',.015,'ground']],
+ outback:[['spinifex',.05],['grass_dry',.15],['rock_red',.02,'big'],['bush_dry',.01,'big'],['patch_dirt',.012,'ground']],
+ savanna:[['grass_tall',.12],['grass_dry',.25],['flower_yellow',.01],['termite_mound',.003,'big'],['bush_dry',.008,'big'],['rock_flat',.006,'big'],['patch_dirt',.006,'ground']],
+ temperate:[['grass',.3],['flower_purple',.03],['flower_white',.03],['flower_yellow',.02],['mushrooms',.01],['bush_autumn',.012,'big'],['pine_small',.008,'big'],['birch',.004,'big'],['log',.004,'big'],['rock',.008,'big']],
+ aviary:[['grass',.3],['flower_pink',.05],['flower_red',.05],['flower_purple',.04],['bush_flower',.012,'big'],['bush',.008,'big'],['patch_green',.01,'ground']],
+ koala:[['grass',.25],['flower_yellow',.02],['bush',.01,'big'],['rock',.01,'big']],
+ panda:[['grass',.3],['fern',.02],['flower_white',.015],['bamboo',.01,'big'],['rock',.012,'big']],
+ insect:[['grass',.2],['flower_red',.09],['flower_yellow',.09],['flower_purple',.08],['flower_pink',.08],['flower_white',.05],['sunflower',.025],['fern',.02],['bush_flower',.015,'big']],
+ reptile:[['grass_dark',.15],['fern',.05],['fern_dark',.03],['mushrooms',.01],['bigleaf',.01,'big'],['log',.006,'big'],['rock',.02,'big']],
+ penguin:[['ice',.02,'big'],['rock_snow',.015,'big']]};
+const HAB_FOR={koala:'koala',panda:'panda',insect:'insect',reptile:'reptile',penguin:'penguin'};   // indoor houses get their own recipe
+const HAB_SIZES=[[/^grass_tall/,1.3,1.8],[/^grass/,1.6,2.4],[/^flower/,1.6,2.3],[/^sunflower/,1.2,1.6],[/^fern/,1.3,2],[/^bush/,1.1,1.7],[/^rock/,.9,2],[/^log/,1,1.4],[/^stump/,.9,1.3],
+ [/^mushrooms/,1.4,2],[/^bamboo/,.8,1.2],[/^bigleaf/,1.1,1.7],[/^palm/,1.3,1.9],[/^cactus_barrel/,1,1.6],[/^cactus/,.9,1.5],[/^termite/,1,1.6],[/^spinifex/,1.2,1.8],[/^pine/,1.2,2],
+ [/^birch/,1,1.4],[/^ice/,1,2],[/^lilypad/,1,1.5],[/^reeds/,.9,1.3],[/^haybale/,1,1.2],[/^patch/,1.5,3]];
+function habSize(id){const e=HAB_SIZES.find(s=>s[0].test(id));return e?[e[1],e[2]]:[1,1]}
+let HABKIT=null;
+function habKit(){if(HABKIT)return HABKIT;const g=GLB[HAB_URL];if(!g)return null;HABKIT={};g.scene.updateMatrixWorld(true);
+ g.scene.children.forEach(node=>{const inv=new THREE.Matrix4().copy(node.matrixWorld).invert();const parts=[];   // ignore the preview layout offset of each asset
+  node.traverse(o=>{if(o.isMesh){const geo=o.geometry.clone();geo.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv,o.matrixWorld));parts.push({geo,mat:toonFrom(o.material)})}});
+  HABKIT[node.name]=parts});return HABKIT}
+function decorateHabitats(){const kit=habKit();if(!kit)return;let n=0,draws=0;
+ ZONES.forEach(z=>{const rec=HAB_RECIPES[HAB_FOR[z.id]||z.biome];if(!rec)return;const R=rng(hashStr(z.id)+11);const g=z.group;
+  const ponds=g.userData.ponds||[];const area=Math.PI*z.r*z.r;
+  // each animal also keeps a clear view cone toward where the close-up camera stands (front, 3/4 angle — see focusAnimal)
+  const blockers=A.filter(a=>a.z===z.id).map(a=>{const h=a.obj.holder,th=h.rotation.y+Math.PI/2+.55;
+   return {x:h.position.x,z:h.position.z,r:a.obj.fr||1,vx:Math.sin(th),vz:Math.cos(th)}});
+  if(z.id==='rainforest')blockers.push({x:-z.r*.42,z:-z.r*.4,r:4.4,bigOnly:true});   // Pangolin Dome
+  z.cover=[];z.habOl=[];z.habBig=[];
+  const place=(id,count,kind,where)=>{const parts=kit[id];if(!parts||count<1)return;const big=kind==='big';const sz=habSize(id);const ms=[];
+   for(let tries=0;ms.length<count&&tries<count*12;tries++){let x,zz,y=.25;
+    if(where){const p=where(R);x=p.x;zz=p.z;y=p.y}
+    else{const a=R()*Math.PI*2,rr=Math.sqrt(R())*z.r*(big?.82:.93);x=Math.cos(a)*rr;zz=Math.sin(a)*rr;
+     if(ponds.some(p=>Math.hypot(x-p.x,zz-p.z)<p.r+(big?.6:.15)))continue;                                           // not in the water
+     if(blockers.some(b=>(!b.bigOnly||big)&&Math.hypot(x-b.x,zz-b.z)<b.r+(big?.9:.25)))continue                       // keep animals visible
+     if(big&&blockers.some(b=>{if(b.vx===undefined)return false;const dx=x-b.x,dz=zz-b.z,d=Math.hypot(dx,dz);return d<7.5&&(dx*b.vx+dz*b.vz)/(d||1)>.55}))continue}   // …and their close-up view
+    const s=sz[0]+R()*(sz[1]-sz[0]);
+    ms.push(new THREE.Matrix4().compose(V(x,y,zz),new THREE.Quaternion().setFromAxisAngle(UP,R()*Math.PI*2),V(s,s,s)))}
+   if(!ms.length)return;
+   parts.forEach(pt=>{const im=new THREE.InstancedMesh(pt.geo,pt.mat,ms.length);const col=new THREE.Color();
+    ms.forEach((m,k)=>{im.setMatrixAt(k,m);const b=.86+R()*.24;im.setColorAt(k,col.setRGB(b,b,b))});   // slight shade variation
+    im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true;im.frustumCulled=false;g.add(im);draws++;if(big)z.habBig.push(im);
+    if(big){const ol=new THREE.InstancedMesh(pt.geo,outlineMat(.9),ms.length);ms.forEach((m,k)=>ol.setMatrixAt(k,m));ol.instanceMatrix.needsUpdate=true;
+     ol.userData.isOutline=true;ol.raycast=function(){};ol.frustumCulled=false;g.add(ol);z.habOl.push(ol);draws++}
+    else if(kind!=='ground')z.cover.push(im)});
+   n+=ms.length};
+  rec.forEach(([id,dens,kind])=>place(id,Math.round(dens*area),kind));
+  if(!['desert','outback','indoor-ice'].includes(z.biome))ponds.forEach(p=>{   // water plants
+   place('lilypad',Math.max(2,Math.round(p.r*p.r*.5)),'',R=>{const a=R()*Math.PI*2,rr=Math.sqrt(R())*Math.max(.2,p.r-.45);return{x:p.x+Math.cos(a)*rr,z:p.z+Math.sin(a)*rr,y:.315}});
+   place('reeds',Math.round(p.r*2.2),'',R=>{const a=R()*Math.PI*2,rr=p.r+.1+R()*.3;return{x:p.x+Math.cos(a)*rr,z:p.z+Math.sin(a)*rr,y:.25}})})});
+ console.log(`decorateHabitats: ${n} plants, ${draws} draw calls`)}
+function habitatLodTick(){for(const z of ZONES){if(!z.cover)continue;const d=camera.position.distanceTo(tmpV.set(z.x,z.y,z.z));
+ const near=AREA===z||(!AREA&&d<z.r+60);if(z.coverOn!==near){z.coverOn=near;z.cover.forEach(m=>m.visible=near)}     // grass and flowers only up close
+ const ol=AREA===z||(!AREA&&d<z.r+45);if(z.habOlOn!==ol){z.habOlOn=ol;z.habOl.forEach(m=>m.visible=ol)}}}
 function optimizeScene(){let b=0,a=0;
  ZONES.forEach(z=>{const r=mergeStatic(z.group,o=>!!o.userData.zone);b+=r[0];a+=r[1]});
  const r=mergeStatic(world,o=>o===terrainMesh);b+=r[0];a+=r[1];
@@ -2144,7 +2235,7 @@ function perfTick(dt){if(dt<=0)return;Perf.acc+=dt;Perf.n++;if(Perf.acc<2)return
  const fps=Perf.n/Perf.acc;Perf.acc=0;Perf.n=0;const now=performance.now();if(now-Perf.last<3000)return;
  let pr=Perf.pr;if(fps<40&&pr>.75)pr=Math.max(.75,pr-.25);else if(fps>57&&pr<Perf.max)pr=Math.min(Perf.max,pr+.25);
  if(pr!==Perf.pr){Perf.pr=pr;Perf.last=now;renderer.setPixelRatio(pr);renderer.setSize(innerWidth,innerHeight,false)}}
-function init(){drawPaper();buildWorld();ZONES.forEach(buildZone);placeAnimals();buildTrain();initNav();buildTrainSystem();optimizeScene();initMe();buildIndex();buildList();buildSong();renderWelcome();
+function init(){drawPaper();buildWorld();ZONES.forEach(buildZone);placeAnimals();decorateHabitats();buildTrain();initNav();buildTrainSystem();optimizeScene();initMe();buildIndex();buildList();buildSong();renderWelcome();
  Speech.load();if(Speech.browser)speechSynthesis.onvoiceschanged=()=>Speech.load();
  if(window.claude&&typeof window.claude.use==='function'){window.claude.use('tts').then(t=>{if(t){Speech.cl=t;Speech.load();if(!$('card').querySelector('#wFind'))return;renderWelcome()}}).catch(()=>{})}initDictation();
  if(isPhone())cam.dist=OV_D*1.45;resize();applyCam();$('loading').hidden=true;loop();setTimeout(()=>toast('Tap an animal to hear its English name · 點動物聽英文名字'),900)}
