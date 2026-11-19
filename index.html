@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!-- Content-Security-Policy: only this site, the two pinned three.js files and Google Fonts may load.
      The inline script is allowed by its sha256 hash, which tools/csp_hash.py updates (publish.sh runs it). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-VgB6t8NJuKP6l/dvA6fMhblfZzv8imNAXkiu0xf22j4='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-TXoOh5BL9xr243+1oEoK3hPHUpu/0R2/rZwjaE/U3qE='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Taipei Zoo 3D English Guide</title>
@@ -1845,7 +1845,9 @@ function safeAvatar(s){return typeof s==='string'&&s.length<120000&&/^data:image
 let AVATAR=AVATAR_DEFAULT;try{const s=safeAvatar(localStorage.getItem(KEY_AVATAR));if(s)AVATAR=s;localStorage.removeItem('zooAvatar')}catch(e){}
 let ME=null,ME_ERR=null,ME_OUT=null,geoWatch=null,placing=false,meFollow=false,firstFix=true;
 const mePin=new THREE.Group();scene.add(mePin);mePin.visible=false;let meSprite=null,accDisc=null,mePulse=null;
-function avatarTexture(src,cb){const img=new Image();img.onload=()=>{const N=256,c=document.createElement('canvas');c.width=N;c.height=N+48;const x=c.getContext('2d');
+function avatarTexture(src,cb){const img=new Image();
+ img.onerror=()=>{if(src!==AVATAR_DEFAULT){AVATAR=AVATAR_DEFAULT;try{localStorage.removeItem(KEY_AVATAR)}catch(e){}avatarTexture(AVATAR_DEFAULT,cb)}};   // broken saved photo → default avatar
+ img.onload=()=>{const N=256,c=document.createElement('canvas');c.width=N;c.height=N+48;const x=c.getContext('2d');
   x.fillStyle='#2F7DE1';x.beginPath();x.moveTo(N/2-26,N-24);x.lineTo(N/2,N+44);x.lineTo(N/2+26,N-24);x.closePath();x.fill();
   x.beginPath();x.arc(N/2,N/2,N/2-2,0,Math.PI*2);x.fillStyle='#2F7DE1';x.fill();x.beginPath();x.arc(N/2,N/2,N/2-16,0,Math.PI*2);x.fillStyle='#fff';x.fill();
   x.save();x.beginPath();x.arc(N/2,N/2,N/2-24,0,Math.PI*2);x.clip();const s=Math.min(img.width,img.height);x.drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,24,24,N-48,N-48);x.restore();
@@ -1876,8 +1878,9 @@ function startGPS(){ME_ERR=null;ME_OUT=null;
 function onGPS(lat,lng,acc){ME_ERR=null;const gp=proj(lat,lng);
  if(nearestParkDist(gp.x,gp.z)*M_GEO>250){const g=proj(...GEO_GATE);ME_OUT={dGate:Math.hypot(gp.x-g.x,gp.z-g.z)*M_GEO};if($('meCard'))renderMe();return}
  ME_OUT=null;const m=geoToMap(lat,lng);const was=ME&&ME.near;setMe(m.x,m.z,'gps',acc,{lat,lng});
- if(firstFix){firstFix=false;centerOnMe();Speech.say(sayWhere())}
- if($('meCard')&&(was!==ME.near||!$('meHead')))renderMe();else if($('meAcc'))$('meAcc').textContent=accText()}
+ const first=firstFix;if(firstFix){firstFix=false;centerOnMe();Speech.say(sayWhere())}
+ // first fix (or coming back from an error / outside the park): redraw so "Finding you…" and old notes go away
+ if($('meCard')&&(first||was!==ME.near||!$('meHead')))renderMe();else if($('meAcc'))$('meAcc').textContent=accText()}
 function accText(){return ME?(ME.src==='gps'?`GPS · within about ${Math.max(5,Math.round(ME.acc))} m`:ME.src==='walk'?'Moved with the arrow keys':'Marked on the map by hand'):''}
 function sayWhere(){if(!ME)return'';const z=ZI[ME.near];return ME.inside?`You are in ${the(z)}.`:`You are near ${the(z)}.`}
 function closestAnimals(n){if(!ME)return[];return A.map(a=>{const p=worldPos(a);return{a,d:Math.hypot(p.x-ME.x,p.z-ME.z)*M_GEO}}).sort((p,q)=>p.d-q.d).slice(0,n)}
@@ -1895,8 +1898,8 @@ function renderMe(){current=null;openCard();const nz=ME?ZI[ME.near]:null;
  ${ME?`<div class="say"><button class="btn" id="meCenter" type="button">Show me</button><button class="btn" id="meFollow" type="button" aria-pressed="${meFollow}">${meFollow?'Following me':'Follow me'}</button><button class="btn" id="meClear" type="button">Clear</button></div>
  <h4 class="res-h" style="padding-left:0">Closest animals · 附近的動物</h4><div class="alist" style="padding-left:0">${closestAnimals(6).map(({a,d})=>`<button type="button" data-a="${a.id}">${a.n}<small>${a.zh} · ${Math.max(10,Math.round(d/10)*10)} m</small></button>`).join('')}</div>`:''}
  <div class="say"><label class="btn" for="mePhoto">Change photo</label><input type="file" id="mePhoto" accept="image/*" hidden>${AVATAR!==AVATAR_DEFAULT?'<button class="btn" id="mePhotoReset" type="button">Remove my photo · 移除我的照片</button>':''}</div>
- <p class="sci" style="font-style:normal">Your photo and location stay on this device and are never uploaded. A photo is remembered in this browser until you remove it.<br>照片和位置只留在這台裝置，不會上傳；照片會記在這個瀏覽器裡，可以隨時移除。</p>`;
- $('card').querySelector('.me-photo img').src=AVATAR;   // set as a property, never inside the HTML string
+ <p class="sci" style="font-style:normal">This page never sends your photo or GPS coordinates anywhere. A photo is remembered in this browser until you remove it. (Read-aloud may use your device's speech service, which only hears the area name.)<br>這個網頁不會把你的照片或 GPS 座標傳到任何地方；照片會記在這個瀏覽器裡，可以隨時移除。（朗讀功能可能使用裝置的語音服務，只會用到展區名稱。）</p>`;
+ {const im=$('card').querySelector('.me-photo img');im.onerror=()=>{im.onerror=null;im.src=AVATAR_DEFAULT};im.src=AVATAR}   // set as a property, never inside the HTML string
  $('cClose').onclick=()=>{placing=false;canvas.classList.remove('placing');NAV?renderNav():renderWelcome()};
  $('meGps').onclick=()=>{if(geoWatch!=null)stopGPS();else startGPS()};$('meWalk').onclick=startWalk;
  $('meTap').onclick=()=>{placing=!placing;canvas.classList.toggle('placing',placing);exitArea();if(placing){overview();if(isPhone())collapseCard()}renderMe()};
@@ -1910,7 +1913,7 @@ function renderMe(){current=null;openCard();const nz=ME?ZI[ME.near]:null;
 // GPS only starts when the person presses "Use GPS" (opening this card or a voice "where am I" never starts it)
 function openMe(){stopTour();exitArea();renderMe();if(ME)centerOnMe();if(isPhone())$('side').classList.remove('open')}
 function stopGPS(){if(geoWatch!=null){try{navigator.geolocation.clearWatch(geoWatch)}catch(e){}geoWatch=null}
- if(ME&&ME.src==='gps'){ME=null;mePin.visible=false;meFollow=false;if(NAV)NAV.live=false}ME_ERR=null;ME_OUT=null;renderMe()}
+ if(ME&&ME.src==='gps'){ME=null;here=null;mePin.visible=false;meFollow=false;if(NAV)NAV.live=false}ME_ERR=null;ME_OUT=null;renderMe()}   // here=null: routes no longer start from the old GPS spot
 function groundAt(x,y){const r=canvas.getBoundingClientRect();ndc.set((x-r.left)/r.width*2-1,-(y-r.top)/r.height*2+1);ray.setFromCamera(ndc,camera);
  const hits=ray.intersectObjects([terrainMesh].concat(ZONES.map(z=>z.disc)),false);for(const h of hits){if(visChain(h.object))return h.point}return null}
 /* live GPS guidance along a planned route */
@@ -2006,7 +2009,11 @@ const FOODS=[
  {id:'flower',en:'flowers and nectar',zh:'花和花蜜',ic:'🌸',re:/nectar|flowers/i},
  {id:'seeds',en:'seeds and grain',zh:'種子和穀物',ic:'🌰',re:/seeds|grain|roots/i}];
 let FEED=null;const FX=[];
-let FED=new Set();try{const v=JSON.parse(localStorage.getItem(KEY_FED)||'[]');if(Array.isArray(v))FED=new Set(v.filter(id=>typeof id==='string'&&AI[id]))}catch(e){}
+let FED=new Set();try{
+ const isAnimal=id=>typeof id==='string'&&Object.prototype.hasOwnProperty.call(AI,id);
+ const read=k=>{try{const v=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(v)?v.filter(isAnimal):[]}catch(e){return[]}};
+ FED=new Set(read(KEY_FED).concat(read('zooFed')));   // carry over progress saved under the old key
+ if(localStorage.getItem('zooFed')!==null){localStorage.setItem(KEY_FED,JSON.stringify([...FED]));localStorage.removeItem('zooFed')}}catch(e){}
 function saveFed(){try{localStorage.setItem(KEY_FED,JSON.stringify([...FED]))}catch(e){}}
 function eats(a,f){return f.re.test(a.d)}
 /* name inside a sentence: "the giant panda", but keep proper words like "the Formosan black bear" */
