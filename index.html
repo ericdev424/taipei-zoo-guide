@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!-- Content-Security-Policy: only this site, the two pinned three.js files and Google Fonts may load.
      The inline script is allowed by its sha256 hash, which tools/csp_hash.py updates (publish.sh runs it). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-LvI6cwi9YfXBuZU+S2vY6ENJPjygenk8JIkntAJgRPQ=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-oLnEXbFIGCjzOLI0yYTVILiKYQujUGQ+0AxSNrR/byM=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Taipei Zoo 3D English Guide</title>
@@ -427,7 +427,7 @@ body.learning .tourbar{bottom:130px}
   <button class="btn" id="dpOff" type="button">Done walking</button>
 </div>
 <div class="toast" id="toast" hidden></div>
-<div class="hint">Tap an animal to hear it · Tap again to look closer · Drag to turn · Scroll or ＋/－ to zoom · Esc to let go</div>
+<div class="hint">Drag to move · Right-drag or two fingers to turn · Tap an animal to hear it, tap again to look closer · Scroll or ＋/－ to zoom · Esc to let go</div>
 <div class="foot"><b>Unofficial student project · 非官方學習作品</b>, not affiliated with Taipei Zoo · Sources: <a href="https://english.zoo.gov.taipei/" referrerpolicy="no-referrer">english.zoo.gov.taipei</a> · simplified park layout</div>
 
 <!-- integrity: the browser refuses to run these files if the CDN ever serves anything different
@@ -1127,16 +1127,21 @@ const GLB={};
 // every animal tries its Blender model models/<id>.glb (made by blender/make_animals.py; the panda by make_panda.py)
 A.forEach(a=>{if(!a.m.glb)a.m.glb='models/'+a.id+'.glb'});
 const TOONC={};
-function toonFrom(old){const k=old.color.getHexString()+'|'+old.side+'|'+(old.transparent?old.opacity:1);if(TOONC[k])return TOONC[k];
+// variant keeps materials of instanced plants (per-instance colour), weather and animals apart: three r128 doesn't
+// recompile a shared material when one mesh has instanceColor and another doesn't, which breaks rendering
+function toonFrom(old,variant){const k=(variant||'')+'|'+old.color.getHexString()+'|'+old.side+'|'+(old.transparent?old.opacity:1);if(TOONC[k])return TOONC[k];
  const o={color:old.color.clone(),side:old.side};if(old.transparent){o.transparent=true;o.opacity=old.opacity;o.depthWrite=false}
  return TOONC[k]=toon(o)}
 function preloadGLB(){
  if(!THREE.GLTFLoader)return Promise.resolve();
  const loader=new THREE.GLTFLoader();
- if(THREE.DRACOLoader){const dr=new THREE.DRACOLoader();dr.setDecoderPath('vendor/draco/');dr.setDecoderConfig({type:'wasm'});loader.setDRACOLoader(dr)}   // models are Draco-compressed
- const urls=[...new Set(A.map(a=>a.m.glb).filter(Boolean).concat([HAB_URL]))];
- return Promise.all(urls.map(u=>new Promise(res=>loader.load(u,g=>{GLB[u]=g;res()},undefined,e=>{console.warn('GLB load failed, using built-in shape:',u,e);res()}))))}
-const HAB_URL='models/habitat-kit.glb';
+ let dr=null;if(THREE.DRACOLoader){dr=new THREE.DRACOLoader();dr.setDecoderPath('vendor/draco/');dr.setDecoderConfig({type:'wasm'});loader.setDRACOLoader(dr)}   // models are Draco-compressed
+ const urls=[...new Set(A.map(a=>a.m.glb).filter(Boolean).concat([HAB_URL,WX_URL]))];
+ const all=Promise.all(urls.map(u=>new Promise(res=>loader.load(u,g=>{GLB[u]=g;res()},undefined,e=>{console.warn('GLB load failed, using built-in shape:',u,e);res()}))));
+ // never wait forever: if the decoder or a file hangs, start with whatever loaded (the rest use built-in shapes)
+ const limit=new Promise(res=>setTimeout(()=>{console.warn('Model loading took too long; continuing without the missing ones');res()},25000));
+ return Promise.race([all,limit]).finally(()=>{if(dr)dr.dispose()})}   // free the decoder workers once loading is done
+const HAB_URL='models/habitat-kit.glb',WX_URL='models/weather-kit.glb';
 function buildGLB(o){
  const src=GLB[o.glb];const g=new THREE.Group();const m=src.scene.clone(true);
  m.traverse(n=>{if(n.isMesh)n.material=toonFrom(n.material)});
@@ -1144,7 +1149,7 @@ function buildGLB(o){
  g.add(m);   // without glbH the model is already in the page's units (same as the hand-built shapes)
  const mixer=new THREE.AnimationMixer(m);src.animations.forEach(c=>mixer.clipAction(c).play());
  let last=null;
- return {g,head:m,update(t,ph){const dt=last==null?ph%4:Math.min(.1,Math.max(0,t-last));last=t;mixer.update(dt)}}}
+ return {g,head:m,mixer,update(t,ph){const dt=last==null?ph%4:Math.min(.1,Math.max(0,t-last));last=t;mixer.update(dt)}}}
 
 /* ---------- real geography: zone pins from Google Maps, projected at 7 m per map unit ---------- */
 const GEO0={lat:24.9945,lng:121.5857},M_GEO=7;
@@ -1312,7 +1317,8 @@ function placeAnimals(){
    const lab=makeLabel(a.n,a.zh,{bg:'#FFFDF7',fg:'#2B2420',w:Math.min(4.2,Math.max(2.8,a.n.length*.16)),small:true});lab.position.set(px,.25+h+.9,pz);lab.visible=false;lab.userData.animalLabel=true;z.group.add(lab);
    const ring=new THREE.Mesh(new THREE.TorusGeometry(1,.08,6,32),new THREE.MeshBasicMaterial({color:'#F5C531'}));ring.rotation.x=Math.PI/2;ring.position.set(px,.32,pz);ring.scale.setScalar(Math.max(.8,fr+.3));ring.visible=false;z.group.add(ring);
    holder.traverse(o=>{o.userData.animal=a.id});pickables.push(holder);
-   a.obj={holder,g,built,h,fr,lab,ring,ph:R2()*6.28,bounce:0}});
+   holder.rotation.order='YXZ';   // yaw = heading, x = roll around the body (birds bank when they turn)
+   a.obj={holder,g,built,h,fr,lab,ring,sh,ph:R2()*6.28,bounce:0}});
  });
 }
 
@@ -1478,21 +1484,27 @@ $('voiceSel').onchange=e=>{Speech.apply(e.target.value);Speech.say('Hello! Welco
 $('rateSel').onchange=e=>{Speech.rateIdx=+e.target.value};
 
 /* ============================ INPUT ============================ */
-const pointers=new Map();let drag=null,pinch0=0,downAt=null;
+const pointers=new Map();let drag=null,pinch0=0,twist0=null,downAt=null;
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});downAt={x:e.clientX,y:e.clientY,t:performance.now()};
- drag={x:e.clientX,y:e.clientY,pan:e.button===2||e.shiftKey};if(pointers.size===2){const p=[...pointers.values()];pinch0=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y)}canvas.classList.add('grabbing')});
+ // drag = move the map; right-drag or Shift/Ctrl/Alt-drag = turn. (Looking at one animal or one area: drag turns around it.)
+ drag={x:e.clientX,y:e.clientY,rot:e.button===2||e.shiftKey||e.ctrlKey||e.altKey};
+ if(pointers.size===2){const p=[...pointers.values()];pinch0=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);twist0=Math.atan2(p[1].y-p[0].y,p[1].x-p[0].x)}canvas.classList.add('grabbing')});
 canvas.addEventListener('pointermove',e=>{
  if(!pointers.has(e.pointerId)){hoverAt(e.clientX,e.clientY);return}
  const prev=pointers.get(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
  if(pointers.size===2){const p=[...pointers.values()];const d=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);if(pinch0){cam.dist=THREE.MathUtils.clamp(cam.dist*pinch0/d,minDist(),260);pinch0=d}
-  const dx=(e.clientX-prev.x)/2,dy=(e.clientY-prev.y)/2;panBy(dx,dy);cam.fly=null;return}
+  // two fingers: pinch = zoom, twist = turn, slide up/down together = tilt
+  const a=Math.atan2(p[1].y-p[0].y,p[1].x-p[0].x);if(twist0!=null){let da=a-twist0;da=Math.atan2(Math.sin(da),Math.cos(da));cam.theta+=da}twist0=a;
+  cam.phi=THREE.MathUtils.clamp(cam.phi-(e.clientY-prev.y)/2*.006,.2,1.42);cam.fly=null;autoRot=false;if(cam.spin){cam.spin=false;updCloseBtns()}return}
  if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;if(Math.abs(dx)+Math.abs(dy)>0)cam.fly=null;if(Math.abs(dx)+Math.abs(dy)>2){autoRot=false;meFollow=false;if(cam.spin){cam.spin=false;updCloseBtns()}if(NAV&&NAV.playing&&NAV.follow){NAV.follow=false;updNavbar()}}
- if(drag.pan)panBy(dx,dy);else{cam.theta-=dx*.006;cam.phi=THREE.MathUtils.clamp(cam.phi-dy*.005,.2,1.42)}});
+ const turn=drag.rot||!!cam.hold||!!AREA;
+ if(turn){cam.theta-=dx*.006;cam.phi=THREE.MathUtils.clamp(cam.phi-dy*.005,.2,1.42)}
+ else{panBy(dx,dy);if(Math.abs(dx)+Math.abs(dy)>2)meFollow=false}});
 function panBy(dx,dy){const k=cam.dist*.0016;const sx=Math.cos(cam.theta),sz=-Math.sin(cam.theta);const fx=-Math.sin(cam.theta),fz=-Math.cos(cam.theta);
  cam.target.x+=(-dx*sx+dy*fx*-1)*k;cam.target.z+=(-dx*sz+dy*fz*-1)*k;cam.target.x=THREE.MathUtils.clamp(cam.target.x,PARK.min.x-25,PARK.max.x+25);cam.target.z=THREE.MathUtils.clamp(cam.target.z,PARK.min.z-25,PARK.max.z+25);cam.target.y=terrainH(cam.target.x,cam.target.z)+1}
 function endPtr(e){const wasTap=downAt&&pointers.size===1&&Math.hypot(e.clientX-downAt.x,e.clientY-downAt.y)<7&&performance.now()-downAt.t<600;
- pointers.delete(e.pointerId);if(pointers.size<2)pinch0=0;if(pointers.size===0){drag=null;canvas.classList.remove('grabbing')}
+ pointers.delete(e.pointerId);if(pointers.size<2){pinch0=0;twist0=null}if(pointers.size===0){drag=null;canvas.classList.remove('grabbing')}
  if(wasTap&&e.type==='pointerup')pickAt(e.clientX,e.clientY)}
 canvas.addEventListener('pointerup',endPtr);canvas.addEventListener('pointercancel',endPtr);
 canvas.addEventListener('wheel',e=>{e.preventDefault();cam.fly=null;cam.dist=THREE.MathUtils.clamp(cam.dist*(1+Math.sign(e.deltaY)*Math.min(.25,Math.abs(e.deltaY)*.0015)),minDist(),260)},{passive:false});
@@ -1618,7 +1630,7 @@ function areaStep(d){const i=ROUTE.indexOf((AREA||ZI[ROUTE[0]]).id);areaView(ZI[
 function updAreabar(){if(!AREA)return;const i=ROUTE.indexOf(AREA.id);$('abTxt').innerHTML=`<b>${i+1} / ${ROUTE.length}</b> ${AREA.n} <small>${AREA.zh}</small>`}
 function renderArea(z){const list=A.filter(a=>a.z===z.id);const i=ROUTE.indexOf(z.id);const pv=ZI[ROUTE[(i-1+ROUTE.length)%ROUTE.length]],nx=ZI[ROUTE[(i+1)%ROUTE.length]];
  openCard();
- $('card').innerHTML=`<button class="close" id="cClose" type="button" aria-label="Back to the full map">✕</button><span class="zp">Area ${i+1} of ${ROUTE.length} · ${z.kind}</span><h2>${z.n}</h2><div class="zh">${z.zh}</div>
+ $('card').innerHTML=`<button class="close" id="cClose" type="button" aria-label="Back to the full map">✕</button><span class="zp">Area ${i+1} of ${ROUTE.length} · ${z.kind}</span><h2>${z.n}</h2><div class="zh">${z.zh}</div>${z.wx&&z.wx.length?`<span class="chip" style="background:#E7EFDD;color:#2B2420">${WX_LABEL[z.wx[0].kind]}</span>`:''}
  <div class="say"><button class="btn primary" id="zRead" type="button">${ICON_SPK}Read aloud</button><button class="btn sign" id="zGo" type="button">${ICON_WALK}Take me here</button></div>
  <p class="intro">${z.blurb}</p><div class="alist" style="padding-left:0">${list.map(a=>`<button type="button" data-a="${a.id}">${a.n}<small>${a.zh}</small></button>`).join('')}</div>
  <div class="nav"><button class="btn" id="aPrev" type="button">← ${pv.n}</button><button class="btn" id="aNext" type="button">${nx.n} →</button></div>`;
@@ -1936,7 +1948,8 @@ function renderMe(){current=null;openCard();const nz=ME?ZI[ME.near]:null;
  $('meZone').onchange=e=>{const z=ZI[e.target.value];if(!z)return;setMe(z.inside.x,z.inside.z,'manual',0,null);centerOnMe();renderMe();Speech.say(sayWhere())};
  if(ME){$('meCenter').onclick=centerOnMe;$('meFollow').onclick=()=>{meFollow=!meFollow;if(meFollow)centerOnMe();renderMe()};$('meClear').onclick=clearMe;
   $('card').querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>planRoute({a:AI[b.dataset.a]}))}
- $('mePhoto').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=c.height=220;const s=Math.min(img.width,img.height);c.getContext('2d').drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,220,220);
+ $('mePhoto').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;
+  if(!/^image\/(jpeg|png|webp|gif|heic|heif)$/.test(f.type)||f.size>15*1024*1024){const m=$('meMsg');if(m)m.textContent='Please choose a photo under 15 MB (JPG, PNG, WebP or HEIC). 請選 15 MB 以下的照片。';e.target.value='';return}const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=c.height=220;const s=Math.min(img.width,img.height);c.getContext('2d').drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,220,220);
    AVATAR=c.toDataURL('image/jpeg',.86);try{localStorage.setItem(KEY_AVATAR,AVATAR)}catch(err){}setAvatar(AVATAR);renderMe()};img.src=r.result};r.readAsDataURL(f)};
  const pr=$('mePhotoReset');if(pr)pr.onclick=()=>{AVATAR=AVATAR_DEFAULT;try{localStorage.removeItem(KEY_AVATAR)}catch(err){}setAvatar(AVATAR);renderMe()}}
 // GPS only starts when the person presses "Use GPS" (opening this card or a voice "where am I" never starts it)
@@ -2119,7 +2132,7 @@ function loop(){requestAnimationFrame(loop);const t=clock.getElapsedTime();const
  feedTick(dt,t);viewOffsetTick(dt);
  if(NAV)navTick(dt,t);
  if(WALK.on)walkTick(dt,t);
- applyCam();perfTick(dt);habitatLodTick();
+ behaviorTick(dt,t);weatherTick(dt,t);applyCam();perfTick(dt);habitatLodTick();
  for(const a of A){const o=a.obj;if(!o.holder.parent.visible)continue;const near=camera.position.distanceTo(o.holder.getWorldPosition(tmpV));
   if(near<70||o.bounce>0)o.built.update(t,o.ph);          // far-away animals are too small to see moving
   const olOn=near<55||current===a;if(o.outlines&&o.olOn!==olOn){o.olOn=olOn;o.outlines.forEach(m=>m.visible=olOn)}   // outlines only up close
@@ -2191,7 +2204,7 @@ function habSize(id){const e=HAB_SIZES.find(s=>s[0].test(id));return e?[e[1],e[2
 let HABKIT=null;
 function habKit(){if(HABKIT)return HABKIT;const g=GLB[HAB_URL];if(!g)return null;HABKIT={};g.scene.updateMatrixWorld(true);
  g.scene.children.forEach(node=>{const inv=new THREE.Matrix4().copy(node.matrixWorld).invert();const parts=[];   // ignore the preview layout offset of each asset
-  node.traverse(o=>{if(o.isMesh){const geo=o.geometry.clone();geo.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv,o.matrixWorld));parts.push({geo,mat:toonFrom(o.material)})}});
+  node.traverse(o=>{if(o.isMesh){const geo=o.geometry.clone();geo.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv,o.matrixWorld));parts.push({geo,mat:toonFrom(o.material,'habitat')})}});
   HABKIT[node.name]=parts});return HABKIT}
 function decorateHabitats(){const kit=habKit();if(!kit)return;let n=0,draws=0;
  ZONES.forEach(z=>{const rec=HAB_RECIPES[HAB_FOR[z.id]||z.biome];if(!rec)return;const R=rng(hashStr(z.id)+11);const g=z.group;
@@ -2200,7 +2213,7 @@ function decorateHabitats(){const kit=habKit();if(!kit)return;let n=0,draws=0;
   const blockers=A.filter(a=>a.z===z.id).map(a=>{const h=a.obj.holder,th=h.rotation.y+Math.PI/2+.55;
    return {x:h.position.x,z:h.position.z,r:a.obj.fr||1,vx:Math.sin(th),vz:Math.cos(th)}});
   if(z.id==='rainforest')blockers.push({x:-z.r*.42,z:-z.r*.4,r:4.4,bigOnly:true});   // Pangolin Dome
-  z.cover=[];z.habOl=[];z.habBig=[];
+  z.cover=[];z.habOl=[];z.habBig=[];z.habPts=[];
   const place=(id,count,kind,where)=>{const parts=kit[id];if(!parts||count<1)return;const big=kind==='big';const sz=habSize(id);const ms=[];
    for(let tries=0;ms.length<count&&tries<count*12;tries++){let x,zz,y=.25;
     if(where){const p=where(R);x=p.x;zz=p.z;y=p.y}
@@ -2213,7 +2226,7 @@ function decorateHabitats(){const kit=habKit();if(!kit)return;let n=0,draws=0;
    if(!ms.length)return;
    parts.forEach(pt=>{const im=new THREE.InstancedMesh(pt.geo,pt.mat,ms.length);const col=new THREE.Color();
     ms.forEach((m,k)=>{im.setMatrixAt(k,m);const b=.86+R()*.24;im.setColorAt(k,col.setRGB(b,b,b))});   // slight shade variation
-    im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true;im.frustumCulled=false;g.add(im);draws++;if(big)z.habBig.push(im);
+    im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true;im.frustumCulled=false;g.add(im);draws++;if(big){z.habBig.push(im);if(pt===parts[0])ms.forEach(m=>{const e=m.elements;z.habPts.push({x:e[12],z:e[14],r:.5*Math.hypot(e[0],e[2])})})}
     if(big){const ol=new THREE.InstancedMesh(pt.geo,outlineMat(.9),ms.length);ms.forEach((m,k)=>ol.setMatrixAt(k,m));ol.instanceMatrix.needsUpdate=true;
      ol.userData.isOutline=true;ol.raycast=function(){};ol.frustumCulled=false;g.add(ol);z.habOl.push(ol);draws++}
     else if(kind!=='ground')z.cover.push(im)});
@@ -2226,6 +2239,137 @@ function decorateHabitats(){const kit=habKit();if(!kit)return;let n=0,draws=0;
 function habitatLodTick(){for(const z of ZONES){if(!z.cover)continue;const d=camera.position.distanceTo(tmpV.set(z.x,z.y,z.z));
  const near=AREA===z||(!AREA&&d<z.r+60);if(z.coverOn!==near){z.coverOn=near;z.cover.forEach(m=>m.visible=near)}     // grass and flowers only up close
  const ol=AREA===z||(!AREA&&d<z.r+45);if(z.habOlOn!==ol){z.habOlOn=ol;z.habOl.forEach(m=>m.visible=ol)}}}
+/* ============================ ANIMAL BEHAVIOURS ============================
+   Each animal gets a way of moving that fits it: swimmers swim (and dive, and rest on the bank), birds of prey
+   circle inside the aviary net or fly between perches, flamingos wade, grazers wander and stop to eat, big cats
+   pace, kangaroos and monkeys hop, meerkats dash, tortoises creep. An animal stands still while you look at or
+   feed it. Positions are in the area's own coordinates (the area group sits at the area centre). */
+const BEH={
+ 'formosan-black-bear':['wander',.6],'chinese-pangolin':['wander',.3],'eurasian-otter':['swim',1.1,.5],'leopard-cat':['pace',1.1],
+ 'formosan-serow':['wander',.7],'formosan-sika-deer':['wander',.8],'formosan-rock-macaque':['hop',.9,.25],
+ 'duck':['swim',.6,.12],'goose':['swim',.5,.15],'goat':['hop',.6,.12],'donkey':['wander',.5],'miniature-horse':['wander',.8],'lanyu-pig':['wander',.5],
+ 'south-american-coati':['wander',.8],'meerkat':['dart',2.4],
+ 'malayan-tiger':['pace',1.2],'bornean-orangutan':['wander',.35],'malayan-tapir':['swim',.5,.55],'capybara':['wander',.4],'brown-spider-monkey':['hop',1,.3],'cotton-top-tamarin':['hop',.8,.15],
+ 'bactrian-camel':['wander',.5],'dromedary':['wander',.5],'oryx':['wander',.8],'addax':['wander',.7],'african-wild-ass':['wander',.9],
+ 'red-kangaroo':['hop',1.6,.5],'emu':['wander',1.4],
+ 'african-elephant':['wander',.45],'somali-giraffe':['wander',.5],'pygmy-hippopotamus':['swim',.4,.6],'western-lowland-gorilla':['wander',.35],
+ 'lion':['wander',.4,0,[6,14]],'grants-zebra':['wander',.9],'white-rhinoceros':['wander',.45],'chimpanzee':['hop',.9,.2],'hippopotamus':['swim',.35,.72],
+ 'king-penguin':['swim',1.3,.55],'african-penguin':['swim',1.5,.5],
+ 'puma':['pace',1.1],'red-panda':['wander',.5],'asian-small-clawed-otter':['swim',1.2,.5],'lynx':['pace',.9],'przewalskis-horse':['wander',.9],
+ 'taipei-tree-frog':['hop',.3,.15,[3,8]],'taipei-frog':['hop',.3,.12,[3,8]],'aldabra-giant-tortoise':['wander',.12],'indian-star-tortoise':['wander',.15],
+ 'eastern-blue-tongued-skink':['dart',1.2],'yellow-margined-box-turtle':['wander',.15],
+ 'tawny-fish-owl':['perch',3],'brown-wood-owl':['perch',3],'mountain-hawk-eagle':['soar',4],'greater-flamingo':['wade',.35],'chilean-flamingo':['wade',.35]};
+const DOME_ANIMALS=['two-toed-sloth','aye-aye','cotton-top-tamarin','capybara'];   // live inside the Pangolin Dome
+const POND_Y=.31;   // water surface (ponds are at y .26, .1 thick)
+function behArea(a){const z=ZI[a.z];if(z.id==='rainforest'&&DOME_ANIMALS.includes(a.id))return{x:-z.r*.42,z:-z.r*.4,r:2.4};
+ return{x:0,z:0,r:z.r*(z.biome.startsWith('indoor')?.55:.72)}}
+function landPoint(a,R){const z=ZI[a.z],ar=behArea(a),ponds=z.group.userData.ponds||[],fr=a.obj.fr||1;
+ for(let i=0;i<30;i++){const t=R()*Math.PI*2,r=Math.sqrt(R())*Math.max(.3,ar.r-fr*.5),x=ar.x+Math.cos(t)*r,zz=ar.z+Math.sin(t)*r;
+  if(ponds.some(p=>Math.hypot(x-p.x,zz-p.z)<p.r+fr*.6+.2))continue;
+  if((z.habPts||[]).some(p=>Math.hypot(x-p.x,zz-p.z)<p.r+fr*.6))continue;
+  return{x,z:zz}}
+ const h=a.obj.holder.position;return{x:h.x,z:h.z}}
+function nearestPond(a){const ps=ZI[a.z].group.userData.ponds||[],h=a.obj.holder.position;let b=null,bd=1e9;for(const p of ps){const d=Math.hypot(h.x-p.x,h.z-p.z);if(d<bd){bd=d;b=p}}return b}
+function addPerch(z,x,zz,top){const g=new THREE.Group();g.position.set(x,.25,zz);
+ limb(g,V(0,0,0),V(0,top,0),.13,'#6b5235',.1);limb(g,V(-.35,top,0),V(.35,top,0),.06,'#7a5e3c');E(g,'#7a5e3c',.18,.06,.18,0,top,0);addOutline(g,1);z.group.add(g)}
+function initBehaviors(){let n=0;
+ A.forEach(a=>{const b=BEH[a.id];if(!b||a.m.b==='butterfly'||a.m.b==='dragonfly')return;const o=a.obj,R=rng(hashStr(a.id)+5),z=ZI[a.z];
+  const st={kind:b[0],speed:b[1],p2:b[2]||0,pause:b[3]||[2,5],R,mode:'idle',timer:R()*3,tx:o.holder.position.x,tz:o.holder.position.z,y:.25,hop:0,dive:0};
+  const s=a.m.s||1;
+  if(st.kind==='swim'||st.kind==='wade'){st.pond=nearestPond(a);if(!st.pond)st.kind='wander'}
+  if(st.kind==='perch'||st.kind==='soar'){st.top=.5*s;st.perches=[{x:o.holder.position.x,z:o.holder.position.z}];
+   if(st.kind==='perch')for(let i=0;i<2;i++){const p=landPoint(a,R);st.perches.push(p)}
+   st.perches.forEach(p=>addPerch(z,p.x,p.z,st.top));st.cur=0}
+  if(st.kind==='pace'){const t=R()*Math.PI*2,L=Math.min(behArea(a).r*.55,4.5),c=landPoint(a,R);st.A={x:c.x-Math.cos(t)*L/2,z:c.z-Math.sin(t)*L/2};st.B={x:c.x+Math.cos(t)*L/2,z:c.z+Math.sin(t)*L/2};st.leg=0;
+   if(Math.hypot(st.A.x-behArea(a).x,st.A.z-behArea(a).z)>behArea(a).r||Math.hypot(st.B.x-behArea(a).x,st.B.z-behArea(a).z)>behArea(a).r){st.kind='wander'}}
+  o.beh=st;n++});
+ console.log(`initBehaviors: ${n} animals move`)}
+function turnTo(o,dx,dz,dt,rate){if(Math.abs(dx)+Math.abs(dz)<1e-4)return 0;const want=Math.atan2(-dz,dx);let d=want-o.holder.rotation.y;d=Math.atan2(Math.sin(d),Math.cos(d));
+ const k=Math.min(1,dt*(rate||3));o.holder.rotation.y+=d*k;return d}
+function stepTo(o,tx,tz,speed,dt){const h=o.holder.position,dx=tx-h.x,dz=tz-h.z,d=Math.hypot(dx,dz);if(d<.12)return true;
+ const bend=turnTo(o,dx,dz,dt,4);const v=Math.min(d,speed*dt*(Math.abs(bend)>1.2?.3:1));h.x+=dx/d*v;h.z+=dz/d*v;return false}
+function behaviorTick(dt,t){
+ for(const a of A){const o=a.obj,st=o.beh;if(!st)continue;const z=ZI[a.z];if(!z.group.visible)continue;
+  const near=AREA===z||camera.position.distanceTo(tmpV.set(z.x,z.y,z.z))<z.r+75;if(!near)continue;
+  const held=cam.hold===a||current===a||FEED===a;const h=o.holder.position,R=st.R,s=a.m.s||1;let moving=false,yWant=.25,roll=0;
+  st.timer-=dt;
+  if(st.kind==='wander'||st.kind==='hop'||st.kind==='dart'){
+   if(held){st.mode='idle'}
+   else if(st.mode==='idle'&&st.timer<=0){const p=landPoint(a,R);st.tx=p.x;st.tz=p.z;st.mode='go';if(st.kind==='dart'){st.tx=h.x+(p.x-h.x)*.35;st.tz=h.z+(p.z-h.z)*.35}}
+   else if(st.mode==='go'){moving=true;if(stepTo(o,st.tx,st.tz,st.speed,dt)){st.mode='idle';st.timer=st.kind==='dart'?.6+R()*1.6:st.pause[0]+R()*(st.pause[1]-st.pause[0])}}
+   if(st.kind==='hop'&&moving){st.hop+=dt*(st.speed>1?6.5:5);yWant=.25+Math.abs(Math.sin(st.hop))*st.p2*s}}
+  else if(st.kind==='pace'){
+   if(!held){const P=st.leg?st.B:st.A;if(st.timer<=0){moving=true;if(stepTo(o,P.x,P.z,st.speed,dt)){st.leg^=1;st.timer=.8+R()*1.6}}}}
+  else if(st.kind==='swim'){const p=st.pond;
+   if(!held){
+    if(st.mode==='idle'||st.mode==='shore'){if(st.timer<=0){st.mode='enter';st.ang=Math.atan2(h.z-p.z,h.x-p.x)}}
+    if(st.mode==='enter'){moving=true;const rr=Math.max(.2,p.r-(o.fr||1)*.6);if(stepTo(o,p.x+Math.cos(st.ang)*rr*.6,p.z+Math.sin(st.ang)*rr*.6,st.speed,dt)){st.mode='swim';st.timer=14+R()*12;st.rad=rr*(.45+R()*.5);st.dir=R()<.5?1:-1}}
+    else if(st.mode==='swim'){moving=true;st.ang+=st.dir*st.speed/Math.max(.4,st.rad)*dt;const tx=p.x+Math.cos(st.ang)*st.rad,tz=p.z+Math.sin(st.ang)*st.rad;turnTo(o,tx-h.x,tz-h.z,dt,5);h.x=tx;h.z=tz;
+     if(st.dive<=0&&R()<dt*.07&&st.p2<.7)st.dive=2.6;                                    // otters and penguins dive now and then
+     if(st.timer<=0){st.mode='exit';const a2=st.ang;const out=p.r+(o.fr||1)*.7+.3;st.tx=p.x+Math.cos(a2)*out;st.tz=p.z+Math.sin(a2)*out}}
+    else if(st.mode==='exit'){moving=true;if(stepTo(o,st.tx,st.tz,st.speed*.7,dt)){st.mode='shore';st.timer=6+R()*8}}}
+   const inWater=Math.hypot(h.x-p.x,h.z-p.z)<p.r-.05;
+   if(inWater){yWant=POND_Y-o.h*st.p2;if(st.dive>0){st.dive-=dt;const k=Math.sin(Math.min(1,(2.6-st.dive)/2.6)*Math.PI);yWant-=k*o.h*(1-st.p2+.15)}}}
+  else if(st.kind==='wade'){const p=st.pond;
+   if(!held){if(st.mode==='idle'&&st.timer<=0){const t2=R()*Math.PI*2,r2=Math.sqrt(R())*Math.max(.2,p.r-.6);st.tx=p.x+Math.cos(t2)*r2;st.tz=p.z+Math.sin(t2)*r2;st.mode='go'}
+    else if(st.mode==='go'){moving=true;if(stepTo(o,st.tx,st.tz,st.speed,dt)){st.mode='idle';st.timer=3+R()*5}}}
+   if(Math.hypot(h.x-p.x,h.z-p.z)<p.r)yWant=POND_Y-.06*s}
+  else if(st.kind==='perch'||st.kind==='soar'){
+   if(st.mode==='idle'){yWant=.25;const P=st.perches[st.cur];h.x+=(P.x-h.x)*Math.min(1,dt*4);h.z+=(P.z-h.z)*Math.min(1,dt*4);
+    if(st.timer<=0&&!held){st.mode='fly';st.from={x:h.x,z:h.z};st.flyT=0;
+     if(st.kind==='soar'){st.timer=18+R()*12;st.ang=Math.atan2(h.z,h.x)}else{st.next=(st.cur+1+Math.floor(R()*(st.perches.length-1)))%st.perches.length}}}
+   else if(st.kind==='perch'){moving=true;const P=st.perches[st.next];st.flyT+=dt*st.speed/Math.max(1,Math.hypot(P.x-st.from.x,P.z-st.from.z));const k=Math.min(1,st.flyT);
+    const nx=st.from.x+(P.x-st.from.x)*k,nz=st.from.z+(P.z-st.from.z)*k;turnTo(o,nx-h.x,nz-h.z,dt,8);h.x=nx;h.z=nz;yWant=.25+Math.sin(k*Math.PI)*2.6;
+    if(k>=1){st.cur=st.next;st.mode='idle';st.timer=9+R()*8}}
+   else{moving=true;const rr=z.r*.5,hgt=.25+3.2+Math.sin(t*.4)*.6;   // circle inside the aviary net
+    if(st.timer>0||held){st.ang+=dt*st.speed/rr;const tx=Math.cos(st.ang)*rr,tz=Math.sin(st.ang)*rr;turnTo(o,tx-h.x,tz-h.z,dt,3);h.x+=(tx-h.x)*Math.min(1,dt*2);h.z+=(tz-h.z)*Math.min(1,dt*2);yWant=hgt;roll=-.35}
+    else{const P=st.perches[0];moving=!stepTo(o,P.x,P.z,st.speed,dt);yWant=.25+(hgt-.25)*Math.min(1,Math.hypot(h.x-P.x,h.z-P.z)/3);
+     if(!moving){st.mode='idle';st.timer=8+R()*8}}}}
+  h.y+=(yWant-h.y)*Math.min(1,dt*(st.kind==='hop'?20:4));o.holder.rotation.x+=(roll-o.holder.rotation.x)*Math.min(1,dt*3);
+  if(o.built.mixer)o.built.mixer.timeScale=(st.kind==='perch'||st.kind==='soar')&&st.mode==='fly'?3:1;   // flap faster in the air
+  // name sign, selection ring and shadow follow the animal
+  const up=h.y-.25;o.lab.position.set(h.x,h.y+o.h+.9,h.z);o.ring.position.set(h.x,Math.max(.32,h.y+.07),h.z);
+  o.sh.position.set(h.x,(st.kind==='swim'||st.kind==='wade')&&h.y<.3?POND_Y+.01:.27,h.z);o.sh.material.opacity=.16/(1+up*.6);
+  if(held&&cam.hold===a&&!cam.fly&&moving){cam.target.lerp(tmpV.set(z.x+h.x,z.y+h.y+o.h*.45,z.z+h.z),Math.min(1,dt*3))}}}   // keep a flying bird in view
+/* ============================ WEATHER ============================
+   Each area gets its own climate from models/weather-kit.glb (blender/make_weather.py): snow in the Penguin House,
+   rain and mist in the rainforest, falling leaves in the temperate zone, dust in the dry areas, petals on the breeze,
+   fireflies in the Insectarium. One InstancedMesh per particle type per area, moved every frame, only near the camera. */
+const WEATHER={penguin:[['snowflake',220,'snow']],rainforest:[['raindrop',380,'rain'],['mist',10,'mist']],reptile:[['mist',7,'mist']],
+ formosan:[['mist',8,'mist'],['leaf_green',22,'leaves']],temperate:[['leaf_orange',28,'leaves'],['leaf_red',24,'leaves'],['leaf_yellow',24,'leaves']],
+ desert:[['dust',70,'dust']],australian:[['dust',50,'dust']],african:[['dust',60,'dust']],bird:[['petal',45,'leaves']],children:[['petal',30,'leaves']],
+ insect:[['firefly',45,'fireflies']]};
+const WX_LABEL={snow:'❄ Snowing · 下雪中',rain:'🌧 Rainy and misty · 下雨、起霧',mist:'🌫 Misty · 霧氣',leaves:'🍃 Breezy · 微風',dust:'🌬 Dry and dusty · 乾燥、起沙塵',fireflies:'✨ Fireflies · 螢火蟲'};
+function initWeather(){const g=GLB[WX_URL];if(!g)return;g.scene.updateMatrixWorld(true);const kit={};
+ g.scene.children.forEach(n=>{n.traverse(o=>{if(o.isMesh){const geo=o.geometry.clone();geo.applyMatrix4(new THREE.Matrix4().copy(n.matrixWorld).invert().multiply(o.matrixWorld));kit[n.name]={geo,mat:o.material}}})});
+ const unlit=c=>new THREE.MeshBasicMaterial({color:c});let n=0;
+ ZONES.forEach(z=>{const list=WEATHER[z.id];if(!list)return;const R=rng(hashStr(z.id)+23);const indoor=z.biome.startsWith('indoor');
+  const H=indoor?z.r*.62:9,rad=z.r*(indoor?.85:.95);z.wx=[];
+  list.forEach(([id,count,kind])=>{const k=kit[id];if(!k)return;
+   const m=kind==='mist'?new THREE.MeshBasicMaterial({color:'#ffffff',transparent:true,opacity:.28,depthWrite:false}):
+     kind==='fireflies'?unlit('#F4FF6A'):kind==='snow'?unlit('#FFFFFF'):kind==='rain'?new THREE.MeshBasicMaterial({color:'#5E9CCB',transparent:true,opacity:.8,depthWrite:false}):toonFrom(k.mat,'weather');
+   const im=new THREE.InstancedMesh(k.geo,m,count);im.frustumCulled=false;im.renderOrder=kind==='mist'?5:0;z.group.add(im);
+   const ps=[];for(let i=0;i<count;i++){const a=R()*Math.PI*2,r=Math.sqrt(R())*rad;
+    ps.push({x:Math.cos(a)*r,z:Math.sin(a)*r,y:kind==='mist'?.6+R()*1.2:kind==='fireflies'||kind==='dust'?.4+R()*2.2:.3+R()*H,ph:R()*6.28,v:.7+R()*.6,s:kind==='mist'?2+R()*2.5:.8+R()*.5,cx:0,cz:0})}
+   if(kind==='dust')ps.forEach(p=>{p.cx=p.x;p.cz=p.z;p.rr=.6+R()*1.8});
+   z.wx.push({im,ps,kind,H,rad});n+=count})});
+ console.log(`initWeather: ${n} particles`)}
+const _wm=new THREE.Matrix4(),_wq=new THREE.Quaternion(),_we=new THREE.Euler(),_wp=new THREE.Vector3(),_ws=new THREE.Vector3();
+function weatherTick(dt,t){for(const z of ZONES){if(!z.wx)continue;const on=z.group.visible&&(AREA===z||(!AREA&&camera.position.distanceTo(tmpV.set(z.x,z.y,z.z))<z.r+70));
+ for(const w of z.wx){w.im.visible=on;if(!on)continue;const ps=w.ps;
+  for(let i=0;i<ps.length;i++){const p=ps[i];let sx=1,sy=1,sz=1,rx=0,ry=0,rz=0;
+   switch(w.kind){
+    case 'snow':p.y-=dt*.7*p.v;p.x+=Math.sin(t*.8+p.ph)*dt*.3;p.z+=Math.cos(t*.6+p.ph)*dt*.3;rx=t*.5+p.ph;ry=t*.7;sx=sy=sz=p.s*2.2;break;
+    case 'rain':p.y-=dt*10*p.v;p.x+=dt*.8;sx=sz=1.6;sy=1.4+p.v*.5;break;
+    case 'leaves':p.y-=dt*.55*p.v;p.x+=Math.sin(t*1.4+p.ph)*dt*.7;p.z+=Math.cos(t*1.1+p.ph)*dt*.5+dt*.15;rx=t*2*p.v+p.ph;rz=Math.sin(t*1.7+p.ph)*1.2;ry=p.ph;sx=sy=sz=p.s*1.6;break;
+    case 'dust':{const a=t*p.v*.9+p.ph;p.x=p.cx+Math.cos(a)*p.rr;p.z=p.cz+Math.sin(a)*p.rr;p.y=.35+((t*.25*p.v+p.ph)%2.4);sx=sy=sz=p.s;break}
+    case 'mist':p.x+=Math.sin(t*.1+p.ph)*dt*.15;p.z+=Math.cos(t*.08+p.ph)*dt*.15;ry=t*.05+p.ph;sx=sz=p.s;sy=p.s*.7;break;
+    case 'fireflies':p.x+=Math.sin(t*.9+p.ph*3)*dt*.4;p.z+=Math.cos(t*.7+p.ph*2)*dt*.4;p.y+=Math.sin(t*1.3+p.ph)*dt*.25;sx=sy=sz=1+2*Math.max(0,Math.sin(t*2.2*p.v+p.ph));break}
+   // fall below the floor or drift out of the area → start again at the top
+   if(p.y<.27||Math.hypot(p.x,p.z)>w.rad*1.05){const a=Math.random()*Math.PI*2,r=Math.sqrt(Math.random())*w.rad;p.x=Math.cos(a)*r;p.z=Math.sin(a)*r;
+    if(w.kind!=='dust'&&w.kind!=='mist'&&w.kind!=='fireflies')p.y=w.H*(.85+Math.random()*.15);else if(w.kind!=='dust')p.y=Math.max(.5,p.y)}
+   _wp.set(p.x,p.y,p.z);_we.set(rx,ry,rz);_wq.setFromEuler(_we);_ws.set(sx,sy,sz);_wm.compose(_wp,_wq,_ws);w.im.setMatrixAt(i,_wm)}
+  w.im.instanceMatrix.needsUpdate=true}}}
 function optimizeScene(){let b=0,a=0;
  ZONES.forEach(z=>{const r=mergeStatic(z.group,o=>!!o.userData.zone);b+=r[0];a+=r[1]});
  const r=mergeStatic(world,o=>o===terrainMesh);b+=r[0];a+=r[1];
@@ -2235,12 +2379,12 @@ function perfTick(dt){if(dt<=0)return;Perf.acc+=dt;Perf.n++;if(Perf.acc<2)return
  const fps=Perf.n/Perf.acc;Perf.acc=0;Perf.n=0;const now=performance.now();if(now-Perf.last<3000)return;
  let pr=Perf.pr;if(fps<40&&pr>.75)pr=Math.max(.75,pr-.25);else if(fps>57&&pr<Perf.max)pr=Math.min(Perf.max,pr+.25);
  if(pr!==Perf.pr){Perf.pr=pr;Perf.last=now;renderer.setPixelRatio(pr);renderer.setSize(innerWidth,innerHeight,false)}}
-function init(){drawPaper();buildWorld();ZONES.forEach(buildZone);placeAnimals();decorateHabitats();buildTrain();initNav();buildTrainSystem();optimizeScene();initMe();buildIndex();buildList();buildSong();renderWelcome();
+function init(){drawPaper();buildWorld();ZONES.forEach(buildZone);placeAnimals();initBehaviors();decorateHabitats();initWeather();buildTrain();initNav();buildTrainSystem();optimizeScene();initMe();buildIndex();buildList();buildSong();renderWelcome();
  Speech.load();if(Speech.browser)speechSynthesis.onvoiceschanged=()=>Speech.load();
  if(window.claude&&typeof window.claude.use==='function'){window.claude.use('tts').then(t=>{if(t){Speech.cl=t;Speech.load();if(!$('card').querySelector('#wFind'))return;renderWelcome()}}).catch(()=>{})}initDictation();
  if(isPhone())cam.dist=OV_D*1.45;resize();applyCam();$('loading').hidden=true;loop();setTimeout(()=>toast('Tap an animal to hear its English name · 點動物聽英文名字'),900)}
 const fontsReady=(document.fonts&&document.fonts.load)?Promise.race([Promise.all([document.fonts.load("400 40px 'Patrick Hand'"),document.fonts.ready]),new Promise(r=>setTimeout(r,2000))]):Promise.resolve();
-fontsReady.then(preloadGLB).then(init).catch(init);
+fontsReady.then(preloadGLB).catch(e=>console.warn('preload failed',e)).then(init);   // init runs exactly once
 </script>
 </body>
 </html>
