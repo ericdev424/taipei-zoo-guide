@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!-- Content-Security-Policy: only this site, the two pinned three.js files and Google Fonts may load.
      The inline script is allowed by its sha256 hash, which tools/csp_hash.py updates (publish.sh runs it). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-qw9I383vfsq9MZy6u2EAk0Cok2/plbwpCwiyUdgkXx0=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-ch1KTPatvtyptjps6atX8dy9urwJL7IpMXuffcfBrGc=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Taipei Zoo 3D English Guide</title>
@@ -357,6 +357,7 @@ body.learning .tourbar{bottom:130px}
   <button class="rb blue" id="meBtn" type="button" aria-label="Where am I"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 100 8 4 4 0 000-8zm9 3h-2.07A7 7 0 0013 5.07V3h-2v2.07A7 7 0 005.07 11H3v2h2.07A7 7 0 0011 18.93V21h2v-2.07A7 7 0 0018.93 13H21zm-9 6a5 5 0 110-10 5 5 0 010 10z"/></svg><span>Me</span></button>
   <button class="rb hl" id="areasBtn" type="button" aria-label="Area by area"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg><span>Areas</span></button>
   <button class="rb" id="turnBtn" type="button" aria-pressed="false" aria-label="Turn 360 degrees"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4a8 8 0 017.7 5.9l1.8-1.1.5 5-4.6-2 1.7-1A6 6 0 006 12H4a8 8 0 018-8zm0 16a8 8 0 01-7.7-5.9l-1.8 1.1-.5-5 4.6 2-1.7 1A6 6 0 0018 12h2a8 8 0 01-8 8z"/></svg><span>360°</span></button>
+  <button class="rb" id="namesBtn" type="button" aria-pressed="false" aria-label="Show all animal names"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5h18v10H9l-4 4v-4H3zm3 3v2h12V8zm0 3v2h8v-2z"/></svg><span>Names</span></button>
   <button class="rb" id="ridesBtn" type="button" aria-label="Rides"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 4l20-2v2L13 5v3h3a2 2 0 012 2v7a2 2 0 01-2 2H8a2 2 0 01-2-2v-7a2 2 0 012-2h3V5.2L2 6zm6 8v3h3v-3zm5 0v3h3v-3z"/></svg><span>Rides</span></button>
   <button class="rb" id="trainBtn" type="button" aria-label="Train times"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-4 0-8 .5-8 4v9.5A3.5 3.5 0 007.5 19L6 20.5v.5h2l2-2h4l2 2h2v-.5L16.5 19a3.5 3.5 0 003.5-3.5V6c0-3.5-4-4-8-4zM7.5 17a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3.5-7H6V6h5zm2 0V6h5v4zm3.5 7a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/></svg><span>Train</span></button>
   <button class="rb" id="tourBtn" type="button" aria-label="Guided tour"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span>Tour</span></button>
@@ -1762,10 +1763,10 @@ function loadLazyModels(){if(!THREE.GLTFLoader)return;const list=A.filter(a=>isL
    let over=false;const t=setTimeout(()=>{if(!over){over=true;console.warn('lazy model timed out',a.id);fin()}},20000);   /* a stuck decode never blocks the queue */
    loader.load(a.m.glb,g=>{if(over)return;over=true;clearTimeout(t);GLB[a.m.glb]=g;try{swapModel(a)}catch(e){console.warn('model swap failed',a.id,e)}fin()},undefined,()=>{if(over)return;over=true;clearTimeout(t);fin()})}};
  const fin=()=>{live--;done++;if(done>=list.length){if(dr){dr.dispose();if(dr.workerSourceURL){URL.revokeObjectURL(dr.workerSourceURL);dr.workerSourceURL=''}dr._getWorker=()=>Promise.reject(new Error('lazy loading finished'))}console.log('lazy models: '+list.length)}else next()};next()}
-function swapModel(a){const o=a.obj;if(!o||!GLB[a.m.glb])return;const built=buildGLB(a.m),g=built.g;g.scale.setScalar(a.m.s||1);addOutline(g,1.1);   /* built-in shape → Blender model */
+function swapModel(a){const o=a.obj;if(!o||!GLB[a.m.glb])return;const built=buildGLB(a.m),g=built.g;g.scale.setScalar((a.m.s||1)*(o.k||1));   /* same room-to-breathe size */addOutline(g,1.1);   /* built-in shape → Blender model */
  o.holder.remove(o.g);o.g.traverse(n=>{if(n.isMesh&&n.geometry&&!n.userData.isOutline)n.geometry.dispose()});o.holder.add(g);   /* (shared shapes are simply re-uploaded if still used elsewhere) */o.holder.traverse(n=>{n.userData.animal=a.id});o.g=g;o.built=built;
  o.outlines=[];g.traverse(n=>{if(n.userData.isOutline)o.outlines.push(n)});o.olOn=true;o.legFar=undefined;
- const box=new THREE.Box3().setFromObject(g);o.h=box.max.y-box.min.y||o.h}
+ fitAnimal(a,o.k||1);const z=ZI[a.z];spreadOut(z,A.filter(b=>b.z===a.z&&b.obj))}   /* the real model may be bigger: refit and make room again */
 function preloadGLB(){
  if(!THREE.GLTFLoader)return Promise.resolve();
  const loader=new THREE.GLTFLoader();
@@ -1803,7 +1804,7 @@ const GEO0={lat:24.9945,lng:121.5857},M_GEO=7;
 const KX=111320*Math.cos(GEO0.lat*Math.PI/180)/M_GEO,KZ=110540/M_GEO;
 function proj(lat,lng){return V((lng-GEO0.lng)*KX,0,-(lat-GEO0.lat)*KZ)}
 // area radius (map units): sized so neighbouring areas and the main road don't push each other far from their real spots
-const ZRAD={formosan:8.5,children:7,koala:4.2,panda:5,rainforest:7.5,pangolin:5,insect:5,bugvalley:6,desert:5.8,australian:4.6,african:13,elephant:7.5,penguin:4.2,temperate:8,reptile:5.6,bird:9.5};
+const ZRAD={formosan:9,children:7,koala:4.2,panda:5,rainforest:8,pangolin:5.8,insect:6,bugvalley:6,desert:5.8,australian:4.6,african:13,elephant:7.5,penguin:4.2,temperate:8,reptile:6.6,bird:10.5};   /* busy areas (birds, insects, reptiles) a little larger */
 const ZGEO={};for(const k in ZRAD)ZGEO[k]=[LAYOUT.zones[k][0],LAYOUT.zones[k][1],ZRAD[k]];
 const GEO_GATE=LAYOUT.gate,GEO_STG=[24.997951,121.582726],GEO_STB=LAYOUT.birdStation,GEO_STS=LAYOUT.gondolaStations['動物園南']||[24.99020,121.58721];   // shuttle-train stations (OSM)
 const WAY=LAYOUT.road;   // main road: shortest walk along real OSM paths, ticket gate → Bird World station → Penguin House
@@ -2058,7 +2059,7 @@ function placeAnimals(){
    const R2=rng(hashStr(a.id));const built=(a.m.glb&&GLB[a.m.glb])?buildGLB(a.m):BUILD[a.m.b](a.m,R2);const g=built.g;g.scale.setScalar(a.m.s||1);addOutline(g,1.1);
    const holder=new THREE.Group();holder.position.set(px,.25,pz);holder.rotation.y=-Math.PI/2+(R()-.5)*1.4+(a.m.b==='butterfly'?0:0);holder.add(g);z.group.add(holder);
    const box=new THREE.Box3().setFromObject(holder);const h=box.max.y-box.min.y;const fr=Math.max(box.max.x-box.min.x,box.max.z-box.min.z)/2;
-   const sh=new THREE.Mesh(new THREE.CircleGeometry(1,20),new THREE.MeshBasicMaterial({color:'#000',transparent:true,opacity:.16,depthWrite:false}));sh.rotation.x=-Math.PI/2;sh.position.set(px,.27,pz);sh.scale.setScalar(Math.max(.5,fr*.8));z.group.add(sh);
+   const sh=new THREE.Mesh(new THREE.CircleGeometry(1,20),new THREE.MeshBasicMaterial({color:'#000',transparent:true,opacity:.16,depthWrite:false}));sh.rotation.x=-Math.PI/2;sh.position.set(px,.27,pz);sh.scale.setScalar(Math.max(.12,fr*.8));z.group.add(sh);
    const lab=makeLabel(a.n,a.zh,{bg:'#FFFDF7',fg:'#2B2420',w:Math.min(4.2,Math.max(2.8,a.n.length*.16)),small:true});lab.position.set(px,.25+h+.9,pz);lab.visible=false;lab.userData.animalLabel=true;z.group.add(lab);
    const ring=new THREE.Mesh(new THREE.TorusGeometry(1,.08,6,32),new THREE.MeshBasicMaterial({color:'#F5C531'}));ring.rotation.x=Math.PI/2;ring.position.set(px,.32,pz);ring.scale.setScalar(Math.max(.8,fr+.3));ring.visible=false;z.group.add(ring);
    holder.traverse(o=>{o.userData.animal=a.id});pickables.push(holder);
@@ -2067,6 +2068,22 @@ function placeAnimals(){
  });
 }
 
+/* room to breathe: when the animals of an area would cover too much of its floor, they are drawn a little smaller
+   (like the real display tanks), so every animal has space around it */
+function zoneArea(z){let s2=0;for(let k=0;k<SHK;k++){const r=zR(z,k/SHK*Math.PI*2);s2+=r*r}return Math.PI*s2/SHK}
+function fitAnimal(a,k){const o=a.obj;o.k=k;o.g.scale.setScalar((a.m.s||1)*k);const box=new THREE.Box3().setFromObject(o.g);
+ o.h=box.max.y-box.min.y||o.h;o.fr=Math.max(box.max.x-box.min.x,box.max.z-box.min.z)/2||o.fr;
+ o.sh.scale.setScalar(Math.max(.12,o.fr*(k<1?.55:.8)));o.sh.material.opacity=k<1?.1:.16;o.ring.scale.setScalar(Math.max(.35,o.fr+.25));o.lab.position.y=o.holder.position.y+o.h+.9}   /* small animals, small shadows */
+function crowdFit(){for(const z of ZONES){const list=A.filter(a=>a.z===z.id&&a.obj);if(!list.length)continue;
+  const foot=list.reduce((t,a)=>t+Math.PI*a.obj.fr*a.obj.fr,0),room=zoneArea(z)*.28;   // animals may cover about a quarter of the floor
+  const k=foot>room?Math.max(.5,Math.sqrt(room/foot)):1;z.fit=k;if(k<1)list.forEach(a=>fitAnimal(a,k));spreadOut(z,list)}}
+function spreadOut(z,list){const P=list.map(a=>({a,p:a.obj.holder.position,r:a.obj.fr*1.05+.25}));   /* each animal keeps its own space (by its size) and stays inside the real outline */
+ for(let it=0;it<80;it++){let moved=false;
+  for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const A1=P[i],B=P[j];const dx=B.p.x-A1.p.x,dz=B.p.z-A1.p.z,d=Math.hypot(dx,dz)||.01,need=A1.r+B.r;
+   if(d<need){const m=(need-d)/2/d*.8;A1.p.x-=dx*m;A1.p.z-=dz*m;B.p.x+=dx*m;B.p.z+=dz*m;moved=true}}
+  for(const q of P){const e=zEdge(z,z.x+q.p.x,z.z+q.p.z)+q.r;if(e>0){const d=Math.hypot(q.p.x,q.p.z)||1,m=Math.min(e,d*.5);q.p.x-=q.p.x/d*m;q.p.z-=q.p.z/d*m;moved=true}}   // the whole animal back inside
+  if(!moved)break}
+ for(const q of P){const o=q.a.obj;o.sh.position.x=o.ring.position.x=o.lab.position.x=q.p.x;o.sh.position.z=o.ring.position.z=o.lab.position.z=q.p.z}}
 /* ============================ CAMERA ============================ */
 const OV_D=Math.max(PARK_S.x,PARK_S.z*1.25)+30;const cam={target:V(PARK_C.x+PARK_S.x*.1,6,PARK_C.z),dist:OV_D,theta:0,phi:.78,fly:null};
 const reduced=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -2244,7 +2261,7 @@ $('rateSel').onchange=e=>{Speech.rateIdx=+e.target.value};
 /* ============================ INPUT ============================ */
 let turnMode=false;   /* 360° button: one-finger drag turns the view around the middle of the screen instead of moving the map */
 const pointers=new Map();let drag=null,pinch0=0,twist0=null,downAt=null,multi=false;
-canvas.addEventListener('contextmenu',e=>e.preventDefault());
+canvas.addEventListener('contextmenu',e=>e.preventDefault());canvas.addEventListener('pointerleave',()=>{hoverIn=false;hoverA=null});
 canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});downAt={x:e.clientX,y:e.clientY,t:performance.now()};
  // drag = move the map; right-drag or Shift/Ctrl/Alt-drag = turn. (Looking at one animal or one area: drag turns around it.)
  drag={x:e.clientX,y:e.clientY,rot:e.button===2||e.shiftKey||e.ctrlKey||e.altKey};
@@ -2293,7 +2310,10 @@ function pickAt(x,y){if(placing){const g=groundAt(x,y);if(g){placing=false;canva
  let h=hitAt(x,y);if(!h||!h.a){const n=nearAnimalAt(x,y);if(n)h={a:n}}if(!h)return;stopTour();
  if(h.a){if(h.a===current&&!FEED){bounce(h.a);focusAnimal(h.a,true);Speech.say(h.a.n);return}select(h.a,{speak:'name'})}  // tap again = look closer
  else if(h.z&&!AREA&&!(current&&current.z===h.z.id))areaView(h.z)}  // don't jump away from the animal you're looking at
-let hoverPending=false;function hoverAt(x,y){if(hoverPending)return;hoverPending=true;requestAnimationFrame(()=>{hoverPending=false;const h=hitAt(x,y);canvas.classList.toggle('hovering',!!(h&&h.a)||!!nearAnimalAt(x,y))})}
+let hoverPending=false;let hoverA=null,SHOWNAMES=false;try{SHOWNAMES=localStorage.getItem('taipeiZooGuide.names')==='1'}catch(e){}
+function setNames(on){SHOWNAMES=on;const b=$('namesBtn');if(b){b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))}try{localStorage.setItem('taipeiZooGuide.names',on?'1':'0')}catch(e){}}
+let hoverIn=false;
+function hoverAt(x,y){hoverIn=true;if(hoverPending)return;hoverPending=true;requestAnimationFrame(()=>{hoverPending=false;if(!hoverIn){hoverA=null;return}const h=hitAt(x,y);const a=(h&&h.a)||nearAnimalAt(x,y)||null;hoverA=a;canvas.classList.toggle('hovering',!!a)})}   /* the mouse shows the name of the animal under it */
 addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
  if(e.key==='Escape'&&current){clearSel();current=null;collapseCard();return}
  if(e.key==='+'||e.key==='='){zoomBy(.75);return}if(e.key==='-'||e.key==='_'){zoomBy(1.33);return}
@@ -2649,7 +2669,7 @@ function updStationLabels(force){if(!LINES)return;const m=simMin();
  [['gate',ST_GATE],['bird',ST_BIRD],['south',ST_SOUTH]].forEach(([st,p])=>{const [t,zh]=stationSign(st,m);const key=t+zh;if(!force&&signCache[st]===key)return;signCache[st]=key;
   if(stLabels[st]){world.remove(stLabels[st]);stLabels[st].material.map.dispose();stLabels[st].material.dispose()}
   const lab=makeLabel(t,zh,{bg:'#EBC45E',fg:'#2B2420',w:st==='bird'?11:7.5,small:true,prio:3});lab.position.set(p.x,terrainH(p.x,p.z)+6.8,p.z);world.add(lab);stLabels[st]=lab})}
-$('trainBtn').onclick=openTrain;$('turnBtn').onclick=()=>setTurnMode(!turnMode);$('ridesBtn').onclick=()=>{stopTour();exitArea();renderRides()};$('rbEnd').onclick=()=>endRide();
+$('trainBtn').onclick=openTrain;$('namesBtn').onclick=()=>{setNames(!SHOWNAMES);toast(SHOWNAMES?'🏷 Showing all animal names · 顯示所有名稱':'🏷 Names only for the animal you pick · 只顯示選到的動物名稱')};setNames(SHOWNAMES);$('turnBtn').onclick=()=>setTurnMode(!turnMode);$('ridesBtn').onclick=()=>{stopTour();exitArea();renderRides()};$('rbEnd').onclick=()=>endRide();
 
 /* ============================ MY LOCATION ============================ */
 /* default marker: an original 3D cartoon explorer rendered in Blender (blender/make_avatar.py), not a real person */
@@ -2939,7 +2959,7 @@ function loop(){requestAnimationFrame(loop);const t=clock.getElapsedTime();const
   {const show=near<160||current===a||cam.hold===a||AREA===ZI[a.z];if(o.holder.visible!==show)o.holder.visible=show}   /* very far: a few pixels, not drawn */
   {const lf=near>=70&&!(o.bounce>0);if(o.built.legLOD&&o.legFar!==lf){o.legFar=lf;o.built.legLOD.visible=lf;o.built.legs.forEach(L=>L.n.visible=!lf)}}   /* far: the merged standing legs */          // far-away animals are too small to see moving
   const olOn=near<55||current===a;if(o.outlines&&o.olOn!==olOn){o.olOn=olOn;o.outlines.forEach(m=>m.visible=olOn)}   // outlines only up close
-  o.lab.visible=AREA?true:(near<(isPhone()?26:32)||current===a||!!(NAV&&NAV.dest.a===a));
+  o.lab.visible=current===a||hoverA===a||!!(NAV&&NAV.dest.a===a)||(SHOWNAMES&&(AREA?true:near<(isPhone()?26:32)));   /* names only when you ask: the one you picked, the one under the mouse, or all with the Names button */
   if(cam.hold===a&&near<14)o.lab.visible=false;   // close-up: the name is already in the bar below
   if(o.bounce>0){o.bounce=Math.max(0,o.bounce-.025);o.g.position.y=Math.abs(Math.sin(o.bounce*Math.PI*3))*.6*o.bounce}
   if(o.shake>0){o.shake=Math.max(0,o.shake-dt*1.2);o.g.rotation.y=Math.sin(o.shake*Math.PI*8)*.35*o.shake}
@@ -3442,7 +3462,7 @@ function perfTick(dt){if(dt<=0)return;Perf.acc+=dt;Perf.n++;if(Perf.acc<2)return
  const fps=Perf.n/Perf.acc;Perf.acc=0;Perf.n=0;const now=performance.now();if(now-Perf.last<3000)return;
  let pr=Perf.pr;if(fps<40&&pr>.75)pr=Math.max(.75,pr-.25);else if(fps>57&&pr<Perf.max)pr=Math.min(Perf.max,pr+.25);
  if(pr!==Perf.pr){Perf.pr=pr;Perf.last=now;renderer.setPixelRatio(pr);renderer.setSize(innerWidth,innerHeight,false)}}
-function init(){drawPaper();buildWorld();ZONES.forEach(buildZone);placeAnimals();initBehaviors();decorateHabitats();initWeather();initRides();setTimeout(loadLazyModels,1500);buildTrain();initNav();initPenguinWalk();initBuildings();buildTrainSystem();optimizeScene();initMe();buildIndex();buildList();buildSong();renderWelcome();
+function init(){drawPaper();buildWorld();ZONES.forEach(buildZone);placeAnimals();crowdFit();initBehaviors();decorateHabitats();initWeather();initRides();setTimeout(loadLazyModels,1500);buildTrain();initNav();initPenguinWalk();initBuildings();buildTrainSystem();optimizeScene();initMe();buildIndex();buildList();buildSong();renderWelcome();
  Speech.load();if(Speech.browser)speechSynthesis.onvoiceschanged=()=>Speech.load();
  if(window.claude&&typeof window.claude.use==='function'){window.claude.use('tts').then(t=>{if(t){Speech.cl=t;Speech.load();if(!$('card').querySelector('#wFind'))return;renderWelcome()}}).catch(()=>{})}initDictation();
  if(isPhone())cam.dist=OV_D*1.45;resize();applyCam();$('loading').hidden=true;loop();setTimeout(()=>{if($('toast').hidden)toast('Tap an animal to hear its English name · 點動物聽英文名字')},900)}   // not over a reminder
