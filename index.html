@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!-- Content-Security-Policy: only this site, the two pinned three.js files and Google Fonts may load.
      The inline script is allowed by its sha256 hash, which tools/csp_hash.py updates (publish.sh runs it). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-Iz3zKLZYqHgVuEGh+bG6T/bGYZIP597N7TcylScYboc=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-qw9I383vfsq9MZy6u2EAk0Cok2/plbwpCwiyUdgkXx0=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Taipei Zoo 3D English Guide</title>
@@ -484,7 +484,7 @@ const ZONES=[
 ];
 
 const STATUS={CR:['Critically Endangered','#C62828','#fff'],EN:['Endangered','#E65100','#fff'],VU:['Vulnerable','#F2B705','#2e2300'],
- NT:['Near Threatened','#A5C94A','#203000'],LC:['Least Concern','#2E7D4F','#fff'],DOM:['Domestic animal','#78909C','#fff'],NA:['Not assessed here','#B0BEC5','#20303a']};
+ NT:['Near Threatened','#A5C94A','#203000'],LC:['Least Concern','#2E7D4F','#fff'],DOM:['Domestic animal','#78909C','#fff'],NA:['Not assessed here','#B0BEC5','#20303a'],NE:['Not evaluated','#B0BEC5','#20303a'],DD:['Data deficient','#90A4AE','#20303a']};
 
 const A=[
 /* Formosan */
@@ -976,6 +976,383 @@ const A=[
  i:"This bear has a white V or moon-shaped mark on its chest, so it is also called the moon bear. The Formosan black bear is one kind of Asiatic black bear.",
  h:"Mountain forests of Asia",d:"Acorns, fruit, insects, small animals",sz:"About 1.2 to 1.9 m long",
  m:{b:"quad",s:1.6,L:0.64,H:0.38,W:0.33,leg:0.36,legR:0.12,neck:0.12,neckA:1.2,hs:0.27,snout:0.55,ear:"round",tail:"short",c:"#1b1b1d",snoutC:"#7a6a58",chestV:"#f2efe6",ruff:"#1b1b1d"}},
+/* added 2026-11-20 from the official guide: Amphibian and Reptile House, Pangolin House fish, Insectarium */
+{id:'african-spurred-tortoise',z:'reptile',n:"African spurred tortoise",zh:"蘇卡達象龜",sci:"Centrochelys sulcata",st:'EN',
+ i:"This is the biggest tortoise that lives on a mainland instead of an island. In the hot, dry land where it comes from, it digs deep burrows to stay cool.",
+ h:"Dry grasslands at the southern edge of the Sahara, Africa",d:"Grass, weeds, leaves",sz:"Shell about 60 to 85 cm long",
+ m:{b:"herp",kind:"tortoise",s:2.3,L:0.6,c:"#b08a55",c2:"#d8c08a",skin:"#c9a46a"}},
+{id:'guenthers-frog',z:'reptile',n:"Guenther's frog",zh:"貢德氏赤蛙",sci:"Sylvirana guentheri",st:'LC',
+ i:"Guenther's frog has a loud call that sounds a bit like a small dog barking. Listen for it near ponds on warm evenings.",
+ h:"Ponds, ditches and rice fields of Taiwan and southern China",d:"Insects, spiders, worms",sz:"About 6 to 9 cm",
+ m:{b:"herp",kind:"frog",s:1.9,L:0.42,c:"#8a7550",c2:"#e8dcc0",patC:"#4a3a26",patN:6}},
+{id:'la-touches-frog',z:'reptile',n:"La Touche's frog",zh:"拉都希氏赤蛙",sci:"Hylarana latouchii",st:'LC',
+ i:"Look for the thick, puffy ridges that run down both sides of its back. A dark band goes from its nose past its eye, like a little mask.",
+ h:"Hill streams, ponds and fields of Taiwan and southern China",d:"Insects, spiders, worms",sz:"About 4 to 6 cm",
+ m:{b:"herp",kind:"frog",s:1.9,L:0.38,c:"#9a7a4c",c2:"#efe2c4",patC:"#3a2c1e",patN:5}},
+{id:'fujian-large-headed-frog',z:'reptile',n:"Fujian large-headed frog",zh:"福建大頭蛙",sci:"Limnonectes fujianensis",st:'LC',
+ i:"Male frogs of this kind have a much bigger head and wider mouth than the females. It hides by slow mountain streams and comes out at night to hunt.",
+ h:"Small mountain streams and wet forests of Taiwan and southeastern China",d:"Insects, worms, small crabs",sz:"About 5 to 7 cm",
+ m:{b:"herp",kind:"frog",s:1.9,L:0.42,c:"#6e5a3e",c2:"#d8ccaa",patC:"#3a2e22",patN:6}},
+{id:'central-formosan-toad',z:'reptile',n:"Central Formosan toad",zh:"盤古蟾蜍",sci:"Bufo bankorensis",st:'LC',
+ i:"This toad lives only in Taiwan, from low hills all the way up to high mountains. The bumps behind its eyes hold a bitter poison, so please never touch a wild toad.",
+ h:"Forests, fields and mountains of Taiwan",d:"Insects, worms, snails",sz:"About 7 to 12 cm",
+ m:{b:"herp",kind:"toad",s:1.9,L:0.5,c:"#7a5a3a",c2:"#c9b08a",wartC:"#5a3e26",patC:"#4a3020",patN:6}},
+{id:'chinese-fire-bellied-newt',z:'reptile',n:"Chinese fire-bellied newt",zh:"東方蠑螈",sci:"Cynops orientalis",st:'LC',
+ i:"Its back is dark, but its belly is bright orange with black spots. The bright color warns hungry animals that its skin tastes bad.",
+ h:"Ponds and rice fields of eastern China",d:"Worms, insects, tadpoles",sz:"About 6 to 10 cm",
+ m:{b:"herp",kind:"newt",s:2.0,L:0.3,c:"#2a2622",c2:"#f0742a"}},
+{id:'hong-kong-warty-newt',z:'reptile',n:"Hong Kong warty newt",zh:"香港瘰螈",sci:"Paramesotriton hongkongensis",st:'NT',
+ i:"This newt has rough, bumpy skin and a black belly with orange blotches. It lives in cool, clear streams and spends most of the year in the water.",
+ h:"Hill streams of Hong Kong and nearby southern China",d:"Worms, insects, tadpoles",sz:"About 11 to 15 cm",
+ m:{b:"herp",kind:"newt",s:1.9,L:0.38,c:"#4a3a2c",c2:"#c85a24"}},
+{id:'red-eyed-treefrog',z:'reptile',n:"Red-eyed treefrog",zh:"紅眼樹蛙",sci:"Agalychnis callidryas",st:'LC',
+ i:"While it sleeps, this green frog tucks away its bright colors. If something wakes it, it pops open its big red eyes to startle the hunter, then leaps away.",
+ h:"Rainforests of Central America",d:"Insects, moths, crickets",sz:"About 5 to 7 cm",
+ m:{b:"herp",kind:"frog",s:2.0,L:0.35,c:"#4fae3a",c2:"#f2e8b8",eyeC:"#d8262c",patC:"#2a5aa8",patN:4}},
+{id:'vietnamese-mossy-frog',z:'reptile',n:"Vietnamese mossy frog",zh:"苔蘚蛙",sci:"Theloderma corticale",st:'LC',
+ i:"Its bumpy green and brown skin looks just like moss on a rock. When it is scared, it curls up into a ball and keeps very still.",
+ h:"Wet mountain forests of northern Vietnam",d:"Insects, crickets, worms",sz:"About 7 to 9 cm",
+ m:{b:"herp",kind:"toad",s:2.0,L:0.42,c:"#5a7a3a",c2:"#3a3028",wartC:"#8aa04a",patC:"#8a4a2a",patN:10}},
+{id:'green-and-black-poison-dart-frog',z:'reptile',n:"Green-and-black poison dart frog",zh:"迷彩箭毒蛙",sci:"Dendrobates auratus",st:'LC',
+ i:"Its shiny green and black skin is a warning sign, because wild ones carry poison in their skin. Frogs raised in zoos eat different food and are not poisonous.",
+ h:"Rainforests of Central America and Colombia",d:"Ants, termites, tiny insects",sz:"About 2.5 to 4 cm",
+ m:{b:"herp",kind:"frog",s:2.2,L:0.3,c:"#2fb86a",c2:"#1a1a1a",patC:"#141414",patN:10}},
+{id:'golden-poison-frog',z:'reptile',n:"Golden poison frog",zh:"金色箭毒蛙",sci:"Phyllobates terribilis",st:'EN',
+ i:"In the wild, this tiny yellow frog may be the most poisonous animal on Earth. Frogs raised in zoos are not poisonous, because their food is different.",
+ h:"Rainforests on the Pacific coast of Colombia",d:"Ants, termites, tiny insects",sz:"About 4 to 5.5 cm",
+ m:{b:"herp",kind:"frog",s:2.1,L:0.32,c:"#f2c21a",c2:"#e8b010"}},
+{id:'yellow-banded-poison-dart-frog',z:'reptile',n:"Yellow-banded poison dart frog",zh:"黃帶箭毒蛙",sci:"Dendrobates leucomelas",st:'LC',
+ i:"Bright yellow bands on black skin make this little frog easy to spot. During the long dry season it hides in damp places and rests until the rain comes back.",
+ h:"Rainforests of Venezuela and nearby countries",d:"Ants, termites, tiny insects",sz:"About 3 to 5 cm",
+ m:{b:"herp",kind:"frog",s:2.1,L:0.32,c:"#f2c81e",c2:"#1a1a1a",patC:"#141414",patN:8}},
+{id:'blue-poison-dart-frog',z:'reptile',n:"Blue poison dart frog",zh:"鈷藍箭毒蛙",sci:"Dendrobates tinctorius 'azureus'",st:'LC',
+ i:"This bright blue frog comes from small patches of forest in Suriname. Each frog has its own pattern of black spots, a bit like a fingerprint.",
+ h:"Forest islands in the grasslands of southern Suriname",d:"Ants, termites, tiny insects",sz:"About 3 to 4.5 cm",
+ m:{b:"herp",kind:"frog",s:2.1,L:0.32,c:"#1f5fc8",c2:"#14306a",patC:"#0e0e14",patN:10}},
+{id:'green-basilisk',z:'reptile',n:"Green basilisk",zh:"雙冠蜥",sci:"Basiliscus plumifrons",st:'LC',
+ i:"This lizard can run across the top of the water on its back legs to escape danger. Males have tall crests on the head, back and tail.",
+ h:"Rainforest rivers of Central America",d:"Insects, fruit, small animals",sz:"About 60 to 90 cm with its long tail",
+ m:{b:"herp",kind:"lizard",s:1.9,L:0.4,c:"#3ea84a",c2:"#a8d870",crest:true,crestC:"#2e8a3a",eyeC:"#e8b020",patC:"#8ad0f0",patN:8}},
+{id:'rhinoceros-iguana',z:'reptile',n:"Rhinoceros iguana",zh:"犀牛鬣蜥",sci:"Cyclura cornuta",st:'EN',
+ i:"Big males grow small horn-like bumps on the snout, like a tiny rhinoceros. It lives on the island of Hispaniola in the Caribbean.",
+ h:"Dry forests of Hispaniola in the Caribbean",d:"Leaves, fruit, flowers",sz:"About 60 to 135 cm with tail",
+ m:{b:"herp",kind:"iguana",s:1.9,L:0.5,c:"#5a5a52",c2:"#7a786a",horn:true,crestC:"#4a4a44"}},
+{id:'taiwan-beauty-snake',z:'reptile',n:"Taiwan beauty snake",zh:"臺灣錦蛇",sci:"Elaphe taeniura friesi",st:'VU',
+ i:"This is one of the longest snakes in Taiwan and can grow over 2 meters. It is not venomous; it catches rats by squeezing them.",
+ h:"Forests, farms and villages of Taiwan",d:"Rodents, birds, eggs",sz:"About 1.6 to 2.5 m long",
+ m:{b:"herp",kind:"snake",s:2.0,L:0.9,c:"#9a9a62",c2:"#e8e0b0",r:0.055,patC:"#2a2620"}},
+{id:'burmese-python',z:'reptile',n:"Burmese python",zh:"緬甸蟒",sci:"Python bivittatus",st:'VU',
+ i:"The Burmese python is one of the biggest snakes in the world. It is not venomous; it wraps its strong body around its prey and squeezes.",
+ h:"Forests, grasslands and marshes of Southeast Asia",d:"Rodents, birds, small animals",sz:"Usually 3.5 to 5 m long",
+ m:{b:"herp",kind:"snake",s:2.4,L:1.2,c:"#b89a5a",c2:"#e8dcb8",r:0.08,patC:"#5a3e22"}},
+{id:'emerald-green-treefrog',z:'reptile',n:"Emerald green treefrog",zh:"翡翠樹蛙",sci:"Zhangixalus prasinatus",st:'NT',
+ i:"This bright green tree frog lives only in northern Taiwan. It lays its eggs in a white foam nest above the water, and the tadpoles drop in when they hatch.",
+ h:"Hill forests, orchards and tea farms of northern Taiwan",d:"Insects, moths, crickets",sz:"About 5 to 8 cm",
+ m:{b:"herp",kind:"frog",s:2.0,L:0.4,c:"#3aa84a",c2:"#f0eedc",eyeC:"#c8782a",patC:"#1a1a1a",patN:4}},
+{id:'green-iguana',z:'reptile',n:"Green iguana",zh:"綠鬣蜥",sci:"Iguana iguana",st:'LC',
+ i:"A green iguana has a big round scale on each cheek and spines down its back. If it falls from a tree into water, it swims away by swishing its long tail.",
+ h:"Rainforests of Central and South America",d:"Leaves, flowers, fruit",sz:"Up to about 1.5 m long with tail",
+ m:{b:"herp",kind:"iguana",s:1.9,L:0.5,c:"#5aa04a",c2:"#9ac87a",crestC:"#3a7a3a",patC:"#3a5a2a",bands:true}},
+{id:'chinese-water-dragon',z:'reptile',n:"Chinese water dragon",zh:"綠水龍",sci:"Physignathus cocincinus",st:'VU',
+ i:"This green lizard often rests on branches above rivers. If it is scared, it drops into the water and can stay under for a long time.",
+ h:"Riverbanks in forests of Southeast Asia and southern China",d:"Insects, worms, small fish",sz:"About 60 to 90 cm with tail",
+ m:{b:"herp",kind:"lizard",s:1.9,L:0.4,c:"#4aa84a",c2:"#e8e8b0",crest:true,crestC:"#3a8a3a",patC:"#5a4a32",bands:true}},
+{id:'olive-frog',z:'reptile',n:"Olive frog",zh:"腹斑蛙",sci:"Nidirana adenopleura",st:'LC',
+ i:"Its Chinese name means belly-spot frog, for the dark spots on its belly. Many olive frogs have a thin pale stripe down the middle of the back.",
+ h:"Ponds, marshes and rice fields of Taiwan and southern China",d:"Insects, spiders, worms",sz:"About 5 to 7 cm",
+ m:{b:"herp",kind:"frog",s:1.9,L:0.4,c:"#7a7a3e",c2:"#e8e0c0",patC:"#3a3a20",patN:6}},
+{id:'asian-common-toad',z:'reptile',n:"Asian common toad",zh:"黑眶蟾蜍",sci:"Duttaphrynus melanostictus",st:'LC',
+ i:"Look for the black ridges on its head, like dark eyebrows. At night it often waits under street lights to snap up the insects that gather there.",
+ h:"Gardens, fields and towns of South and Southeast Asia, including Taiwan",d:"Insects, ants, worms",sz:"About 6 to 15 cm",
+ m:{b:"herp",kind:"toad",s:1.9,L:0.5,c:"#8a6a42",c2:"#d8c49a",wartC:"#2a2018"}},
+{id:'swinhoes-tree-lizard',z:'reptile',n:"Swinhoe's tree lizard",zh:"斯文豪氏攀蜥",sci:"Diploderma swinhonis",st:'LC',
+ i:"This lizard lives only in Taiwan and is often seen on tree trunks in parks. Males bob their heads and puff out their throats to show off.",
+ h:"Forests, parks and gardens of Taiwan",d:"Insects, ants, spiders",sz:"About 20 to 25 cm with tail",
+ m:{b:"herp",kind:"lizard",s:1.8,L:0.32,c:"#6a6a4a",c2:"#c8c0a0",crest:true,crestC:"#5a5a3a",patC:"#e8d27a",patN:6}},
+{id:'swinhoes-frog',z:'reptile',n:"Swinhoe's frog",zh:"斯文豪氏赤蛙",sci:"Odorrana swinhoana",st:'LC',
+ i:"This frog lives along fast mountain streams in Taiwan, and nowhere else. Big sticky toe pads help it hold on to wet, slippery rocks.",
+ h:"Mountain streams of Taiwan",d:"Insects, spiders, worms",sz:"About 5 to 10 cm",
+ m:{b:"herp",kind:"frog",s:1.9,L:0.42,c:"#5a7a42",c2:"#e8e4cc",patC:"#3a4a2a",patN:8}},
+{id:'chinese-cobra',z:'reptile',n:"Chinese cobra",zh:"眼鏡蛇",sci:"Naja atra",st:'VU',
+ i:"When it feels threatened, this cobra lifts its head and spreads a wide hood with a mark like a pair of glasses. It is venomous, so keep a safe distance.",
+ h:"Farmland, forests and towns of Taiwan and southern China",d:"Rodents, frogs, fish, lizards",sz:"About 1.2 to 1.8 m long",
+ m:{b:"herp",kind:"snake",s:2.0,L:0.8,c:"#2a2622",c2:"#9a9480",r:0.05,hood:true,patC:"#d8d0b0",bands:true}},
+{id:'veiled-chameleon',z:'reptile',n:"Veiled chameleon",zh:"高冠變色龍",sci:"Chamaeleo calyptratus",st:'LC',
+ i:"A veiled chameleon has a tall helmet on its head, and each eye can look in a different direction at the same time. It catches insects with a long, sticky tongue.",
+ h:"Dry mountains of Yemen and Saudi Arabia",d:"Insects, crickets, leaves",sz:"About 35 to 60 cm with tail",
+ m:{b:"herp",kind:"chameleon",s:2.0,L:0.35,c:"#4aa04a",c2:"#d8c84a",patC:"#e8b030",bands:true,eyeC:"#5a7a3a"}},
+{id:'banded-water-snake',z:'reptile',n:"Banded water snake",zh:"赤腹游蛇",sci:"Trimerodytes annularis",st:'LC',
+ i:"This snake spends lots of time in streams and ponds, hunting fish and frogs. Its belly is bright orange-red, which gives it its Chinese name.",
+ h:"Streams, ponds and rice fields of Taiwan and southern China",d:"Fish, frogs, tadpoles",sz:"About 60 to 90 cm long",
+ m:{b:"herp",kind:"snake",s:2.0,L:0.7,c:"#5a5448",c2:"#d8502a",r:0.04,patC:"#2a2622",bands:true}},
+{id:'hundred-pace-viper',z:'reptile',n:"Hundred-pace viper",zh:"百步蛇",sci:"Deinagkistrodon acutus",st:'VU',
+ i:"Its name comes from an old story that a bitten person could walk only a hundred steps. It is very venomous, so keep a safe distance.",
+ h:"Mountain forests of Taiwan, southern China and northern Vietnam",d:"Rodents, frogs, birds",sz:"About 80 to 150 cm long",note:"It is an important symbol in the art of Taiwan's Paiwan and Rukai peoples.",
+ m:{b:"herp",kind:"snake",s:2.0,L:0.8,c:"#8a7a62",c2:"#e8dcc0",r:0.06,patC:"#3a2e22"}},
+{id:'tokay-gecko',z:'reptile',n:"Tokay gecko",zh:"大壁虎",sci:"Gekko gecko",st:'LC',
+ i:"This big gecko is named after its loud call, which sounds like to-kay, to-kay. Tiny hairs on its toes let it climb walls and even glass.",
+ h:"Rainforests, rocks and houses of Southeast Asia",d:"Insects, crickets, small animals",sz:"About 20 to 35 cm with tail",
+ m:{b:"herp",kind:"gecko",s:2.0,L:0.35,c:"#7a8aa0",c2:"#c8c8c8",patC:"#e8783a",patN:14,eyeC:"#c8a030"}},
+{id:'yuchi-music-frog',z:'reptile',n:"Yuchi music frog",zh:"魚池琴蛙",sci:"Nidirana shyhhuangi",st:'NE',
+ i:"This frog was named as a brand-new species in 2025, and it lives only in a few wetlands in central Taiwan. It is one of the rarest frogs in the world.",
+ h:"A few forest wetlands around Yuchi, Nantou, in central Taiwan",d:"Insects, spiders, worms",sz:"About 4 to 6 cm",note:"Taiwan's music frogs were once thought to be the Ryukyu music frog; scientists showed they are their own species in 2025.",
+ m:{b:"herp",kind:"frog",s:1.9,L:0.38,c:"#7a6a42",c2:"#e8dcc0",patC:"#3a2e1e",patN:6}},
+{id:'roti-island-snake-necked-turtle',z:'reptile',n:"Roti Island snake-necked turtle",zh:"羅地島蛇頸龜",sci:"Chelodina mccordi",st:'CR',
+ i:"Its neck is so long that it tucks it sideways under the edge of its shell. It is almost gone from the wild on its small home island in Indonesia.",
+ h:"Lakes and swamps of Roti Island, Indonesia",d:"Fish, shrimp, worms",sz:"Shell about 18 to 25 cm long",
+ m:{b:"herp",kind:"snakeneck",s:1.9,L:0.45,c:"#6a5a44",c2:"#c8b890",skin:"#8a7a62"}},
+{id:'chinese-alligator',z:'reptile',n:"Chinese alligator",zh:"揚子鱷",sci:"Alligator sinensis",st:'CR',
+ i:"The Chinese alligator is small for an alligator, and it sleeps through the cold winter in a deep burrow. Very few are left in the wild, and zoos are helping to bring them back.",
+ h:"Wetlands along the lower Yangtze River, China",d:"Fish, snails, shellfish, small animals",sz:"About 1.5 to 2 m long",
+ m:{b:"herp",kind:"croc",s:2.2,L:0.55,c:"#3a3a30",c2:"#c8c0a0",patC:"#8a8a62",bands:true,crestC:"#2e2e26"}},
+{id:'radiated-tortoise',z:'reptile',n:"Radiated tortoise",zh:"射紋陸龜",sci:"Astrochelys radiata",st:'CR',
+ i:"Each part of its tall, dark shell has yellow lines that spread out like the rays of a star. It lives only in southern Madagascar.",
+ h:"Dry spiny forests of southern Madagascar",d:"Grass, leaves, fruit",sz:"Shell about 30 to 40 cm long",
+ m:{b:"herp",kind:"tortoise",s:2.0,L:0.45,c:"#2a2420",c2:"#e8d070",patC:"#f0d050",patN:12,skin:"#d8c06a"}},
+{id:'solomon-islands-skink',z:'reptile',n:"Solomon Islands skink",zh:"猴尾蜥",sci:"Corucia zebrata",st:'NT',
+ i:"This is the largest skink in the world, and it holds on to branches with its tail like a monkey. A mother usually has just one big baby at a time.",
+ h:"Rainforest trees of the Solomon Islands",d:"Leaves, fruit, flowers",sz:"About 60 to 80 cm with tail",
+ m:{b:"herp",kind:"lizard",s:1.9,L:0.42,c:"#6a7a4a",c2:"#a8b07a",patC:"#3a4a2a",patN:12}},
+{id:'yellow-pond-turtle',z:'reptile',n:"Yellow pond turtle",zh:"柴棺龜",sci:"Mauremys mutica",st:'CR',
+ i:"This small turtle has a yellow stripe behind each eye and likes warm, quiet water. It is rare in Taiwan and protected by law.",
+ h:"Ponds, streams and rice fields of Taiwan, southern China, Vietnam and Japan",d:"Water plants, worms, fish",sz:"Shell about 15 to 20 cm long",
+ m:{b:"herp",kind:"turtle",s:1.9,L:0.4,c:"#5a4a34",c2:"#e8d48a",skin:"#8a7a5a",headStripe:"#e8d24a"}},
+{id:'gila-monster',z:'reptile',n:"Gila monster",zh:"鈍尾毒蜥",sci:"Heloderma suspectum",st:'NT',
+ i:"The Gila monster is one of only a few venomous lizards, so keep a safe distance. It stores fat in its thick tail and can go for months without eating.",
+ h:"Deserts of the southwestern United States and Mexico",d:"Eggs, small animals, birds",sz:"About 35 to 55 cm long",
+ m:{b:"herp",kind:"lizard",s:2.0,L:0.45,c:"#1e1a18",c2:"#2a2420",patC:"#e88a5a",patN:16,bands:true}},
+{id:'chinese-stripe-necked-turtle',z:'reptile',n:"Chinese stripe-necked turtle",zh:"斑龜",sci:"Mauremys sinensis",st:'CR',
+ i:"Thin yellow and green stripes run along its head and neck. It often sunbathes on rocks and logs in ponds and rivers.",
+ h:"Ponds, rivers and canals of Taiwan, southern China and Vietnam",d:"Water plants, snails, fish",sz:"Shell about 20 to 25 cm long",
+ m:{b:"herp",kind:"turtle",s:1.9,L:0.45,c:"#3a3a2a",c2:"#d8c87a",skin:"#4a5a3a",headStripe:"#c8d84a"}},
+{id:'pearl-stingray',z:'pangolin',n:"Pearl stingray",zh:"黑帝王魟",sci:"Potamotrygon jabuti",st:'EN',
+ i:"This river stingray is dark with small pale spots, like pearls. It rests on the sandy bottom and has a stinger on its tail, so keep a safe distance.",
+ h:"Clear rivers of the Amazon in Brazil",d:"Fish, shrimp, worms",sz:"Disc about 40 to 60 cm wide",
+ m:{b:"fish",kind:"ray",s:1.6,L:0.7,c:"#1e1c1c",c2:"#d8d0c0",patC:"#f2e8b0"}},
+{id:'julliens-golden-carp',z:'pangolin',n:"Jullien's golden carp",zh:"穗鬚原鯉",sci:"Probarbus jullieni",st:'CR',
+ i:"This big carp has golden scales with dark stripes along its sides. In the wild it lives in big Southeast Asian rivers like the Mekong, where it is now very rare.",
+ h:"Large rivers of Southeast Asia, such as the Mekong",d:"Snails, shellfish, water plants",sz:"Up to about 1.5 m long",
+ m:{b:"fish",kind:"carp",s:1.6,L:1.0,c:"#c8a85a",c2:"#f0e8d0",finC:"#a87a4a",tailC:"#8a6a4a",patC:"#4a3a2a",patN:10}},
+{id:'red-bellied-pacu',z:'pangolin',n:"Red-bellied pacu",zh:"紅銀板",sci:"Piaractus brachypomus",st:'LC',
+ i:"The pacu is a cousin of the piranha, but its flat teeth look a bit like a person's. It cracks open nuts and seeds that fall into flooded forests.",
+ h:"Rivers and flooded forests of the Amazon and Orinoco",d:"Fruit, seeds, insects",sz:"Up to about 80 cm long",
+ m:{b:"fish",kind:"pacu",s:1.6,L:0.8,c:"#7a7a72",c2:"#d8502a",finC:"#3a3a36",tailC:"#2a2a28"}},
+{id:'yellowfin-chalceus',z:'pangolin',n:"Yellowfin chalceus",zh:"紅銅大鱗脂鱧",sci:"Chalceus erythrurus",st:'LC',
+ i:"This shiny silver fish has very large scales and a reddish tail. It swims near the surface and can leap to grab insects that fall into the water.",
+ h:"Rivers of the upper Amazon in South America",d:"Insects, small fish, fruit",sz:"About 20 to 25 cm long",
+ m:{b:"fish",kind:"carp",s:1.6,L:0.45,c:"#c8ccc8",c2:"#f0f0ea",finC:"#e8c84a",tailC:"#c83a2a"}},
+{id:'arapaima',z:'pangolin',n:"Arapaima",zh:"象魚",sci:"Arapaima gigas",st:'DD',
+ i:"The arapaima is one of the biggest freshwater fish in the world. It has to come up to the surface to gulp air every few minutes.",
+ h:"Rivers and flooded forests of the Amazon",d:"Fish, shrimp, insects",sz:"Usually 2 to 3 m long",
+ m:{b:"fish",kind:"arapaima",s:1.8,L:1.2,c:"#5a6a5a",c2:"#c8a87a",finC:"#4a5048",tailC:"#b83a2a",patC:"#c8402a",patN:10}},
+{id:'golden-moon-moth',z:'insect',n:"Golden moon moth",zh:"長尾水青蛾",sci:"Actias sinensis",st:'NE',
+ i:"This moth has long, ribbon-like tails on its back wings that may help confuse bats hunting at night. Grown-up moon moths have no working mouth, so they never eat.",
+ h:"Mountain forests of Taiwan and southern China",d:"Adults do not eat; caterpillars eat sweetgum leaves",sz:"Wings about 8 to 10 cm across",
+ m:{b:"bug",kind:"moth",s:2.2,L:0.4,c:"#e8c440",c2:"#f0e6c8",hind:"#e8c440",patC:"#a0522d",tails:true}},
+{id:'cockscomb-stag-beetle',z:'insect',n:"Cockscomb stag beetle",zh:"雞冠細身赤鍬形蟲",sci:"Cyclommatus mniszechi",st:'NE',
+ i:"The male has very long, thin jaws and a head shaped a bit like a rooster's comb. Males use their jaws to wrestle each other for the best spot on a tree.",
+ h:"Lowland and mountain forests of Taiwan",d:"Tree sap and ripe fruit",sz:"Males up to about 7 cm long with jaws",
+ m:{b:"bug",kind:"stag",s:2.4,L:0.35,c:"#8a3a1e",c2:"#6e2a14",legC:"#3a1a10"}},
+{id:'ceylon-tree-ant',z:'insect',n:"Ceylon tree ant",zh:"錫蘭細腰家蟻",sci:"Paratopula ceylonica",st:'NE',
+ i:"This ant lives up in the trees instead of in the ground. It makes its nest inside hollow, dead branches.",
+ h:"Forests of South and Southeast Asia, including Taiwan",d:"Small insects and sweet honeydew",sz:"Workers about 6 mm long",
+ m:{b:"bug",kind:"ant",s:2.8,L:0.3,c:"#8a3a20",c2:"#6a2a14"}},
+{id:'tiny-snap-jaw-ant',z:'insect',n:"Tiny snap-jaw ant",zh:"瘤顎蟻",sci:"Strumigenys sp.",st:'NE',
+ i:"This ant is only about 2 mm long, smaller than a grain of rice. It holds its jaws wide open and snaps them shut on tiny springtails in the soil.",
+ h:"Leaf litter and soil in forests",d:"Springtails and other tiny insects",sz:"Workers about 1.5 to 2.5 mm long",
+ m:{b:"bug",kind:"ant",s:3.0,L:0.25,c:"#a0603a",c2:"#7a4426",jaws:true}},
+{id:'giant-asian-mantis',z:'insect',n:"Giant Asian mantis",zh:"寬腹斧螳",sci:"Hierodula patellifera",st:'NE',
+ i:"A mantis can turn its head to look over its shoulder. It stands very still, then grabs insects with its spiky front legs.",
+ h:"Gardens, fields and forest edges in East and Southeast Asia, including Taiwan",d:"Insects",sz:"About 5 to 7 cm long",
+ m:{b:"bug",kind:"mantis",s:2.4,L:0.45,c:"#6aa040",c2:"#8bbf5a",legC:"#5a8a36"}},
+{id:'taipei-carpenter-ant',z:'insect',n:"Taipei carpenter ant",zh:"臺北巨山蟻",sci:"Camponotus formosensis",st:'NE',
+ i:"Carpenter ants chew tunnels in soft or rotting wood to build their nests. They do not eat the wood, they just move it out of the way.",
+ h:"Forests of Taiwan",d:"Honeydew, nectar and small insects",sz:"Workers about 7 to 12 mm long",
+ m:{b:"bug",kind:"ant",s:2.6,L:0.35,c:"#2a1e18",c2:"#3a2a20"}},
+{id:'green-bean-stick-insect',z:'insect',n:"Green bean stick insect",zh:"綠椒竹節蟲",sci:"Diapherodes gigantea",st:'NE',
+ i:"The female is big and bright green, like a giant green bean with legs. The males are thinner and brown, and they can fly.",
+ h:"Rainforests of Grenada and nearby Caribbean islands",d:"Bramble and guava leaves",sz:"Females about 13 to 15 cm long",
+ m:{b:"bug",kind:"stick",s:2.4,L:0.5,c:"#5fa83a",c2:"#86c45a",legC:"#4f8f30"}},
+{id:'question-mark-cockroach',z:'insect',n:"Question-mark cockroach",zh:"問號蟑螂",sci:"Therea olegrandjeani",st:'NE',
+ i:"This black and cream cockroach has markings on its back that look a bit like question marks. It lives in dry forests and helps clean up by eating dead leaves.",
+ h:"Dry forests of southern India",d:"Dead leaves and fruit",sz:"About 2.5 to 3 cm long",
+ m:{b:"bug",kind:"roach",s:2.4,L:0.3,c:"#141414",c2:"#1e1e1e",patC:"#f2e6c8",patN:6}},
+{id:'autumn-leaf-insect',z:'insect',n:"Autumn leaf insect",zh:"秋葉䗛",sci:"Phyllium tobeloense",st:'NE',
+ i:"This leaf insect can be orange or brown, just like a dry autumn leaf. It even sways back and forth like a leaf blowing in the wind.",
+ h:"Rainforests of Halmahera, Indonesia",d:"Bramble, guava and oak leaves",sz:"About 8 to 9 cm long",
+ m:{b:"bug",kind:"leaf",s:2.4,L:0.45,c:"#c0782e",c2:"#8a4e1e",legC:"#a0622a"}},
+{id:'spiny-leaf-insect',z:'insect',n:"Spiny leaf insect",zh:"幽靈竹節蟲",sci:"Extatosoma tiaratum",st:'NE',
+ i:"When it is scared, the female curls her tail up over her back like a scorpion. Her eggs look like seeds, and ants carry them into their nests.",
+ h:"Rainforests of eastern Australia",d:"Eucalyptus and bramble leaves",sz:"Females up to about 20 cm long",
+ m:{b:"bug",kind:"stick",s:2.4,L:0.45,c:"#a08a5a",c2:"#6e5a38",legC:"#8a7448",spiny:true}},
+{id:'orange-isopod',z:'insect',n:"Orange isopod",zh:"光滑鼠婦",sci:"Porcellio laevis",st:'NE',
+ i:"Isopods are not insects at all. They are crustaceans, cousins of crabs and shrimp, that live on land and need damp places to breathe.",
+ h:"Damp soil, leaf piles and under logs around the world",d:"Rotting leaves and wood",sz:"About 1.5 to 2 cm long",
+ m:{b:"bug",kind:"isopod",s:2.6,L:0.3,c:"#e07a2a",c2:"#f09040",legC:"#c06a28"}},
+{id:'orange-spotted-diving-beetle',z:'insect',n:"Orange-spotted diving beetle",zh:"橙斑大龍蝨",sci:"Cybister rugosus",st:'NE',
+ i:"This beetle swims with its flat back legs like oars. It carries a bubble of air under its wing covers so it can breathe underwater.",
+ h:"Ponds and rice fields in Asia",d:"Small fish, tadpoles and insects",sz:"About 3 to 3.5 cm long",
+ m:{b:"bug",kind:"beetle",s:2.4,L:0.35,c:"#1f2a1a",c2:"#1f2a1a",patC:"#d08a2a",patN:2,legC:"#3a3020"}},
+{id:'water-walking-stick',z:'insect',n:"Water walking stick",zh:"長翅水螳螂",sci:"Ranatra longipes",st:'NE',
+ i:"This thin water bug looks like a stick floating in the pond. It breathes through a long tube at its tail, like a snorkel.",
+ h:"Still ponds and marshes in Asia",d:"Small insects and tiny fish",sz:"About 4 to 5 cm long, plus the breathing tube",
+ m:{b:"bug",kind:"waterbug",s:2.2,L:0.45,c:"#7a5e3c",c2:"#6a5030",legC:"#6a5030",tailTube:true}},
+{id:'atlas-moth',z:'insect',n:"Atlas moth",zh:"皇蛾",sci:"Attacus atlas formosanus",st:'NE',
+ i:"The Atlas moth is one of the biggest moths in the world. The tips of its front wings look like snake heads, which may scare away birds.",
+ h:"Lowland forests of Taiwan",d:"Adults do not eat; caterpillars eat leaves",sz:"Wings up to about 25 cm across",
+ m:{b:"bug",kind:"moth",s:2.4,L:0.5,c:"#a8452a",c2:"#8a3a20",hind:"#a8452a",patC:"#f2ead8"}},
+{id:'two-spined-hard-ant',z:'insect',n:"Two-spined hard ant",zh:"堅硬雙針家蟻",sci:"Pristomyrmex punctatus",st:'NE',
+ i:"Most nests of this ant have no queen at all, so the workers lay the eggs themselves. If you bother it, it curls up and plays dead.",
+ h:"Forests, parks and gardens of East Asia, including Taiwan",d:"Small insects, seeds and honeydew",sz:"Workers about 2.5 to 3 mm long",
+ m:{b:"bug",kind:"ant",s:3.0,L:0.25,c:"#5a2e1a",c2:"#4a2414"}},
+{id:'siemssens-carpenter-ant',z:'insect',n:"Siemssen's carpenter ant",zh:"希氏巨山蟻",sci:"Camponotus siemsseni",st:'NE',
+ i:"A carpenter ant nest has small workers and big workers. The big ones have huge heads and strong jaws for guarding the nest.",
+ h:"Forests of Taiwan and southern China",d:"Honeydew, nectar and small insects",sz:"Workers about 7 to 14 mm long",
+ m:{b:"bug",kind:"ant",s:2.6,L:0.35,c:"#6a2e1a",c2:"#2a1a14"}},
+{id:'taiwan-long-legged-ant',z:'insect',n:"Taiwan long-legged ant",zh:"大林長腳家蟻",sci:"Aphaenogaster tipuna",st:'NE',
+ i:"This ant has long legs and runs fast across the forest floor. Ants like it help plants by carrying their seeds back to the nest.",
+ h:"Forests of Taiwan",d:"Dead insects and seeds",sz:"Workers about 5 to 6 mm long",
+ m:{b:"bug",kind:"ant",s:2.8,L:0.3,c:"#6a3a20",c2:"#5a2e18"}},
+{id:'beetle-cockroach',z:'insect',n:"Beetle cockroach",zh:"甲蟲蟑螂",sci:"Ergaula capucina",st:'NE',
+ i:"The female has no wings and a round, shiny body, so she looks more like a beetle than a cockroach. She hides under bark and in rotting logs.",
+ h:"Rainforests of Southeast Asia",d:"Rotting wood and fruit",sz:"About 2.5 to 3 cm long",
+ m:{b:"bug",kind:"roach",s:2.4,L:0.3,c:"#2a1a12",c2:"#3a2418"}},
+{id:'mountain-trap-jaw-ant',z:'insect',n:"Mountain trap-jaw ant",zh:"高山鋸針蟻",sci:"Odontomachus monticola",st:'NE',
+ i:"Its long jaws lock open and snap shut faster than you can blink. It can even snap them against the ground to bounce away from danger.",
+ h:"Mountain forests of Taiwan and East Asia",d:"Insects",sz:"Workers about 1 cm long",
+ m:{b:"bug",kind:"ant",s:2.8,L:0.35,c:"#5a2a18",c2:"#a0603a",jaws:true}},
+{id:'big-headed-ant',z:'insect',n:"Big-headed ant",zh:"大頭家蟻",sci:"Pheidole sp.",st:'NE',
+ i:"This ant nest has two kinds of workers. The soldiers have giant heads and strong jaws for cracking seeds and guarding the door.",
+ h:"Soil, gardens and forests in Taiwan",d:"Seeds and small insects",sz:"Workers about 2 to 4 mm long",
+ m:{b:"bug",kind:"ant",s:3.0,L:0.25,c:"#8a4a24",c2:"#7a3e1c"}},
+{id:'kaohsiung-carpenter-ant',z:'insect',n:"Kaohsiung carpenter ant",zh:"高雄巨山蟻",sci:"Camponotus sp.",st:'NE',
+ i:"Many carpenter ants come out to look for food at night. They love honeydew, a sweet juice made by aphids, and they protect the aphids like tiny farmers.",
+ h:"Forests of southern Taiwan",d:"Honeydew, nectar and small insects",sz:"Workers about 7 to 12 mm long",
+ m:{b:"bug",kind:"ant",s:2.6,L:0.35,c:"#2a1a14",c2:"#4a2a1a"}},
+{id:'smelly-carpenter-ant',z:'insect',n:"Smelly carpenter ant",zh:"臭巨山蟻",sci:"Camponotus habereri",st:'NE',
+ i:"Its Chinese name means smelly carpenter ant. When it is bothered, it sprays a strong-smelling acid to protect itself.",
+ h:"Forests and parks of Taiwan and East Asia",d:"Honeydew, nectar and small insects",sz:"Workers about 6 to 10 mm long",
+ m:{b:"bug",kind:"ant",s:2.6,L:0.35,c:"#3a2418",c2:"#2a1a12"}},
+{id:'orange-oakleaf',z:'insect',n:"Orange oakleaf",zh:"枯葉蝶",sci:"Kallima inachus formosana",st:'NE',
+ i:"With its wings open it shows blue and orange, but with its wings closed it looks just like a dry, dead leaf. It even has a leaf stem shape and vein lines.",
+ h:"Forests and streams of Taiwan",d:"Tree sap and rotting fruit",sz:"Wings about 8 to 11 cm across",
+ m:{b:"butterfly",s:1.6,c:"#2a4a8a",c2:"#e8862a",hind:"#3a4a6a"}},
+{id:'common-tiger',z:'insect',n:"Common tiger",zh:"黑脈樺斑蝶",sci:"Danaus genutia",st:'NE',
+ i:"This orange butterfly has thick black lines on its wings. Its caterpillars eat milkweed plants, which make the butterfly taste bad to birds.",
+ h:"Open fields and gardens of Taiwan and Asia",d:"Flower nectar",sz:"Wings about 7 to 9 cm across",
+ m:{b:"butterfly",s:1.6,c:"#e8802a",c2:"#1a1a1a",hind:"#d8702a",spots:"#1a1a1a"}},
+{id:'plain-tiger',z:'insect',n:"Plain tiger",zh:"樺斑蝶",sci:"Danaus chrysippus",st:'LC',
+ i:"The plain tiger is one of the most widespread butterflies in the world, found from Africa to Australia. Birds learn that it tastes bad and leave it alone.",
+ h:"Open fields and gardens in Africa, Asia and Australia",d:"Flower nectar",sz:"Wings about 7 to 8 cm across",
+ m:{b:"butterfly",s:1.5,c:"#e0862e",c2:"#1a1a1a",hind:"#e8a050",spots:"#f2efe6"}},
+{id:'yellow-emperor',z:'insect',n:"Yellow emperor",zh:"臺灣小紫蛺蝶",sci:"Chitoria chrysolora",st:'NE',
+ i:"This golden-orange butterfly likes to drink tree sap and the juice of rotting fruit. Its caterpillars feed on hackberry trees.",
+ h:"Forests of Taiwan and southern China",d:"Tree sap and rotting fruit",sz:"Wings about 5 to 7 cm across",
+ m:{b:"butterfly",s:1.5,c:"#e8a830",c2:"#4a3a2a",hind:"#e0a030"}},
+{id:'ceylon-blue-glassy-tiger',z:'insect',n:"Ceylon blue glassy tiger",zh:"旖斑蝶(琉球青斑蝶)",sci:"Ideopsis similis",st:'NE',
+ i:"Its pale blue wings look almost like glass with black lines painted on. It flies slowly and gently, because birds know it does not taste good.",
+ h:"Forest edges and coasts of Taiwan and East Asia",d:"Flower nectar",sz:"Wings about 6 to 8 cm across",
+ m:{b:"butterfly",s:1.5,c:"#cfe2ee",c2:"#1a1a1a",hind:"#d8e8f0",spots:"#1a2a3a"}},
+{id:'common-rose',z:'insect',n:"Common rose",zh:"紅紋鳳蝶",sci:"Pachliopta aristolochiae",st:'NE',
+ i:"This black swallowtail has a bright red body and red spots on its wings. The red is a warning sign that says I taste bad, do not eat me!",
+ h:"Gardens and forest edges of Taiwan and South Asia",d:"Flower nectar",sz:"Wings about 8 to 11 cm across",
+ m:{b:"butterfly",s:1.6,c:"#1a1a1e",c2:"#f2efe6",hind:"#1a1a1e",spots:"#d0283a"}},
+{id:'paris-peacock',z:'insect',n:"Paris peacock",zh:"大琉璃紋鳳蝶",sci:"Papilio paris",st:'NE',
+ i:"This swallowtail has a big shiny patch of blue-green on each back wing. The color comes from tiny scales that shimmer in the sun.",
+ h:"Mountain forests of Taiwan and South Asia",d:"Flower nectar",sz:"Wings about 9 to 13 cm across",
+ m:{b:"butterfly",s:1.7,c:"#1a2420",c2:"#2ab0a0",hind:"#1e9a8c"}},
+{id:'chinese-peacock',z:'insect',n:"Chinese peacock",zh:"翠鳳蝶(烏鴉鳳蝶)",sci:"Papilio bianor",st:'NE',
+ i:"Its dark wings are sprinkled with sparkly green scales, and it has little tails on its back wings. It often drinks from wet mud to get salt.",
+ h:"Forests and gardens of Taiwan and East Asia",d:"Flower nectar",sz:"Wings about 9 to 12 cm across",
+ m:{b:"butterfly",s:1.7,c:"#1e2a2a",c2:"#2a8a6a",hind:"#1e2a2a",spots:"#c03040"}},
+{id:'lime-butterfly',z:'insect',n:"Lime butterfly",zh:"無尾鳳蝶",sci:"Papilio demoleus",st:'NE',
+ i:"This swallowtail has no tails, which is why its Chinese name means tailless swallowtail. Its young caterpillars look like bird droppings, so birds leave them alone.",
+ h:"Gardens and citrus farms across Asia",d:"Flower nectar; caterpillars eat citrus leaves",sz:"Wings about 8 to 10 cm across",
+ m:{b:"butterfly",s:1.6,c:"#1a1a1a",c2:"#f2d04a",hind:"#1a1a1a",spots:"#f2d04a"}},
+{id:'long-tailed-stick-insect',z:'insect',n:"Long-tailed stick insect",zh:"長肛竹節蟲",sci:"Entoria sp.",st:'NE',
+ i:"This thin stick insect sways gently from side to side, just like a twig in the breeze. Birds walk right past without seeing it.",
+ h:"Forests of Taiwan and East Asia",d:"Leaves",sz:"About 8 to 12 cm long",
+ m:{b:"bug",kind:"stick",s:2.4,L:0.5,c:"#7a6a40",c2:"#5a4a30"}},
+{id:'six-spotted-stick-insect',z:'insect',n:"Six-spotted stick insect",zh:"六點瘤胸竹節蟲",sci:"Trachythorax sexpunctatus",st:'NE',
+ i:"Its scientific name means six-spotted bumpy chest. When it is scared, it freezes and stays very still so it looks like a stick.",
+ h:"Forests of Southeast Asia",d:"Leaves",sz:"About 7 to 10 cm long",
+ m:{b:"bug",kind:"stick",s:2.4,L:0.45,c:"#8a7a50",c2:"#5a4a30"}},
+{id:'giant-leaf-insect',z:'insect',n:"Giant leaf insect",zh:"巨人葉䗛",sci:"Phyllium giganteum",st:'NE',
+ i:"This is one of the biggest leaf insects. Even its legs have flat flaps that look like bits of leaf, and females can lay eggs without any males.",
+ h:"Rainforests of Malaysia",d:"Guava, bramble and oak leaves",sz:"About 10 to 12 cm long",
+ m:{b:"bug",kind:"leaf",s:2.6,L:0.55,c:"#6aa040",c2:"#4a7a2a",legC:"#5a8a36"}},
+{id:'thai-red-winged-stick-insect',z:'insect',n:"Thai red-winged stick insect",zh:"泰國小紅翅竹節蟲",sci:"Phaenopharos khaoyaiensis",st:'NE',
+ i:"It hides small bright red wings on its back. If something scares it, it flashes the red wings to give the attacker a surprise.",
+ h:"Forests of Khao Yai, Thailand",d:"Leaves",sz:"Females about 12 cm long",
+ m:{b:"bug",kind:"stick",s:2.4,L:0.5,c:"#6a5a3a",c2:"#c8302a"}},
+{id:'long-winged-katydid',z:'insect',n:"Long-winged katydid",zh:"臺灣騷斯",sci:"Mecopoda elongata",st:'NE',
+ i:"On summer nights the male sings a loud buzzing song by rubbing his wings together. People say the song sounds like sao-si, which gave it its Taiwanese name.",
+ h:"Grassy forest edges of Taiwan and Asia",d:"Leaves, flowers and small insects",sz:"About 5 to 6 cm long with wings",
+ m:{b:"bug",kind:"katydid",s:2.2,L:0.5,c:"#8aa050",c2:"#7a9440",legC:"#7a9440"}},
+{id:'two-spotted-cricket',z:'insect',n:"Two-spotted field cricket",zh:"黃斑黑蟋蟀",sci:"Gryllus bimaculatus",st:'LC',
+ i:"This black cricket has two yellow spots near the base of its wings. Males chirp by rubbing one wing against the other.",
+ h:"Fields and grasslands of Africa, Europe and Asia",d:"Plants, seeds and small insects",sz:"About 2.5 to 3 cm long",
+ m:{b:"bug",kind:"cricket",s:2.4,L:0.35,c:"#1a1614",c2:"#1a1614",legC:"#1a1614"}},
+{id:'giant-walking-stick',z:'insect',n:"Giant walking stick",zh:"尖刺足刺竹節蟲",sci:"Phobaeticus serratipes",st:'NE',
+ i:"This is one of the longest insects in the world. The female's legs have little saw-like spines that help her hold on to branches.",
+ h:"Rainforests of Malaysia",d:"Guava and mango leaves",sz:"Females can be over 25 cm long, even longer with legs stretched out",
+ m:{b:"bug",kind:"stick",s:2.6,L:0.6,c:"#6a5a3c",c2:"#4a3c28"}},
+{id:'giant-spiny-stick-insect',z:'insect',n:"Giant spiny stick insect",zh:"巨棘竹節蟲",sci:"Eurycantha calcarata",st:'NE',
+ i:"This heavy stick insect has no wings. Males have a big spike on each back leg and kick hard if a predator gets too close.",
+ h:"Rainforests of New Guinea and nearby islands",d:"Leaves",sz:"About 12 to 15 cm long",
+ m:{b:"bug",kind:"stick",s:2.4,L:0.45,c:"#3a2e24",c2:"#5a4636",legC:"#3a2e24",spiny:true}},
+{id:'malaysian-jungle-nymph',z:'insect',n:"Malaysian jungle nymph",zh:"扁竹節蟲",sci:"Heteropteryx dilatata",st:'NE',
+ i:"The bright green female is one of the heaviest insects in the world. When scared, she hisses with her wings and kicks with her spiny legs.",
+ h:"Rainforests of Malaysia",d:"Guava, bramble and oak leaves",sz:"Females about 15 to 17 cm long",
+ m:{b:"bug",kind:"stick",s:2.4,L:0.5,c:"#7ab04a",c2:"#4a7a2a",legC:"#5a8a36",spiny:true}},
+{id:'three-lined-diving-beetle',z:'insect',n:"Three-lined diving beetle",zh:"點刻三線大龍蝨",sci:"Cybister tripunctatus",st:'NE',
+ i:"This diving beetle has yellow edges along its smooth body. Its babies are fierce hunters nicknamed water tigers.",
+ h:"Ponds, ditches and rice fields in Asia, Africa and Europe",d:"Small fish, tadpoles and insects",sz:"About 2.5 to 3.5 cm long",
+ m:{b:"bug",kind:"beetle",s:2.2,L:0.3,c:"#1a2618",c2:"#1a2618",patC:"#c8a830",patN:2,legC:"#3a3020"}},
+{id:'six-spotted-cockroach',z:'insect',n:"Six-spotted cockroach",zh:"六點金翼蟑螂",sci:"Eublaberus distanti",st:'NE',
+ i:"This big golden-winged cockroach lives in large groups in caves and hollow trees. It is a forest cleaner that eats fallen fruit and rotting plants.",
+ h:"Caves and rainforests of Central and South America",d:"Rotting fruit and dead leaves",sz:"About 5 to 6 cm long",
+ m:{b:"bug",kind:"roach",s:2.4,L:0.4,c:"#c8963c",c2:"#2a1e14",patC:"#1a1410",patN:6}},
+{id:'brown-water-bug',z:'insect',n:"Brown water bug",zh:"褐負蝽",sci:"Diplonychus rusticus",st:'NE',
+ i:"The mother glues her eggs onto the father's back. He carries them and keeps them safe until the babies hatch.",
+ h:"Ponds, ditches and rice fields in Asia, including Taiwan",d:"Snails, tadpoles and small insects",sz:"About 1.5 to 2 cm long",
+ m:{b:"bug",kind:"waterbug",s:2.4,L:0.3,c:"#6a5030",c2:"#5a4028",legC:"#5a4028"}},
+{id:'redknee-tarantula',z:'insect',n:"Mexican redknee tarantula",zh:"墨西哥紅膝頭蜘蛛",sci:"Brachypelma hamorii",st:'NE',
+ i:"This hairy spider has bright orange knees and can live for more than 25 years. When it feels scared it flicks itchy hairs, so look, don't touch!",
+ h:"Dry forests and hillsides of western Mexico",d:"Crickets and other insects",sz:"Body about 5 to 7 cm, legs about 13 to 15 cm across",
+ m:{b:"bug",kind:"spider",s:2.2,L:0.4,c:"#2a2420",c2:"#2a2420",patC:"#e0702a",kneeC:true,legC:"#2a2420"}},
+{id:'emperor-scorpion',z:'insect',n:"Emperor scorpion",zh:"帝王蠍",sci:"Pandinus imperator",st:'NE',
+ i:"This is one of the biggest scorpions in the world, and it glows blue-green under a special ultraviolet light. Its sting hurts, so look, don't touch!",
+ h:"Rainforests and grasslands of West Africa",d:"Crickets, insects and small animals",sz:"About 15 to 20 cm long",
+ m:{b:"bug",kind:"scorpion",s:2.2,L:0.45,c:"#141414",c2:"#5a3a20",legC:"#141414"}},
+{id:'red-headed-centipede',z:'insect',n:"Chinese red-headed centipede",zh:"少棘蜈蚣",sci:"Scolopendra mutilans",st:'NE',
+ i:"A centipede has one pair of legs on each body part, and its front pair is turned into venom claws for catching food. It can give a painful bite, so look, don't touch!",
+ h:"Forests and fields of China, Taiwan and Japan",d:"Insects, worms and small animals",sz:"About 10 to 14 cm long",
+ m:{b:"bug",kind:"centipede",s:2.2,L:0.55,c:"#22201a",c2:"#c0302a",legC:"#e0a030"}},
+{id:'yellow-edged-firefly',z:'insect',n:"Yellow-edged firefly",zh:"黃緣螢",sci:"Aquatica ficta",st:'NE',
+ i:"Its babies live in water and hunt small snails. Grown-up fireflies flash their glowing tails at night to find each other.",
+ h:"Rice fields, ditches and wetlands of Taiwan and southern China",d:"Larvae eat water snails; adults drink dew",sz:"About 1 cm long",
+ m:{b:"bug",kind:"firefly",s:2.6,L:0.2,c:"#1a1a18",c2:"#e8a040",glow:"#e8f56a",legC:"#1a1a18"}},
+{id:'lanyu-giant-katydid',z:'insect',n:"Lanyu giant katydid",zh:"蘭嶼大葉螽斯",sci:"Phyllophorina kotoshoensis",st:'NE',
+ i:"This big katydid has a wide shield on its back shaped like a leaf. It lives on Lanyu, a small island off Taiwan's southeast coast.",
+ h:"Forests of Lanyu (Orchid Island) and Green Island, Taiwan",d:"Leaves and fruit",sz:"About 6 to 8 cm long",
+ m:{b:"bug",kind:"katydid",s:2.2,L:0.55,c:"#6a9a3a",c2:"#7aaa4a",legC:"#5a8a30"}},
+{id:'round-spotted-weevil',z:'insect',n:"Big round-spotted weevil",zh:"大圓斑球背象鼻蟲",sci:"Pachyrhynchus sarcitis kotoensis",st:'NE',
+ i:"This shiny weevil has a shell so hard that birds and lizards can hardly bite it. Its wing covers are joined together, so it cannot fly.",
+ h:"Forests of Lanyu (Orchid Island), Taiwan",d:"Leaves",sz:"About 1.2 to 1.6 cm long",
+ m:{b:"bug",kind:"weevil",s:2.6,L:0.25,c:"#141418",c2:"#141418",patC:"#3ac0c8",patN:6}},
+{id:'long-fanged-stag-beetle',z:'insect',n:"Formosan long-fanged stag beetle",zh:"長角大鍬形蟲",sci:"Dorcus schenklingi",st:'NE',
+ i:"This stag beetle lives only in Taiwan. The male's jaws can be almost as long as the rest of his body.",
+ h:"Mountain forests of Taiwan",d:"Tree sap and ripe fruit",sz:"Males up to about 9 cm long with jaws",
+ m:{b:"bug",kind:"stag",s:2.4,L:0.4,c:"#1a1410",c2:"#1a1410",legC:"#1a1410"}},
+{id:'water-scorpion',z:'insect',n:"Water scorpion",zh:"大紅娘華",sci:"Laccotrephes pfeiferiae",st:'NE',
+ i:"It is not a real scorpion but a water bug. It hides on the pond bottom, breathes through a long tail tube, and grabs passing prey with its front legs.",
+ h:"Ponds, ditches and rice fields in Asia, including Taiwan",d:"Tadpoles, small fish and insects",sz:"About 3.5 to 4 cm long, plus the breathing tube",
+ m:{b:"bug",kind:"waterbug",s:2.2,L:0.4,c:"#5a4430",c2:"#4a3828",legC:"#4a3828",tailTube:true}},
+{id:'lanyu-giant-walking-stick',z:'insect',n:"Lanyu giant walking stick",zh:"蘭嶼筒胸竹節蟲",sci:"Phasmotaenia lanyuhensis",st:'NE',
+ i:"This stick insect is named after Lanyu, the island where it lives. Scientists only gave it a name in 2001, even though it is common there.",
+ h:"Forests of Lanyu (Orchid Island), Taiwan",d:"Leaves",sz:"About 8 to 11 cm long",
+ m:{b:"bug",kind:"stick",s:2.4,L:0.45,c:"#6a7a3a",c2:"#4a5a2a"}},
 ];
 const ROUTE=['formosan','children','koala','panda','rainforest','pangolin','elephant','insect','bugvalley','desert','australian','african','penguin','temperate','reptile','bird'];
 const ZI={};ZONES.forEach(z=>ZI[z.id]=z);
@@ -989,9 +1366,9 @@ const SONG=[
  {t:"Children's Zoo",z:'children',l:["[donkey:Donkey] says hee-haw, [miniature-horse:mini horse] trots by,", "[south-american-coati:Coati] and [meerkat:meerkat] dig and spy!", "[kinkajou:Kinkajou] and [northern-raccoon:raccoon] with a mask so neat,", "[lar-gibbon:Gibbon] swinging, [alpaca:alpaca] fluffy and sweet!"]},
  {t:"Koala House and Giant Panda House",z:'koala',l:["[koala:Koala] sleeping in a tree,", "[giant-panda:Giant panda], bamboo, one, two, three!"]},
  {t:"Tropical Rainforest Area",z:'rainforest',l:["[malayan-tiger:Malayan tiger], [bornean-orangutan:orangutan],", "[malayan-tapir:Tapir], [capybara:capybara], swim if you can!", "[brown-spider-monkey:Spider monkey] swinging high,", "Hooting, calling to the sky!", "[laughing-kookaburra:Kookaburra] laughing, ha-ha-ha all day,", "[great-hornbill:Great hornbill], [black-swan:black swan], hip, hip, hooray!", "[black-howler:Howler monkey] calling, loud as loud can be,", "[colombian-white-faced-capuchin:Capuchin], [bolivian-squirrel-monkey:squirrel monkey] up the tree,", "[geoffroys-spider-monkey:Geoffroy's spider monkey], [brown-headed-spider-monkey:brown-headed] friend,", "[siamang:Siamang] sings and swings from end to end!", "[giant-anteater:Giant anteater], [southern-tamandua:tamandua] too,", "Long sticky tongues catch ants, it's true!"]},
- {t:"Pangolin House",z:'pangolin',l:["[cotton-top-tamarin:Tamarin], [aye-aye:aye-aye], [two-toed-sloth:sloth] so slow,", "Inside the Pangolin House, watch them go!", "[blue-and-yellow-macaw:Macaw] in blue and yellow, [toco-toucan:toucan] with a giant beak,", "[scarlet-ibis:Scarlet ibis], red as fire, [blue-tailed-bee-eater:bee-eater] catches bees, so sleek!", "[great-argus:Great argus] shows a hundred eyes, [palawan-peacock-pheasant:peacock-pheasant] too,", "[great-curassow:Curassow] in a curly crown says boom, boom, boom to you!", "[fat-tailed-dwarf-lemur:Dwarf lemur], [senegal-bushbaby:bushbaby], leaping in the night,", "[pygmy-slow-loris:Slow loris], [azaras-night-monkey:night monkey], big eyes shining bright!"]},
+ {t:"Pangolin House",z:'pangolin',l:["[cotton-top-tamarin:Tamarin], [aye-aye:aye-aye], [two-toed-sloth:sloth] so slow,", "Inside the Pangolin House, watch them go!", "[blue-and-yellow-macaw:Macaw] in blue and yellow, [toco-toucan:toucan] with a giant beak,", "[scarlet-ibis:Scarlet ibis], red as fire, [blue-tailed-bee-eater:bee-eater] catches bees, so sleek!", "[great-argus:Great argus] shows a hundred eyes, [palawan-peacock-pheasant:peacock-pheasant] too,", "[great-curassow:Curassow] in a curly crown says boom, boom, boom to you!", "[fat-tailed-dwarf-lemur:Dwarf lemur], [senegal-bushbaby:bushbaby], leaping in the night,", "[pygmy-slow-loris:Slow loris], [azaras-night-monkey:night monkey], big eyes shining bright!", "[arapaima:Arapaima], [red-bellied-pacu:pacu], [julliens-golden-carp:golden carp] in the pool,", "[pearl-stingray:Pearl stingray], [yellowfin-chalceus:chalceus], gliding slow and cool!"]},
  {t:"Asian Elephant Area",z:'elephant',l:["[asian-elephant:Asian elephant] splashing in the pool,", "Spraying water, keeping cool!"]},
- {t:"Insectarium",z:'insect',l:["[great-mormon:Great mormon], [large-tree-nymph:tree nymph], flutter by,", "[tsuda-stick-insect:Stick insect] hides where leaves are high!"]},
+ {t:"Insectarium",z:'insect',l:["[great-mormon:Great mormon], [large-tree-nymph:tree nymph], flutter by,", "[tsuda-stick-insect:Stick insect] hides where leaves are high!", "[golden-moon-moth:Moon moth], [atlas-moth:Atlas moth], wings open wide,", "[orange-oakleaf:Oakleaf butterfly] folds up like a leaf to hide!", "[common-tiger:Common tiger], [plain-tiger:plain tiger], [yellow-emperor:yellow emperor] glide,", "[ceylon-blue-glassy-tiger:Glassy tiger], [common-rose:common rose] fly side by side!", "[paris-peacock:Paris peacock], [chinese-peacock:Chinese peacock], [lime-butterfly:lime butterfly] too,", "[taipei-carpenter-ant:Carpenter ant], [siemssens-carpenter-ant:carpenter ant], [kaohsiung-carpenter-ant:carpenter ant], [smelly-carpenter-ant:smelly ant] marching through!", "[mountain-trap-jaw-ant:Trap-jaw ant], [tiny-snap-jaw-ant:snap-jaw ant], [big-headed-ant:big-headed ant], [ceylon-tree-ant:tree ant], [two-spined-hard-ant:hard ant] in a line,", "[taiwan-long-legged-ant:Long-legged ant], [giant-asian-mantis:mantis], [yellow-edged-firefly:firefly] that shines!", "[cockscomb-stag-beetle:Stag beetle], [long-fanged-stag-beetle:long-fanged stag], [round-spotted-weevil:weevil] shiny and strong,", "[green-bean-stick-insect:Green bean stick], [giant-walking-stick:giant stick], [long-tailed-stick-insect:long-tailed stick], oh so long!", "[spiny-leaf-insect:Spiny leaf], [giant-spiny-stick-insect:spiny stick], [malaysian-jungle-nymph:jungle nymph], [six-spotted-stick-insect:six-spot stick] stay,", "[thai-red-winged-stick-insect:Red-winged stick], [lanyu-giant-walking-stick:Lanyu stick], [autumn-leaf-insect:autumn leaf], [giant-leaf-insect:giant leaf] sway!", "[long-winged-katydid:Katydid], [lanyu-giant-katydid:Lanyu katydid], [two-spotted-cricket:cricket] sing at night,", "[orange-spotted-diving-beetle:Diving beetle], [three-lined-diving-beetle:diving beetle], [water-walking-stick:water stick], [water-scorpion:water scorpion], [brown-water-bug:water bug] dive out of sight!", "[question-mark-cockroach:Roach], [beetle-cockroach:beetle roach], [six-spotted-cockroach:six-spot roach], [orange-isopod:isopod], [red-headed-centipede:centipede] crawl,", "[redknee-tarantula:Tarantula], [emperor-scorpion:scorpion], look, don't touch at all!"]},
  {t:"Bug Exploration Valley",z:'bugvalley',l:["[rhinoceros-beetle:Rhinoceros beetle] on a log,", "[darner-dragonfly:Darner dragonfly] zooms past the bog!"]},
  {t:'Chorus',chorus:true,z:null,l:["Come along, come along to the Taipei Zoo,","So many animals waiting for you!"]},
  {t:"Desert Animal Area",z:'desert',l:["[bactrian-camel:Bactrian camel], two humps high,", "[addax:Addax], [african-wild-ass:wild ass] walking by!"]},
@@ -999,7 +1376,7 @@ const SONG=[
  {t:"African Animal Area",z:'african',l:["[african-elephant:Elephant], [somali-giraffe:giraffe] so tall,", "[pygmy-hippopotamus:Pygmy hippo], [hippopotamus:hippo], [western-lowland-gorilla:gorilla], that's not all!", "[lion:Lion] roars and [grants-zebra:zebra] stripes,", "[white-rhinoceros:White rhino], [chimpanzee:chimpanzee], [oryx:oryx] day and night!", "[spotted-hyena:Spotted hyena] giggles, [olive-baboon:baboon] in a troop,", "[patas-monkey:Patas monkey] running, swoop, swoop, swoop!", "[ring-tailed-lemur:Ring-tailed lemur], [common-brown-lemur:brown lemur], [black-and-white-ruffed-lemur:ruffed lemur] in a row,", "[barbary-sheep:Barbary sheep], [mountain-bongo:bongo], [common-eland:eland], on the go!"]},
  {t:"Penguin House",z:'penguin',l:["[king-penguin:King penguin], [african-penguin:African penguin], waddle, waddle, slide!"]},
  {t:"Temperate Zone Animal Area",z:'temperate',l:["[puma:Puma], [red-panda:red panda], [lynx:lynx] with tufted ears,", "[asian-small-clawed-otter:Small-clawed otter], [przewalskis-horse:wild horse], give them cheers!", "[american-beaver:Beaver] builds a dam, slap goes its tail,", "[asiatic-black-bear:Asiatic black bear] walking down the trail!"]},
- {t:"Amphibian and Reptile House",z:'reptile',l:["[taipei-frog:Taipei frog] croaks in a froggy world,", "[aldabra-giant-tortoise:Aldabra tortoise], [yellow-margined-box-turtle:box turtle], slow and curled!"]},
+ {t:"Amphibian and Reptile House",z:'reptile',l:["[taipei-frog:Taipei frog] croaks in a froggy world,", "[aldabra-giant-tortoise:Aldabra tortoise], [yellow-margined-box-turtle:box turtle], slow and curled!", "[african-spurred-tortoise:Spurred tortoise], [radiated-tortoise:radiated tortoise], [chinese-alligator:alligator] in the sun,", "[green-iguana:Green iguana], [rhinoceros-iguana:rhino iguana], [green-basilisk:basilisk] on the run!", "[guenthers-frog:Guenther's frog], [la-touches-frog:La Touche's frog], [olive-frog:olive frog] croak and sing,", "[swinhoes-frog:Swinhoe's frog], [fujian-large-headed-frog:big-headed frog], [yuchi-music-frog:music frog] in the spring!", "[red-eyed-treefrog:Red-eyed treefrog], [emerald-green-treefrog:emerald treefrog], [vietnamese-mossy-frog:mossy frog] hide in green,", "[golden-poison-frog:Golden frog], [blue-poison-dart-frog:blue frog], [yellow-banded-poison-dart-frog:yellow-banded frog], [green-and-black-poison-dart-frog:green-and-black frog], the brightest ever seen!", "[central-formosan-toad:Formosan toad], [asian-common-toad:common toad], [tokay-gecko:tokay gecko] out at night,", "[chinese-fire-bellied-newt:Fire-bellied newt], [hong-kong-warty-newt:warty newt], [chinese-water-dragon:water dragon] splashing in the light!", "[burmese-python:Burmese python], [taiwan-beauty-snake:beauty snake], [banded-water-snake:water snake] slide,", "[chinese-cobra:Cobra], [hundred-pace-viper:hundred-pace viper], watch them from the safe side!", "[veiled-chameleon:Chameleon], [swinhoes-tree-lizard:tree lizard], [solomon-islands-skink:monkey-tailed skink], [gila-monster:Gila monster] too,", "[roti-island-snake-necked-turtle:Snake-necked turtle], [yellow-pond-turtle:pond turtle], [chinese-stripe-necked-turtle:stripe-necked turtle] swim to you!"]},
  {t:"Bird World",z:'bird',l:["[tawny-fish-owl:Fish owl] hoots, hoo, hoo, hoo,", "[greater-flamingo:Greater flamingo] on one leg too!", "[red-crowned-crane:Red-crowned crane], [white-naped-crane:white-naped crane], [grey-crowned-crane:crowned crane] dance with pride,", "[marabou-stork:Marabou stork] and [great-white-pelican:pelican] with wings so wide!", "[wood-duck:Wood duck], [mandarin-duck:mandarin duck], [common-moorhen:moorhen] paddle in a row,", "[oriental-turtle-dove:Turtle dove], [nicobar-pigeon:Nicobar pigeon], [victoria-crowned-pigeon:crowned pigeon] say hello!", "[white-cockatoo:White cockatoo], [palm-cockatoo:palm cockatoo], crests up high,", "[rose-ringed-parakeet:Parakeet], [papuan-eclectus:eclectus], green and red fly by!", "[brahminy-kite:Brahminy kite], [crested-serpent-eagle:serpent eagle], circling round and round,", "[swinhoes-pheasant:Swinhoe's pheasant], [vietnam-pheasant:Vietnam pheasant], [taiwan-bamboo-partridge:bamboo partridge] on the ground!"]},
  {t:'Chorus',chorus:true,z:null,l:["Come along, come along to the Taipei Zoo,","So many animals waiting for you!","Look and listen, say each name,","Come back soon and sing again!"]}
 ];
@@ -1358,8 +1735,12 @@ function beetle(o){const g=new THREE.Group();limb(g,V(-.55,.12,0),V(.55,.12,0),.
  hg.position.set(.2,.3,0);E(hg,o.c,.05,.045,.06,0,0,0);limb(hg,V(.03,.02,0),V(.18,.22,0),.02,o.c,.012);
  for(const s of[1,-1])for(const x of[-.1,0,.1])limb(g,V(x,.27,s*.08),V(x+.05,.24,s*.2),.012,o.c);
  return {g,head:hg,update(t,ph){hg.rotation.z=Math.sin(t*1.6+ph)*.12}}}
+function herp(o,R){const k=o.kind||'lizard';const b=k==='frog'||k==='toad'?frog:k==='snake'?snake:(k==='turtle'||k==='tortoise'||k==='snakeneck')?tortoise:lizard;
+ return b(Object.assign({c2:o.c,side:o.c2||o.c,stripe:o.patC||o.c,tongue:'#d8283a',skin:o.skin||'#7a7060',coil:1},o),R)}
+function bug(o,R){const k=o.kind||'beetle';return (k==='stick'||k==='leaf'||k==='mantis'?stick:k==='moth'?butterfly:beetle)(Object.assign({hind:o.hind||o.c,c2:o.c2||o.c},o),R)}
+function fish(o,R){const g=new THREE.Group();const L=o.L||.5;E(g,o.c,L*.5,L*.18,L*.12,0,L*.3,0);E(g,o.tailC||o.finC||o.c,L*.1,L*.16,L*.02,-L*.55,L*.3,0);return {g}}
 function avian(o,R){return bird(Object.assign({wingC:o.wingC||o.c,beakC:o.billC||'#d8b070',legC:o.legC||'#d8b070'},o,{kind:(o.leg||0)>.4?'flamingo':'duck'}),R)}   /* simple stand-in for the Blender bird when its model cannot load */
-const BUILD={avian,beetle,quad,primate,meerkat,kangaroo,koala,sloth,bird,penguin,snake,tortoise,lizard,frog,butterfly,stick,dragonfly,pangolin};
+const BUILD={herp,bug,fish,avian,beetle,quad,primate,meerkat,kangaroo,koala,sloth,bird,penguin,snake,tortoise,lizard,frog,butterfly,stick,dragonfly,pangolin};
 
 /* ---------- Blender models (.glb) ----------
    An animal with m.glb uses the Blender model; if it fails to load (e.g. the page is opened
@@ -1374,11 +1755,22 @@ const TOONC={};
 function toonFrom(old,variant){const k=(variant||'')+'|'+old.color.getHexString()+'|'+old.side+'|'+(old.transparent?old.opacity:1);if(TOONC[k])return TOONC[k];
  const o={color:old.color.clone(),side:old.side};if(old.transparent){o.transparent=true;o.opacity=old.opacity;o.depthWrite=false}
  return TOONC[k]=toon(o)}
+function isLazy(a){return a.m.b==='herp'||a.m.b==='bug'||a.m.b==='fish'}   /* frogs, snakes, insects and fish: small, indoors */
+function loadLazyModels(){if(!THREE.GLTFLoader)return;const list=A.filter(a=>isLazy(a)&&a.m.glb&&!GLB[a.m.glb]&&a.obj);if(!list.length)return;
+ const loader=new THREE.GLTFLoader();let dr=null;if(THREE.DRACOLoader){dr=new THREE.DRACOLoader();dr.setDecoderPath('vendor/draco/');dr.setDecoderConfig({type:'wasm'});loader.setDRACOLoader(dr)}
+ let i=0,live=0,done=0;const next=()=>{while(live<4&&i<list.length){const a=list[i++];live++;   // four at a time, in the background
+   let over=false;const t=setTimeout(()=>{if(!over){over=true;console.warn('lazy model timed out',a.id);fin()}},20000);   /* a stuck decode never blocks the queue */
+   loader.load(a.m.glb,g=>{if(over)return;over=true;clearTimeout(t);GLB[a.m.glb]=g;try{swapModel(a)}catch(e){console.warn('model swap failed',a.id,e)}fin()},undefined,()=>{if(over)return;over=true;clearTimeout(t);fin()})}};
+ const fin=()=>{live--;done++;if(done>=list.length){if(dr){dr.dispose();if(dr.workerSourceURL){URL.revokeObjectURL(dr.workerSourceURL);dr.workerSourceURL=''}dr._getWorker=()=>Promise.reject(new Error('lazy loading finished'))}console.log('lazy models: '+list.length)}else next()};next()}
+function swapModel(a){const o=a.obj;if(!o||!GLB[a.m.glb])return;const built=buildGLB(a.m),g=built.g;g.scale.setScalar(a.m.s||1);addOutline(g,1.1);   /* built-in shape → Blender model */
+ o.holder.remove(o.g);o.g.traverse(n=>{if(n.isMesh&&n.geometry&&!n.userData.isOutline)n.geometry.dispose()});o.holder.add(g);   /* (shared shapes are simply re-uploaded if still used elsewhere) */o.holder.traverse(n=>{n.userData.animal=a.id});o.g=g;o.built=built;
+ o.outlines=[];g.traverse(n=>{if(n.userData.isOutline)o.outlines.push(n)});o.olOn=true;o.legFar=undefined;
+ const box=new THREE.Box3().setFromObject(g);o.h=box.max.y-box.min.y||o.h}
 function preloadGLB(){
  if(!THREE.GLTFLoader)return Promise.resolve();
  const loader=new THREE.GLTFLoader();
  let dr=null;if(THREE.DRACOLoader){dr=new THREE.DRACOLoader();dr.setDecoderPath('vendor/draco/');dr.setDecoderConfig({type:'wasm'});loader.setDRACOLoader(dr)}   // models are Draco-compressed
- const urls=[...new Set(A.map(a=>a.m.glb).filter(Boolean).concat([HAB_URL,WX_URL,RIDES_URL]))];
+ const urls=[...new Set(A.filter(a=>!isLazy(a)).map(a=>a.m.glb).filter(Boolean).concat([HAB_URL,WX_URL,RIDES_URL,BLD_URL]))];   /* the small indoor animals come later (loadLazyModels) */
  let settled=false;   // once the park is built, models that arrive late are ignored (the built-in shapes stay)
  const all=Promise.all(urls.map(u=>new Promise(res=>loader.load(u,g=>{if(!settled)GLB[u]=g;res()},undefined,e=>{console.warn('GLB load failed, using built-in shape:',u,e);res()}))));
  // never wait forever: if the decoder or a file hangs, start with whatever loaded (the rest use built-in shapes)
@@ -1388,7 +1780,7 @@ function preloadGLB(){
  return Promise.race([all,limit]).then(()=>{settled=true;clearTimeout(timer);freeDecoder();
   if(dr){dr._getWorker=()=>Promise.reject(new Error('model loading finished'));   // no new decoder workers after this point
    if(dr.decoderPending)dr.decoderPending.then(freeDecoder,()=>{})}})}             // a decoder that finishes starting up late is freed too
-const HAB_URL='models/habitat-kit.glb',WX_URL='models/weather-kit.glb',RIDES_URL='models/rides-kit.glb';
+const HAB_URL='models/habitat-kit.glb',WX_URL='models/weather-kit.glb',RIDES_URL='models/rides-kit.glb',BLD_URL='models/buildings-kit.glb';
 function buildGLB(o){
  const src=GLB[o.glb];const g=new THREE.Group();const m=src.scene.clone(true);
  m.traverse(n=>{if(n.isMesh)n.material=toonFrom(n.material)});
@@ -1584,6 +1976,7 @@ function buildZone(z){
  if(indoor){
   if(z.id==='panda')for(let i=0;i<5;i++){const a=i/5*Math.PI*2+.3;treeAt(g,'bamboo',Math.cos(a)*z.r*.7,Math.sin(a)*z.r*.7,.8,R)}
   if(z.id==='penguin'){pond(g,z.r*.22,0,Math.min(2.6,z.r*.52),'#4a9ac8');for(let i=0;i<3;i++)E(g,'#f4fbff',.6,.35,.55,-z.r*.68+Math.abs(i-1)*.25,.3,(i-1)*z.r*.3,GSL)}   /* ice floes on the far edge, scaled to the area so the penguins never stand inside them */
+  if(z.id==='pangolin')pond(g,z.r*.2,-z.r*.15,Math.min(2.6,z.r*.42),'#3a7f9a');   /* the aquarium pool (the real house has an underwater tunnel) */
   if(z.id==='insect')for(let i=0;i<4;i++){const a=i/4*Math.PI*2+.5;treeAt(g,'broad',Math.cos(a)*z.r*.75,Math.sin(a)*z.r*.75,.55,R)}
   if(z.id==='reptile'){rimTree('rock',4,.6,.9);pond(g,0,0,1.4,'#5aa69a')}
  }
@@ -1596,7 +1989,9 @@ function buildZone(z){
  if(z.biome==='aviary'){const net=new THREE.Mesh(shapeDomeGeo(z,z.r*.55),new THREE.MeshBasicMaterial({color:'#ffffff',wireframe:true,transparent:true,opacity:.28}));g.add(net)}
  if(indoor){const dome=new THREE.Mesh(shapeDomeGeo(z,z.r*.7),new THREE.MeshStandardMaterial({color:z.biome==='indoor-ice'?'#bfe3f2':'#e8f4ee',transparent:true,opacity:.22,roughness:.2,side:THREE.DoubleSide,depthWrite:false}));g.add(dome);
   const ring=new THREE.Mesh(shapeTube(z,0,.3,.15),mat('#7a8a80'));g.add(ring);
-  for(let i=0;i<6;i++){const a=i/6*Math.PI*2,ra=zR(z,a);const pts=[];for(let k=0;k<=8;k++){const t=k/8*Math.PI/2;pts.push(V(Math.cos(a)*Math.cos(t)*ra,Math.sin(t)*z.r*.7,Math.sin(a)*Math.cos(t)*ra))}for(let k=0;k<8;k++)limb(g,pts[k],pts[k+1],.06,'#9aa8a0')}}
+  const nRib=z.id==='pangolin'?18:6,ribC=z.id==='pangolin'?'#eef0ec':'#9aa8a0';   /* the Pangolin House: a white steel lattice like its real glass roof */
+  for(let i=0;i<nRib;i++){const a=i/nRib*Math.PI*2,ra=zR(z,a);const pts=[];for(let k=0;k<=8;k++){const t=k/8*Math.PI/2;pts.push(V(Math.cos(a)*Math.cos(t)*ra,Math.sin(t)*z.r*.7,Math.sin(a)*Math.cos(t)*ra))}for(let k=0;k<8;k++)limb(g,pts[k],pts[k+1],.06,ribC)}
+  if(z.id==='pangolin')for(const t of [Math.PI/7,Math.PI/3.6,Math.PI/2.5]){const ring=new THREE.Mesh(shapeTube(z,0,0,.05),mat('#eef0ec'));ring.scale.set(Math.cos(t),1,Math.cos(t));ring.position.y=Math.sin(t)*z.r*.7;g.add(ring)}}
  const label=makeLabel(z.n,z.zh,{prio:4,bg:'#EBC45E',fg:'#2B2420',w:Math.max(9,z.r*.9),num:ROUTE.indexOf(z.id)+1});
  label.position.set(0,(indoor?z.r*.7:4)+4.5,0);g.add(label);z.label=label;
 }
@@ -1653,7 +2048,8 @@ const pickables=[];
 function placeAnimals(){
  ZONES.forEach(z=>{const list=A.filter(a=>a.z===z.id);const n=list.length;const R=rng(hashStr(z.id)+3);
   list.forEach((a,i)=>{let px=0,pz=0;
-   if(n>1){const two=n>10,outer=!two||i%2===0,m=two?(outer?Math.ceil(n/2):Math.floor(n/2)):n,k=two?Math.floor(i/2):i;   /* many animals: two rings */
+   if(n>20){const k=i+.5,rr=Math.sqrt(k/n)*z.r*.82,ang=k*2.39996;px=Math.cos(ang)*rr;pz=Math.sin(ang)*rr}   /* lots of small animals: an even spiral */
+   else if(n>1){const two=n>10,outer=!two||i%2===0,m=two?(outer?Math.ceil(n/2):Math.floor(n/2)):n,k=two?Math.floor(i/2):i;   /* many animals: two rings */
     const ring=z.r*(two?(outer?.66:.3):n>6?.52:.48);const ang=(k/m)*Math.PI*2+.6+(two&&!outer?Math.PI/m:0);px=Math.cos(ang)*ring;pz=Math.sin(ang)*ring;
     if(z.id==='rainforest'&&['two-toed-sloth','aye-aye','cotton-top-tamarin','capybara'].includes(a.id)){const k=['two-toed-sloth','aye-aye','cotton-top-tamarin','capybara'].indexOf(a.id);const ang2=k/4*Math.PI*2;px=z.pango[0]+Math.cos(ang2)*2.4*z.pangoS;pz=z.pango[1]+Math.sin(ang2)*2.4*z.pangoS;a.inDome=true}
    }
@@ -1924,7 +2320,8 @@ const ALIAS={
 'lynx':'lynx,猞猁,山貓','przewalskis-horse':'wild horse,horse,普氏野馬,野馬,馬','taipei-frog':'frog,台北赤蛙,赤蛙,青蛙',
 'aldabra-giant-tortoise':'tortoise,turtle,giant tortoise,象龜,陸龜,烏龜','yellow-margined-box-turtle':'turtle,box turtle,食蛇龜,箱龜,烏龜',
 'tawny-fish-owl':'owl,fish owl,黃魚鴞,魚鴞,貓頭鷹','greater-flamingo':'flamingo,大紅鶴,紅鶴,火鶴,紅鸛','asian-elephant':'asian elephant,elephant,大象,象,亞洲象','rhinoceros-beetle':'beetle,rhinoceros beetle,stag beetle,獨角仙,甲蟲,兜蟲',
- 'wood-duck':"wood duck,duck,林鴛鴦,鴛鴦,鴨",'rose-ringed-parakeet':"parakeet,parrot,ring-necked parakeet,紅領綠鸚鵡,鸚鵡",'common-moorhen':"moorhen,water hen,紅冠水雞,水雞",'oriental-turtle-dove':"turtle dove,dove,金背鳩,斑鳩,鳩",'marabou-stork':"marabou,stork,禿鸛,非洲禿鸛,鸛",'papuan-eclectus':"eclectus,eclectus parrot,parrot,折衷鸚鵡,鸚鵡",'taiwan-bamboo-partridge':"bamboo partridge,partridge,竹雞,臺灣竹雞,台灣竹雞",'grey-crowned-crane':"crowned crane,crane,冠鶴,灰頸冠鶴,鶴",'white-cockatoo':"cockatoo,white cockatoo,umbrella cockatoo,白鳳頭鸚鵡,鳳頭鸚鵡,鸚鵡",'white-naped-crane':"white-naped crane,crane,白枕鶴,鶴",'brahminy-kite':"kite,brahminy kite,栗鳶,鳶,老鷹",'red-crowned-crane':"red-crowned crane,crane,japanese crane,丹頂鶴,仙鶴,鶴",'crested-serpent-eagle':"serpent eagle,eagle,大冠鷲,蛇鵰,老鷹",'swinhoes-pheasant':"swinhoe's pheasant,pheasant,藍腹鷴,鷴",'vietnam-pheasant':"vietnam pheasant,edwards's pheasant,pheasant,越南鷴,鷴",'victoria-crowned-pigeon':"crowned pigeon,pigeon,冠鴿,維多利亞冠鴿,鴿子",'nicobar-pigeon':"nicobar pigeon,pigeon,綠簑鴿,鴿子",'mandarin-duck':"mandarin duck,duck,鴛鴦,鴨",'palm-cockatoo':"palm cockatoo,black cockatoo,cockatoo,棕櫚鳳頭鸚鵡,鳳頭鸚鵡,鸚鵡",'great-white-pelican':"pelican,white pelican,白鵜鶘,鵜鶘",'palawan-peacock-pheasant':"peacock-pheasant,peacock pheasant,pheasant,孔雀雉,巴拉望孔雀雉",'blue-and-yellow-macaw':"macaw,blue and yellow macaw,parrot,金剛鸚鵡,琉璃金剛鸚鵡,鸚鵡",'scarlet-ibis':"scarlet ibis,ibis,紅䴉,朱鷺",'great-argus':"great argus,argus,pheasant,青鸞,大青鸞",'blue-tailed-bee-eater':"bee-eater,bee eater,蜂虎,栗喉蜂虎",'toco-toucan':"toucan,toco toucan,巨嘴鳥,大巨嘴鳥,鵎鵼",'great-curassow':"curassow,great curassow,寶冠鳥,大寶冠鳥",'laughing-kookaburra':"kookaburra,kingfisher,笑翠鳥,笑鴗,翠鳥",'great-hornbill':"hornbill,great hornbill,犀鳥,雙角犀鳥",'black-swan':"black swan,swan,黑天鵝,天鵝",'collared-scops-owl':"scops owl,owl,領角鴞,貓頭鷹",'fat-tailed-dwarf-lemur':"dwarf lemur,lemur,粗尾侏儒狐猴,侏儒狐猴,狐猴",'senegal-bushbaby':"bushbaby,bush baby,galago,嬰猴",'pygmy-slow-loris':"slow loris,loris,小懶猴,懶猴",'azaras-night-monkey':"night monkey,owl monkey,夜猴,阿氏夜猴,猴子",'black-howler':"howler monkey,howler,吼猴,黑吼猴,猴子",'colombian-white-faced-capuchin':"capuchin,white-faced capuchin,捲尾猴,白面捲尾猴,猴子",'southern-tamandua':"tamandua,anteater,小食蟻獸,食蟻獸",'geoffroys-spider-monkey':"spider monkey,black-handed spider monkey,黑掌蜘蛛猴,蜘蛛猴,猴子",'brown-headed-spider-monkey':"spider monkey,brown-headed spider monkey,棕頭蜘蛛猴,蜘蛛猴,猴子",'giant-anteater':"giant anteater,anteater,大食蟻獸,食蟻獸",'siamang':"siamang,gibbon,ape,大長臂猿,合趾猿,長臂猿",'bolivian-squirrel-monkey':"squirrel monkey,松鼠猴,黑冠松鼠猴,猴子",'spotted-hyena':"hyena,spotted hyena,鬣狗,斑點鬣狗",'common-brown-lemur':"brown lemur,lemur,褐狐猴,狐猴",'patas-monkey':"patas,patas monkey,紅猴,赤猴,猴子",'olive-baboon':"baboon,olive baboon,狒狒,東非狒狒",'barbary-sheep':"barbary sheep,aoudad,sheep,北非髯羊,髯羊,羊",'mountain-bongo':"bongo,antelope,條紋羚,山地斑哥條紋羚,斑哥羚羊,羚羊",'black-and-white-ruffed-lemur':"ruffed lemur,lemur,白頸狐猴,領狐猴,黑白領狐猴,狐猴",'ring-tailed-lemur':"ring-tailed lemur,lemur,環尾狐猴,狐猴",'common-eland':"eland,antelope,伊蘭羚羊,大羚羊,羚羊",'formosan-sambar':"sambar,deer,水鹿,臺灣水鹿,台灣水鹿,鹿",'formosan-reeves-muntjac':"muntjac,barking deer,deer,山羌,臺灣山羌,台灣山羌",'formosan-wild-boar':"wild boar,boar,pig,野豬,臺灣野豬,台灣野豬",'formosan-ferret-badger':"ferret-badger,ferret badger,badger,鼬獾",'masked-palm-civet':"civet,palm civet,masked palm civet,白鼻心,果子狸",'clouded-leopard':"clouded leopard,leopard,雲豹,臺灣雲豹,台灣雲豹",'kinkajou':"kinkajou,honey bear,蜜熊",'northern-raccoon':"raccoon,浣熊,北美浣熊",'lar-gibbon':"gibbon,lar gibbon,white-handed gibbon,ape,白手長臂猿,長臂猿",'alpaca':"alpaca,羊駝,草泥馬",'american-beaver':"beaver,河狸,美洲河狸,海狸",'asiatic-black-bear':"asiatic black bear,moon bear,bear,亞洲黑熊,黑熊,熊"};
+ 'wood-duck':"wood duck,duck,林鴛鴦,鴛鴦,鴨",'rose-ringed-parakeet':"parakeet,parrot,ring-necked parakeet,紅領綠鸚鵡,鸚鵡",'common-moorhen':"moorhen,water hen,紅冠水雞,水雞",'oriental-turtle-dove':"turtle dove,dove,金背鳩,斑鳩,鳩",'marabou-stork':"marabou,stork,禿鸛,非洲禿鸛,鸛",'papuan-eclectus':"eclectus,eclectus parrot,parrot,折衷鸚鵡,鸚鵡",'taiwan-bamboo-partridge':"bamboo partridge,partridge,竹雞,臺灣竹雞,台灣竹雞",'grey-crowned-crane':"crowned crane,crane,冠鶴,灰頸冠鶴,鶴",'white-cockatoo':"cockatoo,white cockatoo,umbrella cockatoo,白鳳頭鸚鵡,鳳頭鸚鵡,鸚鵡",'white-naped-crane':"white-naped crane,crane,白枕鶴,鶴",'brahminy-kite':"kite,brahminy kite,栗鳶,鳶,老鷹",'red-crowned-crane':"red-crowned crane,crane,japanese crane,丹頂鶴,仙鶴,鶴",'crested-serpent-eagle':"serpent eagle,eagle,大冠鷲,蛇鵰,老鷹",'swinhoes-pheasant':"swinhoe's pheasant,pheasant,藍腹鷴,鷴",'vietnam-pheasant':"vietnam pheasant,edwards's pheasant,pheasant,越南鷴,鷴",'victoria-crowned-pigeon':"crowned pigeon,pigeon,冠鴿,維多利亞冠鴿,鴿子",'nicobar-pigeon':"nicobar pigeon,pigeon,綠簑鴿,鴿子",'mandarin-duck':"mandarin duck,duck,鴛鴦,鴨",'palm-cockatoo':"palm cockatoo,black cockatoo,cockatoo,棕櫚鳳頭鸚鵡,鳳頭鸚鵡,鸚鵡",'great-white-pelican':"pelican,white pelican,白鵜鶘,鵜鶘",'palawan-peacock-pheasant':"peacock-pheasant,peacock pheasant,pheasant,孔雀雉,巴拉望孔雀雉",'blue-and-yellow-macaw':"macaw,blue and yellow macaw,parrot,金剛鸚鵡,琉璃金剛鸚鵡,鸚鵡",'scarlet-ibis':"scarlet ibis,ibis,紅䴉,朱鷺",'great-argus':"great argus,argus,pheasant,青鸞,大青鸞",'blue-tailed-bee-eater':"bee-eater,bee eater,蜂虎,栗喉蜂虎",'toco-toucan':"toucan,toco toucan,巨嘴鳥,大巨嘴鳥,鵎鵼",'great-curassow':"curassow,great curassow,寶冠鳥,大寶冠鳥",'laughing-kookaburra':"kookaburra,kingfisher,笑翠鳥,笑鴗,翠鳥",'great-hornbill':"hornbill,great hornbill,犀鳥,雙角犀鳥",'black-swan':"black swan,swan,黑天鵝,天鵝",'collared-scops-owl':"scops owl,owl,領角鴞,貓頭鷹",'fat-tailed-dwarf-lemur':"dwarf lemur,lemur,粗尾侏儒狐猴,侏儒狐猴,狐猴",'senegal-bushbaby':"bushbaby,bush baby,galago,嬰猴",'pygmy-slow-loris':"slow loris,loris,小懶猴,懶猴",'azaras-night-monkey':"night monkey,owl monkey,夜猴,阿氏夜猴,猴子",'black-howler':"howler monkey,howler,吼猴,黑吼猴,猴子",'colombian-white-faced-capuchin':"capuchin,white-faced capuchin,捲尾猴,白面捲尾猴,猴子",'southern-tamandua':"tamandua,anteater,小食蟻獸,食蟻獸",'geoffroys-spider-monkey':"spider monkey,black-handed spider monkey,黑掌蜘蛛猴,蜘蛛猴,猴子",'brown-headed-spider-monkey':"spider monkey,brown-headed spider monkey,棕頭蜘蛛猴,蜘蛛猴,猴子",'giant-anteater':"giant anteater,anteater,大食蟻獸,食蟻獸",'siamang':"siamang,gibbon,ape,大長臂猿,合趾猿,長臂猿",'bolivian-squirrel-monkey':"squirrel monkey,松鼠猴,黑冠松鼠猴,猴子",'spotted-hyena':"hyena,spotted hyena,鬣狗,斑點鬣狗",'common-brown-lemur':"brown lemur,lemur,褐狐猴,狐猴",'patas-monkey':"patas,patas monkey,紅猴,赤猴,猴子",'olive-baboon':"baboon,olive baboon,狒狒,東非狒狒",'barbary-sheep':"barbary sheep,aoudad,sheep,北非髯羊,髯羊,羊",'mountain-bongo':"bongo,antelope,條紋羚,山地斑哥條紋羚,斑哥羚羊,羚羊",'black-and-white-ruffed-lemur':"ruffed lemur,lemur,白頸狐猴,領狐猴,黑白領狐猴,狐猴",'ring-tailed-lemur':"ring-tailed lemur,lemur,環尾狐猴,狐猴",'common-eland':"eland,antelope,伊蘭羚羊,大羚羊,羚羊",'formosan-sambar':"sambar,deer,水鹿,臺灣水鹿,台灣水鹿,鹿",'formosan-reeves-muntjac':"muntjac,barking deer,deer,山羌,臺灣山羌,台灣山羌",'formosan-wild-boar':"wild boar,boar,pig,野豬,臺灣野豬,台灣野豬",'formosan-ferret-badger':"ferret-badger,ferret badger,badger,鼬獾",'masked-palm-civet':"civet,palm civet,masked palm civet,白鼻心,果子狸",'clouded-leopard':"clouded leopard,leopard,雲豹,臺灣雲豹,台灣雲豹",'kinkajou':"kinkajou,honey bear,蜜熊",'northern-raccoon':"raccoon,浣熊,北美浣熊",'lar-gibbon':"gibbon,lar gibbon,white-handed gibbon,ape,白手長臂猿,長臂猿",'alpaca':"alpaca,羊駝,草泥馬",'american-beaver':"beaver,河狸,美洲河狸,海狸",'asiatic-black-bear':"asiatic black bear,moon bear,bear,亞洲黑熊,黑熊,熊",
+ 'african-spurred-tortoise':"sulcata,spurred tortoise,tortoise,蘇卡達象龜,蘇卡達,陸龜",'guenthers-frog':"frog,guenthers frog,貢德氏赤蛙,赤蛙,青蛙",'la-touches-frog':"frog,la touches frog,拉都希氏赤蛙,赤蛙,青蛙",'fujian-large-headed-frog':"frog,big-headed frog,large-headed frog,福建大頭蛙,大頭蛙,青蛙",'central-formosan-toad':"toad,formosan toad,盤古蟾蜍,蟾蜍,癩蝦蟆",'chinese-fire-bellied-newt':"newt,fire-bellied newt,salamander,東方蠑螈,蠑螈",'hong-kong-warty-newt':"newt,warty newt,salamander,香港瘰螈,瘰螈,蠑螈",'red-eyed-treefrog':"tree frog,red-eyed tree frog,frog,紅眼樹蛙,樹蛙",'vietnamese-mossy-frog':"mossy frog,frog,苔蘚蛙,苔蘚樹蛙,青蛙",'green-and-black-poison-dart-frog':"poison frog,dart frog,frog,迷彩箭毒蛙,箭毒蛙",'golden-poison-frog':"golden frog,poison frog,dart frog,金色箭毒蛙,箭毒蛙",'yellow-banded-poison-dart-frog':"bumblebee frog,poison frog,dart frog,黃帶箭毒蛙,箭毒蛙",'blue-poison-dart-frog':"blue frog,poison frog,dart frog,鈷藍箭毒蛙,箭毒蛙",'green-basilisk':"basilisk,lizard,plumed basilisk,雙冠蜥,蜥蜴",'rhinoceros-iguana':"rhino iguana,iguana,lizard,犀牛鬣蜥,鬣蜥",'taiwan-beauty-snake':"snake,beauty snake,rat snake,臺灣錦蛇,台灣錦蛇,錦蛇",'burmese-python':"python,snake,緬甸蟒,緬甸蟒蛇,蟒蛇",'emerald-green-treefrog':"tree frog,emerald tree frog,frog,翡翠樹蛙,樹蛙",'green-iguana':"iguana,lizard,綠鬣蜥,鬣蜥,蜥蜴",'chinese-water-dragon':"water dragon,lizard,綠水龍,水龍,蜥蜴",'olive-frog':"frog,olive frog,腹斑蛙,青蛙",'asian-common-toad':"toad,common toad,黑眶蟾蜍,蟾蜍,癩蝦蟆",'swinhoes-tree-lizard':"tree lizard,lizard,japalure,斯文豪氏攀蜥,攀蜥,蜥蜴",'swinhoes-frog':"frog,swinhoes frog,斯文豪氏赤蛙,赤蛙,青蛙",'chinese-cobra':"cobra,snake,眼鏡蛇,飯匙倩,毒蛇",'veiled-chameleon':"chameleon,lizard,高冠變色龍,變色龍,蜥蜴",'banded-water-snake':"water snake,snake,赤腹游蛇,水蛇",'hundred-pace-viper':"viper,snake,hundred pacer,百步蛇,毒蛇,蛇",'tokay-gecko':"gecko,tokay,lizard,大壁虎,壁虎,守宮",'yuchi-music-frog':"music frog,frog,魚池琴蛙,琴蛙,青蛙",'roti-island-snake-necked-turtle':"snake-necked turtle,turtle,羅地島蛇頸龜,蛇頸龜,烏龜",'chinese-alligator':"alligator,crocodile,揚子鱷,鱷魚",'radiated-tortoise':"tortoise,star tortoise,射紋陸龜,輻射龜,陸龜",'solomon-islands-skink':"skink,monkey-tailed skink,lizard,猴尾蜥,石龍子,蜥蜴",'yellow-pond-turtle':"turtle,pond turtle,柴棺龜,烏龜",'gila-monster':"gila monster,lizard,鈍尾毒蜥,毒蜥,蜥蜴",'chinese-stripe-necked-turtle':"turtle,stripe-necked turtle,斑龜,烏龜",'pearl-stingray':"stingray,ray,black diamond stingray,黑帝王魟,魟魚",'julliens-golden-carp':"carp,golden carp,穗鬚原鯉,七線魚,鯉魚,魚",'red-bellied-pacu':"pacu,pirapitinga,紅銀板,魚",'yellowfin-chalceus':"chalceus,tucan fish,紅銅大鱗脂鱧,紅銅大鱗脂鯉,粗鱗紅尾平克,魚",'arapaima':"arapaima,pirarucu,象魚,海象魚,魚",'golden-moon-moth':"moon moth,moth,長尾水青蛾,臺灣長尾水青蛾,水青蛾,蛾",'cockscomb-stag-beetle':"stag beetle,beetle,雞冠細身赤鍬形蟲,鍬形蟲,甲蟲",'ceylon-tree-ant':"ant,tree ant,錫蘭細腰家蟻,螞蟻",'tiny-snap-jaw-ant':"ant,snap-jaw ant,瘤顎蟻,螞蟻",'giant-asian-mantis':"mantis,praying mantis,寬腹斧螳,螳螂",'taipei-carpenter-ant':"carpenter ant,ant,臺北巨山蟻,巨山蟻,螞蟻",'green-bean-stick-insect':"stick insect,green bean,綠椒竹節蟲,竹節蟲",'question-mark-cockroach':"cockroach,roach,問號蟑螂,蟑螂",'autumn-leaf-insect':"leaf insect,秋葉䗛,葉䗛,葉竹節蟲",'spiny-leaf-insect':"stick insect,spiny leaf insect,幽靈竹節蟲,竹節蟲",'orange-isopod':"isopod,pill bug,woodlouse,光滑鼠婦,鼠婦",'orange-spotted-diving-beetle':"diving beetle,water beetle,橙斑大龍蝨,龍蝨,甲蟲",'water-walking-stick':"water stick,water bug,長翅水螳螂,水螳螂",'atlas-moth':"atlas moth,moth,皇蛾,蛾",'two-spined-hard-ant':"ant,hard ant,堅硬雙針家蟻,螞蟻",'siemssens-carpenter-ant':"carpenter ant,ant,希氏巨山蟻,巨山蟻,螞蟻",'taiwan-long-legged-ant':"ant,long-legged ant,大林長腳家蟻,螞蟻",'beetle-cockroach':"cockroach,roach,beetle cockroach,甲蟲蟑螂,蟑螂",'mountain-trap-jaw-ant':"trap-jaw ant,ant,高山鋸針蟻,螞蟻",'big-headed-ant':"big-headed ant,ant,大頭家蟻,螞蟻",'kaohsiung-carpenter-ant':"carpenter ant,ant,高雄巨山蟻,巨山蟻,螞蟻",'smelly-carpenter-ant':"carpenter ant,ant,臭巨山蟻,巨山蟻,螞蟻",'orange-oakleaf':"butterfly,dead leaf butterfly,oakleaf,枯葉蝶,蝴蝶",'common-tiger':"butterfly,tiger butterfly,黑脈樺斑蝶,樺斑蝶,蝴蝶",'plain-tiger':"butterfly,plain tiger,樺斑蝶,蝴蝶",'yellow-emperor':"butterfly,emperor,臺灣小紫蛺蝶,小紫蛺蝶,蛺蝶,蝴蝶",'ceylon-blue-glassy-tiger':"butterfly,glassy tiger,旖斑蝶,琉球青斑蝶,青斑蝶,蝴蝶",'common-rose':"butterfly,swallowtail,common rose,紅紋鳳蝶,鳳蝶,蝴蝶",'paris-peacock':"butterfly,swallowtail,peacock,大琉璃紋鳳蝶,鳳蝶,蝴蝶",'chinese-peacock':"butterfly,swallowtail,翠鳳蝶,烏鴉鳳蝶,鳳蝶,蝴蝶",'lime-butterfly':"butterfly,swallowtail,lime butterfly,無尾鳳蝶,鳳蝶,蝴蝶",'long-tailed-stick-insect':"stick insect,長肛竹節蟲,竹節蟲",'six-spotted-stick-insect':"stick insect,六點瘤胸竹節蟲,竹節蟲",'giant-leaf-insect':"leaf insect,巨人葉䗛,葉䗛,葉竹節蟲",'thai-red-winged-stick-insect':"stick insect,red-winged stick insect,泰國小紅翅竹節蟲,竹節蟲",'long-winged-katydid':"katydid,bush cricket,臺灣騷斯,騷斯,螽斯",'two-spotted-cricket':"cricket,黃斑黑蟋蟀,蟋蟀",'giant-walking-stick':"stick insect,walking stick,尖刺足刺竹節蟲,竹節蟲",'giant-spiny-stick-insect':"stick insect,spiny stick insect,巨棘竹節蟲,竹節蟲",'malaysian-jungle-nymph':"stick insect,jungle nymph,扁竹節蟲,竹節蟲",'three-lined-diving-beetle':"diving beetle,water beetle,點刻三線大龍蝨,龍蝨,甲蟲",'six-spotted-cockroach':"cockroach,roach,六點金翼蟑螂,蟑螂",'brown-water-bug':"water bug,giant water bug,褐負蝽,負蝽,水蟲",'redknee-tarantula':"tarantula,spider,redknee,紅膝頭蜘蛛,捕鳥蛛,蜘蛛",'emperor-scorpion':"scorpion,emperor scorpion,帝王蠍,蠍子",'red-headed-centipede':"centipede,少棘蜈蚣,蜈蚣",'yellow-edged-firefly':"firefly,lightning bug,黃緣螢,螢火蟲",'lanyu-giant-katydid':"katydid,leaf katydid,蘭嶼大葉螽斯,螽斯",'round-spotted-weevil':"weevil,beetle,大圓斑球背象鼻蟲,球背象鼻蟲,象鼻蟲,甲蟲",'long-fanged-stag-beetle':"stag beetle,beetle,長角大鍬形蟲,鍬形蟲,甲蟲",'water-scorpion':"water scorpion,water bug,大紅娘華,紅娘華",'lanyu-giant-walking-stick':"stick insect,蘭嶼筒胸竹節蟲,竹節蟲"};
 const ZALIAS={formosan:'taiwan,formosan,台灣動物區,台灣區',children:"children,kids,farm,兒童動物區,兒童區",koala:'koala house,無尾熊館',
  panda:'panda house,貓熊館,熊貓館,大貓熊館,新光特展館',rainforest:'rainforest,熱帶雨林區,雨林,熱帶雨林',pangolin:'pangolin house,pangolin dome,穿山甲館,雨林館,熱帶雨林室內館,室內雨林',
  insect:'insectarium,insect,bugs,昆蟲館,昆蟲,蝴蝶館',desert:'desert,沙漠動物區,沙漠',australian:'australia,australian,澳洲動物區,澳洲',
@@ -2446,11 +2843,11 @@ $('lbClose').onclick=()=>{hideLearn();clearSel()};
 const FOODS=[
  {id:'bamboo',en:'bamboo',zh:'竹子',ic:'🎋',re:/bamboo/i},
  {id:'fish',en:'fish',zh:'魚',ic:'🐟',re:/\bfish|squid/i},
- {id:'shrimp',en:'tiny shrimp',zh:'小蝦',ic:'🦐',re:/shrimp|algae|crabs?\b|shellfish/i},
- {id:'grass',en:'grass and hay',zh:'草',ic:'🌾',re:/grass|\bhay\b|straw|water plants/i},
+ {id:'shrimp',en:'shrimp and shellfish',zh:'蝦和貝類',ic:'🦐',re:/shrimp|algae|crabs?\b|shellfish/i},
+ {id:'grass',en:'grass and water plants',zh:'草和水草',ic:'🌾',re:/grass|\bhay\b|straw|water plants/i},
  {id:'leaves',en:'leaves',zh:'樹葉',ic:'🍃',re:/lea(f|ves)|eucalyptus|acacia|twigs?|shoots|ferns|shrubs|bark|\bplants|stems/i},
  {id:'fruit',en:'fruit',zh:'水果',ic:'🍎',re:/fruit|acorns?/i},
- {id:'bugs',en:'insects',zh:'昆蟲',ic:'🐛',re:/\b(insects?|ants|termites|grubs|worms|snails|scorpions|bugs)\b/i},
+ {id:'bugs',en:'insects and snails',zh:'昆蟲和蝸牛',ic:'🐛',re:/\b(insects?|ants|termites|grubs|worms|snails|scorpions|bugs)\b/i},
  {id:'meat',en:'meat',zh:'肉',ic:'🍖',re:/zebras|deer|pigs|buffalo|antelopes|hares|rodents|mammals|other animals|small animals|squirrels|birds|lizards|frogs/i},
  {id:'flower',en:'flowers and nectar',zh:'花和花蜜',ic:'🌸',re:/nectar|flowers/i},
  {id:'seeds',en:'seeds and grain',zh:'種子和穀物',ic:'🌰',re:/seeds|grain|roots/i}];
@@ -2463,7 +2860,7 @@ let FED=new Set();try{
 function saveFed(){try{localStorage.setItem(KEY_FED,JSON.stringify([...FED]))}catch(e){}}
 function eats(a,f){return f.re.test(a.d)}
 /* name inside a sentence: "the giant panda", but keep proper words like "the Formosan black bear" */
-const PROPER=/^(Formosan|Chinese|Eurasian|South|Malayan|Bornean|Tsuda's|Bactrian|African|Western|Chapman's|Beisa|Asian|Przewalski's|Taipei|Aldabra|Swinhoe's|Vietnam|Palawan|Papuan|Taiwan|Nicobar|Victoria|Brahminy|Oriental|Senegal|Azara's|Colombian|Geoffroy's|Bolivian|Barbary|Asiatic|American)\b/;
+const PROPER=/^(Formosan|Chinese|Eurasian|South|Malayan|Bornean|Tsuda's|Bactrian|African|Western|Chapman's|Beisa|Asian|Przewalski's|Taipei|Aldabra|Swinhoe's|Vietnam|Palawan|Papuan|Taiwan|Nicobar|Victoria|Brahminy|Oriental|Senegal|Azara's|Colombian|Geoffroy's|Bolivian|Barbary|Asiatic|American|Ceylon|Siemssen's|Kaohsiung|Lanyu|Mexican|Thai|Malaysian|Paris|Atlas|Guenther's|La|Fujian|Central|Hong|Vietnamese|Burmese|Roti|Solomon|Gila|Jullien's|Yuchi)\b/;
 function nm(a){return PROPER.test(a.n)?a.n:a.n.charAt(0).toLowerCase()+a.n.slice(1)}
 function shuffle(l){const R=rng((Date.now()&0xffff)+l.length);for(let i=l.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[l[i],l[j]]=[l[j],l[i]]}return l}
 function feedChoices(a){const ok=shuffle(FOODS.filter(f=>eats(a,f))),no=shuffle(FOODS.filter(f=>!eats(a,f)));return shuffle([ok[0]].concat(no.slice(0,2)).filter(Boolean))}
@@ -2502,7 +2899,7 @@ function feedTick(dt){for(let i=FX.length-1;i>=0;i--){const e=FX[i];e.t+=dt;cons
  if(k>=1&&e.t>=e.dur){if(e.done){const d=e.done;e.done=null;d()}if(e.kind!=='fly'){scene.remove(e.obj);if(e.obj.material&&e.obj.material.map)e.obj.material.map.dispose()}FX.splice(i,1)}}}
 function renderFeed(a){FEED=a;openCard();const choices=feedChoices(a);const k=ORDER.indexOf(a);const nx=ORDER[(k+1)%ORDER.length];
  $('card').innerHTML=`<button class="close" id="cClose" type="button" aria-label="Close">✕</button>
- <span class="zp">Feeding time · 餵食時間</span><h2>What does the ${nm(a)} eat?</h2><div class="zh">${a.zh}吃什麼？請選一個食物</div>
+ <span class="zp">Feeding time · 餵食時間</span><h2>${/caterpillars|larvae/i.test(a.d)?`What does the young ${nm(a)} eat?`:`What does the ${nm(a)} eat?`}</h2><div class="zh">${a.zh}${/caterpillars|larvae/i.test(a.d)?'小時候':''}吃什麼？請選一個食物</div>
  <div class="foods">${choices.map(f=>`<button class="food" type="button" data-f="${f.id}"><span class="fi">${f.ic}</span><b>${f.en}</b><small>${f.zh}</small></button>`).join('')}</div>
  <p class="feedmsg" id="feedMsg" aria-live="polite"></p>
  <div class="fedcount">Animals fed · 已餵食：<b>${FED.size}</b> / ${A.length}</div>
@@ -2664,7 +3061,8 @@ const BEH={
  'puma':['pace',1.1],'red-panda':['wander',.5],'asian-small-clawed-otter':['swim',1.2,.5],'lynx':['pace',.9],'przewalskis-horse':['wander',.9],
  'taipei-frog':['hop',.3,.12,[3,8]],'aldabra-giant-tortoise':['wander',.12], 'yellow-margined-box-turtle':['wander',.15],
  'asian-elephant':['swim',.4,.45],'tawny-fish-owl':['perch',3],'greater-flamingo':['wade',.35],
- 'wood-duck':["swim", 0.6, 0.12],'rose-ringed-parakeet':["perch", 3],'common-moorhen':["swim", 0.6, 0.12],'oriental-turtle-dove':["wander", 0.6],'marabou-stork':["wade", 0.3],'papuan-eclectus':["perch", 3],'taiwan-bamboo-partridge':["wander", 0.7],'grey-crowned-crane':["wade", 0.35],'white-cockatoo':["perch", 3],'white-naped-crane':["wade", 0.35],'brahminy-kite':["soar", 4],'red-crowned-crane':["wade", 0.35],'crested-serpent-eagle':["soar", 4],'swinhoes-pheasant':["wander", 0.6],'vietnam-pheasant':["wander", 0.6],'victoria-crowned-pigeon':["wander", 0.5],'nicobar-pigeon':["wander", 0.5],'mandarin-duck':["swim", 0.6, 0.12],'palm-cockatoo':["perch", 3],'great-white-pelican':["wade", 0.3],'palawan-peacock-pheasant':["wander", 0.6],'blue-and-yellow-macaw':["perch", 3],'scarlet-ibis':["wade", 0.4],'great-argus':["wander", 0.5],'blue-tailed-bee-eater':["perch", 4],'toco-toucan':["perch", 3],'great-curassow':["wander", 0.5],'laughing-kookaburra':["perch", 3],'great-hornbill':["perch", 3],'black-swan':["swim", 0.5, 0.15],'collared-scops-owl':["perch", 3],'fat-tailed-dwarf-lemur':["hop", 0.7, 0.15],'senegal-bushbaby':["hop", 1, 0.3],'pygmy-slow-loris':["wander", 0.2],'azaras-night-monkey':["hop", 0.8, 0.2],'black-howler':["wander", 0.35],'colombian-white-faced-capuchin':["hop", 1, 0.25],'southern-tamandua':["wander", 0.5],'geoffroys-spider-monkey':["hop", 1, 0.3],'brown-headed-spider-monkey':["hop", 1, 0.3],'giant-anteater':["wander", 0.5],'siamang':["hop", 1.1, 0.35],'bolivian-squirrel-monkey':["hop", 0.9, 0.18],'spotted-hyena':["pace", 1.0],'common-brown-lemur':["hop", 0.9, 0.25],'patas-monkey':["wander", 1.4],'olive-baboon':["wander", 0.8],'barbary-sheep':["hop", 0.6, 0.12],'mountain-bongo':["wander", 0.6],'black-and-white-ruffed-lemur':["hop", 0.9, 0.25],'ring-tailed-lemur':["hop", 0.9, 0.25],'common-eland':["wander", 0.6],'formosan-sambar':["wander", 0.7],'formosan-reeves-muntjac':["wander", 0.9],'formosan-wild-boar':["wander", 0.6],'formosan-ferret-badger':["dart", 1.4],'masked-palm-civet':["wander", 0.6],'clouded-leopard':["pace", 1.0],'kinkajou':["wander", 0.4],'northern-raccoon':["wander", 0.7],'lar-gibbon':["hop", 1.1, 0.35],'alpaca':["wander", 0.6],'american-beaver':["swim", 0.9, 0.5],'asiatic-black-bear':["wander", 0.6]};
+ 'wood-duck':["swim", 0.6, 0.12],'rose-ringed-parakeet':["perch", 3],'common-moorhen':["swim", 0.6, 0.12],'oriental-turtle-dove':["wander", 0.6],'marabou-stork':["wade", 0.3],'papuan-eclectus':["perch", 3],'taiwan-bamboo-partridge':["wander", 0.7],'grey-crowned-crane':["wade", 0.35],'white-cockatoo':["perch", 3],'white-naped-crane':["wade", 0.35],'brahminy-kite':["soar", 4],'red-crowned-crane':["wade", 0.35],'crested-serpent-eagle':["soar", 4],'swinhoes-pheasant':["wander", 0.6],'vietnam-pheasant':["wander", 0.6],'victoria-crowned-pigeon':["wander", 0.5],'nicobar-pigeon':["wander", 0.5],'mandarin-duck':["swim", 0.6, 0.12],'palm-cockatoo':["perch", 3],'great-white-pelican':["wade", 0.3],'palawan-peacock-pheasant':["wander", 0.6],'blue-and-yellow-macaw':["perch", 3],'scarlet-ibis':["wade", 0.4],'great-argus':["wander", 0.5],'blue-tailed-bee-eater':["perch", 4],'toco-toucan':["perch", 3],'great-curassow':["wander", 0.5],'laughing-kookaburra':["perch", 3],'great-hornbill':["perch", 3],'black-swan':["swim", 0.5, 0.15],'collared-scops-owl':["perch", 3],'fat-tailed-dwarf-lemur':["hop", 0.7, 0.15],'senegal-bushbaby':["hop", 1, 0.3],'pygmy-slow-loris':["wander", 0.2],'azaras-night-monkey':["hop", 0.8, 0.2],'black-howler':["wander", 0.35],'colombian-white-faced-capuchin':["hop", 1, 0.25],'southern-tamandua':["wander", 0.5],'geoffroys-spider-monkey':["hop", 1, 0.3],'brown-headed-spider-monkey':["hop", 1, 0.3],'giant-anteater':["wander", 0.5],'siamang':["hop", 1.1, 0.35],'bolivian-squirrel-monkey':["hop", 0.9, 0.18],'spotted-hyena':["pace", 1.0],'common-brown-lemur':["hop", 0.9, 0.25],'patas-monkey':["wander", 1.4],'olive-baboon':["wander", 0.8],'barbary-sheep':["hop", 0.6, 0.12],'mountain-bongo':["wander", 0.6],'black-and-white-ruffed-lemur':["hop", 0.9, 0.25],'ring-tailed-lemur':["hop", 0.9, 0.25],'common-eland':["wander", 0.6],'formosan-sambar':["wander", 0.7],'formosan-reeves-muntjac':["wander", 0.9],'formosan-wild-boar':["wander", 0.6],'formosan-ferret-badger':["dart", 1.4],'masked-palm-civet':["wander", 0.6],'clouded-leopard':["pace", 1.0],'kinkajou':["wander", 0.4],'northern-raccoon':["wander", 0.7],'lar-gibbon':["hop", 1.1, 0.35],'alpaca':["wander", 0.6],'american-beaver':["swim", 0.9, 0.5],'asiatic-black-bear':["wander", 0.6],
+ 'african-spurred-tortoise':["wander", 0.12],'guenthers-frog':["hop", 0.3, 0.15, [3, 8]],'la-touches-frog':["hop", 0.3, 0.15, [3, 8]],'fujian-large-headed-frog':["hop", 0.3, 0.15, [3, 8]],'central-formosan-toad':["hop", 0.3, 0.15, [3, 8]],'chinese-fire-bellied-newt':["swim", 0.25, 0.5],'hong-kong-warty-newt':["swim", 0.25, 0.5],'red-eyed-treefrog':["hop", 0.3, 0.15, [3, 8]],'vietnamese-mossy-frog':["hop", 0.3, 0.15, [3, 8]],'green-and-black-poison-dart-frog':["hop", 0.3, 0.15, [3, 8]],'golden-poison-frog':["hop", 0.3, 0.15, [3, 8]],'yellow-banded-poison-dart-frog':["hop", 0.3, 0.15, [3, 8]],'blue-poison-dart-frog':["hop", 0.3, 0.15, [3, 8]],'green-basilisk':["dart", 1.2],'rhinoceros-iguana':["wander", 0.2],'taiwan-beauty-snake':["wander", 0.15, 0, [6, 14]],'burmese-python':["wander", 0.08, 0, [8, 16]],'emerald-green-treefrog':["hop", 0.3, 0.15, [3, 8]],'green-iguana':["wander", 0.2],'chinese-water-dragon':["wander", 0.25],'olive-frog':["hop", 0.3, 0.15, [3, 8]],'asian-common-toad':["hop", 0.3, 0.15, [3, 8]],'swinhoes-tree-lizard':["dart", 1.0],'swinhoes-frog':["hop", 0.3, 0.15, [3, 8]],'chinese-cobra':["wander", 0.12, 0, [6, 14]],'veiled-chameleon':["wander", 0.08, 0, [6, 14]],'banded-water-snake':["swim", 0.4, 0.5],'hundred-pace-viper':["wander", 0.06, 0, [8, 16]],'tokay-gecko':["dart", 0.9],'yuchi-music-frog':["hop", 0.3, 0.15, [3, 8]],'roti-island-snake-necked-turtle':["swim", 0.35, 0.5],'chinese-alligator':["swim", 0.3, 0.6],'radiated-tortoise':["wander", 0.12],'solomon-islands-skink':["wander", 0.15],'yellow-pond-turtle':["swim", 0.4, 0.5],'gila-monster':["wander", 0.1, 0, [6, 14]],'chinese-stripe-necked-turtle':["swim", 0.4, 0.5],'pearl-stingray':["swim", 0.3, 0.5],'julliens-golden-carp':["swim", 0.5, 0.5],'red-bellied-pacu':["swim", 0.5, 0.5],'yellowfin-chalceus':["swim", 0.5, 0.5],'arapaima':["swim", 0.35, 0.5],'golden-moon-moth':["wander", 0.1],'cockscomb-stag-beetle':["wander", 0.1],'ceylon-tree-ant':["wander", 0.1],'tiny-snap-jaw-ant':["wander", 0.1],'giant-asian-mantis':["wander", 0.1],'taipei-carpenter-ant':["wander", 0.1],'green-bean-stick-insect':["wander", 0.1],'question-mark-cockroach':["wander", 0.1],'autumn-leaf-insect':["wander", 0.1],'spiny-leaf-insect':["wander", 0.1],'orange-isopod':["wander", 0.1],'orange-spotted-diving-beetle':["swim", 0.3, 0.4],'water-walking-stick':["swim", 0.3, 0.4],'atlas-moth':["wander", 0.1],'two-spined-hard-ant':["wander", 0.1],'siemssens-carpenter-ant':["wander", 0.1],'taiwan-long-legged-ant':["wander", 0.1],'beetle-cockroach':["wander", 0.1],'mountain-trap-jaw-ant':["wander", 0.1],'big-headed-ant':["wander", 0.1],'kaohsiung-carpenter-ant':["wander", 0.1],'smelly-carpenter-ant':["wander", 0.1],'long-tailed-stick-insect':["wander", 0.1],'six-spotted-stick-insect':["wander", 0.1],'giant-leaf-insect':["wander", 0.1],'thai-red-winged-stick-insect':["wander", 0.1],'long-winged-katydid':["wander", 0.1],'two-spotted-cricket':["wander", 0.1],'giant-walking-stick':["wander", 0.1],'giant-spiny-stick-insect':["wander", 0.1],'malaysian-jungle-nymph':["wander", 0.1],'three-lined-diving-beetle':["swim", 0.3, 0.4],'six-spotted-cockroach':["wander", 0.1],'brown-water-bug':["swim", 0.3, 0.4],'redknee-tarantula':["wander", 0.1],'emperor-scorpion':["wander", 0.1],'red-headed-centipede':["wander", 0.1],'yellow-edged-firefly':["wander", 0.15],'lanyu-giant-katydid':["wander", 0.1],'round-spotted-weevil':["wander", 0.1],'long-fanged-stag-beetle':["wander", 0.1],'water-scorpion':["swim", 0.3, 0.4],'lanyu-giant-walking-stick':["wander", 0.1]};
 const DOME_ANIMALS=[];   /* (the Pangolin House is its own area now) */   // live inside the Pangolin Dome
 const POND_Y=.31;   // water surface (ponds are at y .26, .1 thick)
 function behArea(a){const z=ZI[a.z];if(z.id==='rainforest'&&DOME_ANIMALS.includes(a.id))return{x:z.pango[0],z:z.pango[1],r:2.4*z.pangoS};
@@ -2683,6 +3081,7 @@ function initBehaviors(){let n=0;
   const st={kind:b[0],speed:b[1],p2:b[2]||0,pause:b[3]||[2,5],R,mode:'idle',timer:R()*3,tx:o.holder.position.x,tz:o.holder.position.z,y:.25,hop:0,dive:0};
   const s=a.m.s||1;
   if(st.kind==='swim'||st.kind==='wade'){st.pond=nearestPond(a);if(!st.pond)st.kind='wander'}
+  if(a.m.b==='fish'&&st.pond){const p=st.pond,an=R()*Math.PI*2,rr=Math.max(.3,p.r-.6)*(.4+R()*.5);o.holder.position.set(p.x+Math.cos(an)*rr,.25,p.z+Math.sin(an)*rr);st.mode='swim';st.ang=an;st.rad=rr;st.dir=R()<.5?1:-1;st.timer=30}   /* fish start in the water */
   if(st.kind==='perch'||st.kind==='soar'){st.top=.5*s;st.perches=[{x:o.holder.position.x,z:o.holder.position.z}];
    if(st.kind==='perch')for(let i=0;i<2;i++){const p=landPoint(a,R);st.perches.push(p)}
    st.perches.forEach(p=>addPerch(z,p.x,p.z,st.top));st.cur=0}
@@ -2727,6 +3126,7 @@ function behaviorTick(dt,t){
     if(st.mode==='enter'){moving=true;const rr=Math.max(.2,p.r-(o.fr||1)*.6);if(stepTo(o,p.x+Math.cos(st.ang)*rr*.6,p.z+Math.sin(st.ang)*rr*.6,st.speed,dt)){st.mode='swim';st.timer=14+R()*12;st.rad=rr*(.45+R()*.5);st.dir=R()<.5?1:-1}}
     else if(st.mode==='swim'){moving=true;st.ang+=st.dir*st.speed/Math.max(.4,st.rad)*dt;const tx=p.x+Math.cos(st.ang)*st.rad,tz=p.z+Math.sin(st.ang)*st.rad;turnTo(o,tx-h.x,tz-h.z,dt,5);h.x=tx;h.z=tz;
      if(st.dive<=0&&R()<dt*.07&&st.p2<.7)st.dive=2.6;                                    // otters and penguins dive now and then
+     if(st.timer<=0&&a.m.b==='fish'){st.timer=20+R()*20;st.dir=-st.dir;st.rad=Math.max(.3,(p.r-.6)*(.35+R()*.6))}   /* fish never leave the water */
      if(st.timer<=0){st.mode='exit';const a2=st.ang;const out=p.r+(o.fr||1)*.7+.3;st.tx=p.x+Math.cos(a2)*out;st.tz=p.z+Math.sin(a2)*out}}
     else if(st.mode==='exit'){moving=true;if(stepTo(o,st.tx,st.tz,st.speed*.7,dt)){st.mode='shore';st.timer=6+R()*8}}}
    const inWater=Math.hypot(h.x-p.x,h.z-p.z)<p.r-.05;
@@ -3002,6 +3402,37 @@ function renderPenguinWalk(){openCard();const now=fmt(((simMin()%1440)+1440)%144
  const ps=$('pwSys');if(ps)ps.onclick=()=>{if(PW.sys){PW.sys=false;try{localStorage.setItem('taipeiZooGuide.pwNotify','0')}catch(e){}renderPenguinWalk();return}
   Notification.requestPermission().then(r=>{PW.sys=r==='granted';try{localStorage.setItem('taipeiZooGuide.pwNotify',PW.sys?'1':'0')}catch(e){}if(!PW.sys)toast('Notifications are blocked in this browser. Reminders still show inside the page. <small>這個瀏覽器沒有允許通知，提醒仍會顯示在網頁裡。</small>');renderPenguinWalk()}).catch(()=>{})}}
 function goPenguinWalk(){if(!PW.P)return;exitArea();stopTour();if(RIDE)endRide(null,true);if(NAV&&NAV.playing&&NAV.follow){NAV.follow=false;updNavbar()}cam.spin=false;meFollow=false;const c=PW.P[1].clone().addScaledVector(PW.T,1.6);c.y=gy(c.x,c.z)+.6;cam.hold=null;flyTo(c,13,1.0,Math.atan2(PW.N2.x,PW.N2.z)+.5)}
+/* ============================ BUILDINGS ============================
+   models/buildings-kit.glb (blender/make_buildings.py): original cartoon pieces drawn from public photos' features (not copies):
+   the Pangolin House's branching white steel columns, glass lift and sky walk; the rainforest entrance sign and totem;
+   a koala mural wall (the mural is drawn here, an original picture). */
+let BLDKIT=null;
+function bldKit(){if(BLDKIT)return BLDKIT;const g=GLB[BLD_URL];if(!g)return null;BLDKIT={};g.scene.updateMatrixWorld(true);
+ g.scene.children.forEach(n=>{const inv=new THREE.Matrix4().copy(n.matrixWorld).invert();const parts=[];
+  n.traverse(o=>{if(o.isMesh){const geo=o.geometry.clone();geo.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv,o.matrixWorld));parts.push({geo,mat:o.material})}});BLDKIT[n.name]=parts});return BLDKIT}
+function placeKit(parts,parent,x,y,z,sc,yaw){const g=new THREE.Group();parts.forEach(pt=>g.add(new THREE.Mesh(pt.geo,pt.mat.transparent?pt.mat:toonFrom(pt.mat,'ride'))));
+ g.position.set(x,y,z);if(Array.isArray(sc))g.scale.set(...sc);else g.scale.setScalar(sc);g.rotation.y=yaw||0;addOutline(g,1);parent.add(g);return g}
+function entranceOf(z){const d=V(z.ent.x-z.x,0,z.ent.z-z.z).normalize();return {d,t:V(-d.z,0,d.x),r:zR(z,Math.atan2(d.z,d.x))}}   // area-local: towards the road, along the edge
+function koalaMural(){const c=document.createElement('canvas');c.width=512;c.height=256;const x=c.getContext('2d');   // an original drawing, not a copy of the real mural
+ const sky=x.createLinearGradient(0,0,0,256);sky.addColorStop(0,'#8fd0f0');sky.addColorStop(1,'#d8f0c8');x.fillStyle=sky;x.fillRect(0,0,512,256);
+ x.fillStyle='#4f9a4a';for(let i=0;i<14;i++){x.beginPath();x.ellipse(20+i*38,210+Math.sin(i)*14,34,16,i*.4,0,Math.PI*2);x.fill()}
+ for(const [cx,cy,s] of [[130,150,1],[260,135,1.15],[390,152,.95]]){x.fillStyle='#9aa0a6';
+  for(const ex of [-1,1]){x.beginPath();x.arc(cx+ex*52*s,cy-40*s,30*s,0,Math.PI*2);x.fill()}x.fillStyle='#e8e2dc';for(const ex of [-1,1]){x.beginPath();x.arc(cx+ex*52*s,cy-40*s,16*s,0,Math.PI*2);x.fill()}
+  x.fillStyle='#9aa0a6';x.beginPath();x.arc(cx,cy,55*s,0,Math.PI*2);x.fill();x.fillStyle='#2b2420';x.beginPath();x.ellipse(cx,cy+6*s,14*s,20*s,0,0,Math.PI*2);x.fill();
+  for(const ex of [-1,1]){x.beginPath();x.arc(cx+ex*24*s,cy-12*s,6*s,0,Math.PI*2);x.fill()}}
+ const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;return t}
+function initBuildings(){const kit=bldKit();if(!kit)return;
+ try{const z=ZI.pangolin;if(z&&z.ent&&kit.tree_column){const e=entranceOf(z);   // Pangolin House: three branching columns at the door, a glass lift and a sky walk inside
+  for(const k of [-1,0,1]){const p=e.d.clone().multiplyScalar(e.r+.2).addScaledVector(e.t,k*1.5);placeKit(kit.tree_column,z.group,p.x,.25,p.z,[3,3.4,3],k)}
+  const lp=zWarp(z,-z.r*.3,z.r*.25);placeKit(kit.elevator,z.group,lp[0],.25,lp[1],[6,z.r*.62,6]);
+  const walk=new THREE.Mesh(shapeTube(z,-z.r*.35,1.7,.12),mat('#8a6a45'));z.group.add(walk);
+  for(let i=0;i<8;i++){const a=i/8*Math.PI*2,r=zR(z,a)-z.r*.35;limb(z.group,V(Math.cos(a)*r,.25,Math.sin(a)*r),V(Math.cos(a)*r,1.7,Math.sin(a)*r),.05,'#d9dcd8')}}}catch(err){console.warn('pangolin house',err)}
+ try{const z=ZI.rainforest;if(z&&z.ent&&kit.rain_sign){const e=entranceOf(z),p=e.d.clone().multiplyScalar(e.r+.9);   // rainforest entrance: leaf sign and a totem
+  const yaw=Math.atan2(-e.d.z,e.d.x);placeKit(kit.rain_sign,z.group,p.x,.25,p.z,2.6,yaw);const q=p.clone().addScaledVector(e.t,1.3);placeKit(kit.totem,z.group,q.x,.25,q.z,2.4,yaw);
+  const lab=makeLabel('Tropical Rainforest','熱帶雨林區',{bg:'#3a2a20',fg:'#ffffff',w:2.6,small:true,prio:2});lab.position.set(p.x,2.1,p.z);z.group.add(lab)}}catch(err){console.warn('rainforest sign',err)}
+ try{const z=ZI.koala;if(z&&z.ent&&kit.mural_wall){const e=entranceOf(z),p=e.d.clone().multiplyScalar(e.r+.6).addScaledVector(e.t,1.6);   // koala mural wall facing the road
+  const yaw=Math.atan2(e.d.x,e.d.z);placeKit(kit.mural_wall,z.group,p.x,.25,p.z,[3.6,3.6,3.6],yaw);
+  const art=new THREE.Mesh(new THREE.PlaneGeometry(3.4,1.6),new THREE.MeshBasicMaterial({map:koalaMural()}));art.position.set(p.x+e.d.x*.13,.25+.9,p.z+e.d.z*.13);art.rotation.y=yaw;z.group.add(art)}}catch(err){console.warn('koala mural',err)}}
 function optimizeScene(){let b=0,a=0;
  ZONES.forEach(z=>{const r=mergeStatic(z.group,o=>!!o.userData.zone);b+=r[0];a+=r[1]});
  const r=mergeStatic(world,o=>o===terrainMesh);b+=r[0];a+=r[1];
@@ -3011,7 +3442,7 @@ function perfTick(dt){if(dt<=0)return;Perf.acc+=dt;Perf.n++;if(Perf.acc<2)return
  const fps=Perf.n/Perf.acc;Perf.acc=0;Perf.n=0;const now=performance.now();if(now-Perf.last<3000)return;
  let pr=Perf.pr;if(fps<40&&pr>.75)pr=Math.max(.75,pr-.25);else if(fps>57&&pr<Perf.max)pr=Math.min(Perf.max,pr+.25);
  if(pr!==Perf.pr){Perf.pr=pr;Perf.last=now;renderer.setPixelRatio(pr);renderer.setSize(innerWidth,innerHeight,false)}}
-function init(){drawPaper();buildWorld();ZONES.forEach(buildZone);placeAnimals();initBehaviors();decorateHabitats();initWeather();initRides();buildTrain();initNav();initPenguinWalk();buildTrainSystem();optimizeScene();initMe();buildIndex();buildList();buildSong();renderWelcome();
+function init(){drawPaper();buildWorld();ZONES.forEach(buildZone);placeAnimals();initBehaviors();decorateHabitats();initWeather();initRides();setTimeout(loadLazyModels,1500);buildTrain();initNav();initPenguinWalk();initBuildings();buildTrainSystem();optimizeScene();initMe();buildIndex();buildList();buildSong();renderWelcome();
  Speech.load();if(Speech.browser)speechSynthesis.onvoiceschanged=()=>Speech.load();
  if(window.claude&&typeof window.claude.use==='function'){window.claude.use('tts').then(t=>{if(t){Speech.cl=t;Speech.load();if(!$('card').querySelector('#wFind'))return;renderWelcome()}}).catch(()=>{})}initDictation();
  if(isPhone())cam.dist=OV_D*1.45;resize();applyCam();$('loading').hidden=true;loop();setTimeout(()=>{if($('toast').hidden)toast('Tap an animal to hear its English name · 點動物聽英文名字')},900)}   // not over a reminder
