@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!-- Content-Security-Policy: only this site, the two pinned three.js files and Google Fonts may load.
      The inline script is allowed by its sha256 hash, which tools/csp_hash.py updates (publish.sh runs it). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-RFRn8sfBzv/bF+zHLu17OZxxMp/3YjIiN2CSnty+w9E=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-oA9vfNRVzRHacjwaNFB9H3Zp33d1aou+hN9DpMstuTE=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Taipei Zoo 3D English Guide</title>
@@ -171,6 +171,15 @@ button{cursor:pointer}
 .chk input{width:20px;height:20px;margin-top:2px;accent-color:var(--accent);flex:none}
 .chk small{color:var(--muted);font-weight:600;font-size:12px}
 .navsum{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin:12px 0 2px}
+.stamps{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.stamp{display:flex;gap:10px;align-items:center;background:var(--accent-soft);border-radius:12px;padding:8px 10px}
+.stamp.on{background:#CFE6C9}
+.stamp .sn{flex:none;width:30px;height:30px;border-radius:50%;background:#C8323C;color:#fff;font-weight:800;display:grid;place-items:center;font-size:14px}
+.stamp .sn.x{background:var(--accent)}
+.stamp .st{flex:1;min-width:0;font-size:14px;line-height:1.35}
+.stamp .sw{color:#9A3B00;font-weight:700}
+.stamp .sb{display:flex;gap:6px;flex:none}
+.stamp .sb .btn{display:inline-flex;padding:8px 10px}
 .navsum b{font-family:var(--font-display);font-weight:400;font-size:34px;color:var(--accent);line-height:1}
 .navsum span{font-weight:700;color:var(--muted)}
 .steps{list-style:none;padding:0;margin:12px 0 0;display:flex;flex-direction:column;gap:3px;counter-reset:st}
@@ -358,6 +367,7 @@ body.learning .tourbar{bottom:130px}
   <button class="rb hl" id="areasBtn" type="button" aria-label="Area by area"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg><span>Areas</span></button>
   <button class="rb" id="turnBtn" type="button" aria-pressed="false" aria-label="Turn 360 degrees"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4a8 8 0 017.7 5.9l1.8-1.1.5 5-4.6-2 1.7-1A6 6 0 006 12H4a8 8 0 018-8zm0 16a8 8 0 01-7.7-5.9l-1.8 1.1-.5-5 4.6 2-1.7 1A6 6 0 0018 12h2a8 8 0 01-8 8z"/></svg><span>360°</span></button>
   <button class="rb" id="namesBtn" type="button" aria-pressed="false" aria-label="Show all animal names"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5h18v10H9l-4 4v-4H3zm3 3v2h12V8zm0 3v2h8v-2z"/></svg><span>Names</span></button>
+  <button class="rb hl" id="stampBtn" type="button" aria-label="Stamp rally"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 7a2 2 0 012-2h14a2 2 0 012 2v3a2 2 0 000 4v3a2 2 0 01-2 2H5a2 2 0 01-2-2v-3a2 2 0 000-4zm5.3 4.6L7 12.9l3.2 3.2 6.3-6.3-1.3-1.3-5 5z"/></svg><span>集章</span></button>
   <button class="rb" id="ridesBtn" type="button" aria-label="Rides"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 4l20-2v2L13 5v3h3a2 2 0 012 2v7a2 2 0 01-2 2H8a2 2 0 01-2-2v-7a2 2 0 012-2h3V5.2L2 6zm6 8v3h3v-3zm5 0v3h3v-3z"/></svg><span>Rides</span></button>
   <button class="rb" id="trainBtn" type="button" aria-label="Train times"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-4 0-8 .5-8 4v9.5A3.5 3.5 0 007.5 19L6 20.5v.5h2l2-2h4l2 2h2v-.5L16.5 19a3.5 3.5 0 003.5-3.5V6c0-3.5-4-4-8-4zM7.5 17a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3.5-7H6V6h5zm2 0V6h5v4zm3.5 7a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/></svg><span>Train</span></button>
   <button class="rb" id="tourBtn" type="button" aria-label="Guided tour"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span>Tour</span></button>
@@ -2168,9 +2178,9 @@ function renderWelcome(open){current=null;
  $('card').innerHTML=`<span class="zp">Welcome · 歡迎</span><h2>Explore Taipei Zoo in English</h2>
  <p class="intro">Tap any animal on the map to hear its English name. Search or say an animal in English or Chinese to get a walking route, or press Walk and use the arrow keys.</p>
  <ul><li><b>${ZONES.length}</b> areas and <b>${A.length}</b> animals, laid out like the real park</li><li>Every animal has an English intro you can listen to</li><li>See the areas one block at a time</li><li>The Zoo Song names every animal</li><li><b>Feed the animals:</b> guess what each one eats (fed ${FED.size} / ${A.length})</li><li>Tap an animal twice, or press Close-up 360°, to see it up close</li></ul>
- <div class="say"><button class="btn primary" id="wFind" type="button">Find an animal</button><button class="btn sign" id="wAreas" type="button">Area by area</button><button class="btn" id="wTour" type="button">${ICON_SPK}Guided tour</button><button class="btn" id="wSong" type="button">Zoo Song</button><button class="btn" id="wTrain" type="button">Train times</button><button class="btn" id="wMe" type="button">Where am I</button><button class="btn" id="wWalk" type="button">Walk with arrows</button></div>
+ <div class="say"><button class="btn primary" id="wFind" type="button">Find an animal</button><button class="btn sign" id="wStamp" type="button">🎫 Stamp rally · 集章</button><button class="btn sign" id="wAreas" type="button">Area by area</button><button class="btn" id="wTour" type="button">${ICON_SPK}Guided tour</button><button class="btn" id="wSong" type="button">Zoo Song</button><button class="btn" id="wTrain" type="button">Train times</button><button class="btn" id="wMe" type="button">Where am I</button><button class="btn" id="wWalk" type="button">Walk with arrows</button></div>
  ${Speech.ok?'':'<p class="warn">This browser cannot read text aloud. Try Chrome, Edge or Safari.</p>'}`;
- $('wFind').onclick=()=>{qEl.focus();runQuery(qEl.value,false)};$('wAreas').onclick=()=>areaView(ZI[ROUTE[0]]);
+ $('wFind').onclick=()=>{qEl.focus();runQuery(qEl.value,false)};$('wStamp').onclick=renderStamp;$('wAreas').onclick=()=>areaView(ZI[ROUTE[0]]);
  $('wTour').onclick=()=>startTour();$('wTrain').onclick=openTrain;$('wMe').onclick=openMe;$('wWalk').onclick=startWalk;$('wSong').onclick=()=>{showTab('S');if(isPhone())$('side').classList.add('open');startSong()};if(open)openCard();else collapseCard()}
 function renderAnimal(a){const z=ZI[a.z];const k=ORDER.indexOf(a);
  openCard();
@@ -2365,6 +2375,7 @@ function buildIndex(){A.forEach(a=>CANDS.push({kind:'a',id:a.id,al:[...new Set([
  CANDS.push({kind:'r',id:'gondola',al:['gondola','cable car','maokong gondola','ropeway','纜車','貓空纜車','貓纜','空中纜車'].map(norm)});
  CANDS.push({kind:'r',id:'bus',al:['bus','safari bus','safari','巴士','遊園車','遊園巴士','草原巴士','公車'].map(norm)});
  CANDS.push({kind:'r',id:'pwalk',al:['penguin walk','penguin parade','penguin outing','企鵝散步','企鵝走路','企鵝走路趣','企鵝遊行','黑腳企鵝散步'].map(norm)});
+ CANDS.push({kind:'r',id:'stamp',al:['stamp','stamp rally','stamps','checkpoint','集章','蓋章','闖關','關卡','集點','完成禮','兌換'].map(norm)});
  CANDS.push({kind:'r',id:'dino',al:['dinosaur','topiary dinosaur','secret','恐龍','灌木恐龍','彩蛋'].map(norm)});
  CANDS.push({kind:'t',id:'train',al:['train','shuttle train','train times','timetable','schedule','列車','遊客列車','遊園列車','火車','小火車','時刻表','時刻','班次','發車','進站','列車時間'].map(norm)})}
 function scoreAlias(q,al){const qc=q.replace(/ /g,''),ac=al.replace(/ /g,'');const zh=/[㐀-鿿]/.test(ac);
@@ -2378,7 +2389,7 @@ function search(raw){const q=cleanQ(raw);if(!q)return[];const out=[];
  for(const c of CANDS){let s=0;for(const al of c.al)s=Math.max(s,scoreAlias(q,al));if(s>0)out.push({kind:c.kind,id:c.id,score:s-(c.kind==='z'?1:0)})}
  out.sort((a,b)=>b.score-a.score);return out.slice(0,10)}
 let resAct=-1;const qEl=$('q');
-function resRow(r){if(r.kind==='r'){const R0={gondola:['🚡 Ride the Maokong Gondola','搭乘貓空纜車','Fly over the zoo'],bus:['🚌 Ride the safari bus','搭乘非洲草原巴士','Meet the African animals'],dino:['🦖 A secret by the main gate','大門旁的祕密','Go and see'],pwalk:['🐧 Penguin Walk','企鵝走路趣','African penguins take a stroll · 09:30']}[r.id];
+function resRow(r){if(r.kind==='r'){const R0={gondola:['🚡 Ride the Maokong Gondola','搭乘貓空纜車','Fly over the zoo'],bus:['🚌 Ride the safari bus','搭乘非洲草原巴士','Meet the African animals'],dino:['🦖 A secret by the main gate','大門旁的祕密','Go and see'],pwalk:['🐧 Penguin Walk','企鵝走路趣','African penguins take a stroll · 09:30'],stamp:['🎫 Stamp rally','今日集章','6 stops · '+stampCount()+' stamped']}[r.id];
   return `<button class="res zone" type="button" data-k="r" data-id="${r.id}"><span class="rt"><b>${R0[0]}</b> <small>${R0[1]}</small></span><span class="rs">${R0[2]}</span><span class="go">Go</span></button>`}
  if(r.kind==='m')return `<button class="res zone" type="button" data-k="m" data-id="me"><span class="rt"><b>Where am I?</b> <small>我的位置</small></span><span class="rs">${ME?'You are near '+the(ZI[ME.near]):'Show my spot on the map'}</span><span class="go">Open</span></button>`;if(r.kind==='t'){const m=simMin();const d=nextDep('gate',m);return `<button class="res zone" type="button" data-k="t" data-id="train"><span class="rt"><b>Shuttle train times</b> <small>遊客列車時刻</small></span><span class="rs">${d!=null?'Next from Train Station ~'+fmt(d):'Not running now · first train 09:00'}</span><span class="go">Open</span></button>`}if(r.kind==='a'){const a=AI[r.id],z=ZI[a.z];return `<button class="res" type="button" data-k="a" data-id="${a.id}"><span class="rt"><b>${a.n}</b> <small>${a.zh}</small></span><span class="rs">${ROUTE.indexOf(z.id)+1}. ${z.n}</span><span class="go">Go</span></button>`}
  const z=ZI[r.id];const n=A.filter(a=>a.z===z.id).length;return `<button class="res zone" type="button" data-k="z" data-id="${z.id}"><span class="rt"><b>${ROUTE.indexOf(z.id)+1}. ${z.n}</b> <small>${z.zh}</small></span><span class="rs">Area · ${n} animal${n>1?'s':''}</span><span class="go">View</span></button>`}
@@ -2390,7 +2401,7 @@ function renderResults(list,raw){const box=$('results');let html='';
   if(zs.length)html+=`<div class="res-h">Areas · see the block</div>`+zs.map(resRow).join('')}
  box.innerHTML=html;box.hidden=false;resAct=-1;
  box.querySelectorAll('.res').forEach(b=>b.onclick=()=>actResult({kind:b.dataset.k,id:b.dataset.id}))}
-function actResult(r){$('results').hidden=true;qEl.blur();if(r.kind==='r'){if(r.id==='pwalk'){renderPenguinWalk();goPenguinWalk();return}if(r.id==='dino'){exitArea();const p=DINO.g&&DINO.g.position;if(p)flyTo(V(p.x,p.y+3,p.z),16,1.05,cam.theta);else toast('The secret is not available right now. 彩蛋模型沒有載入。')}else startRide(r.id);return}if(r.kind==='m')openMe();else if(r.kind==='t')openTrain();else if(r.kind==='a')planRoute({a:AI[r.id]});else areaView(ZI[r.id])}
+function actResult(r){$('results').hidden=true;qEl.blur();if(r.kind==='r'){if(r.id==='pwalk'){renderPenguinWalk();goPenguinWalk();return}if(r.id==='stamp'){renderStamp();return}if(r.id==='dino'){exitArea();const p=DINO.g&&DINO.g.position;if(p)flyTo(V(p.x,p.y+3,p.z),16,1.05,cam.theta);else toast('The secret is not available right now. 彩蛋模型沒有載入。')}else startRide(r.id);return}if(r.kind==='m')openMe();else if(r.kind==='t')openTrain();else if(r.kind==='a')planRoute({a:AI[r.id]});else areaView(ZI[r.id])}
 function runQuery(raw,auto){const list=search(raw);renderResults(list,raw);
  if(auto&&list.length&&list[0].score>=90&&(list.length===1||list[1].score<=list[0].score-12)){actResult(list[0]);return true}return false}
 qEl.addEventListener('input',()=>runQuery(qEl.value,false));
@@ -2672,7 +2683,7 @@ function updStationLabels(force){if(!LINES)return;const m=simMin();
  [['gate',ST_GATE],['bird',ST_BIRD],['south',ST_SOUTH]].forEach(([st,p])=>{const [t,zh]=stationSign(st,m);const key=t+zh;if(!force&&signCache[st]===key)return;signCache[st]=key;
   if(stLabels[st]){world.remove(stLabels[st]);stLabels[st].material.map.dispose();stLabels[st].material.dispose()}
   const lab=makeLabel(t,zh,{bg:'#EBC45E',fg:'#2B2420',w:st==='bird'?11:7.5,small:true,prio:3});lab.position.set(p.x,terrainH(p.x,p.z)+6.8,p.z);world.add(lab);stLabels[st]=lab})}
-$('trainBtn').onclick=openTrain;$('namesBtn').onclick=()=>{setNames(!SHOWNAMES);toast(SHOWNAMES?'🏷 Showing all animal names · 顯示所有名稱':'🏷 Names only for the animal you pick · 只顯示選到的動物名稱')};setNames(SHOWNAMES);$('turnBtn').onclick=()=>setTurnMode(!turnMode);$('ridesBtn').onclick=()=>{stopTour();exitArea();renderRides()};$('rbEnd').onclick=()=>endRide();
+$('trainBtn').onclick=openTrain;$('namesBtn').onclick=()=>{setNames(!SHOWNAMES);toast(SHOWNAMES?'🏷 Showing all animal names · 顯示所有名稱':'🏷 Names only for the animal you pick · 只顯示選到的動物名稱')};setNames(SHOWNAMES);$('turnBtn').onclick=()=>setTurnMode(!turnMode);$('ridesBtn').onclick=()=>{stopTour();exitArea();renderRides()};$('stampBtn').onclick=()=>{stopTour();exitArea();renderStamp()};$('rbEnd').onclick=()=>endRide();
 
 /* ============================ MY LOCATION ============================ */
 /* default marker: an original 3D cartoon explorer rendered in Blender (blender/make_avatar.py), not a real person */
@@ -3430,6 +3441,48 @@ function renderPenguinWalk(){openCard();const now=fmt(((simMin()%1440)+1440)%144
  const ps=$('pwSys');if(ps)ps.onclick=()=>{if(PW.sys){PW.sys=false;try{localStorage.setItem('taipeiZooGuide.pwNotify','0')}catch(e){}renderPenguinWalk();return}
   Notification.requestPermission().then(r=>{PW.sys=r==='granted';try{localStorage.setItem('taipeiZooGuide.pwNotify',PW.sys?'1':'0')}catch(e){}if(!PW.sys)toast('Notifications are blocked in this browser. Reminders still show inside the page. <small>這個瀏覽器沒有允許通知，提醒仍會顯示在網頁裡。</small>');renderPenguinWalk()}).catch(()=>{})}}
 function goPenguinWalk(){if(!PW.P)return;exitArea();stopTour();if(RIDE)endRide(null,true);if(NAV&&NAV.playing&&NAV.follow){NAV.follow=false;updNavbar()}cam.spin=false;meFollow=false;const c=PW.P[1].clone().addScaledVector(PW.T,1.6);c.y=gy(c.x,c.z)+.6;cam.hold=null;flyTo(c,13,1.0,Math.atan2(PW.N2.x,PW.N2.z)+.5)}
+/* ============================ STAMP RALLY · 今日集章 ============================
+   A one-day stamp rally (21 Nov 2026) from the paper map handed out at the gate: six checkpoints circled on the
+   official park map, a meeting point under the "臺北市動物園" sign, and a prize desk beside the stage near the exit.
+   This guide's park is simplified, so each stop points at the closest thing it has: an animal (walking route),
+   an area (walking route), or the Main Gate (the camera flies there). The paper map is the source of truth. */
+const STAMP={date:'2026-11-21',key:'taipeiZooGuide.stamp.2026-11-21',done:new Set()};
+const STAMP_STOPS=[
+ {id:'meet',n:'Meeting point',zh:'集合',wzh:'入口「臺北市動物園」招牌題字下方空地',go:{gate:1}},
+ {id:'s1',n:'Formosan rock macaque',zh:'臺灣獼猴',wzh:'入口右手邊，臺灣動物區',go:{a:'formosan-rock-macaque'}},
+ {id:'s2',n:'Lar gibbon',zh:'白手長臂猿',wzh:'入口廣場正前方，教育中心旁',go:{a:'lar-gibbon'}},
+ {id:'s3',n:'Flamingos',zh:'紅鶴',wzh:'入口廣場的紅鶴池，白手長臂猿正下方',go:{gate:1},tip:'This guide keeps its flamingos in Bird World; the rally stop is the pond by the gate. 本導覽的紅鶴在鳥園，集章點是入口旁的紅鶴池。'},
+ {id:'s4',n:'Farm birds',zh:'家禽',wzh:'入口左側，兒童動物區',go:{z:'children'}},
+ {id:'s5',n:'Giraffe',zh:'長頸鹿',wzh:'往上走到非洲動物區，右側',go:{a:'somali-giraffe'},warn:'“因施工封閉” is printed just below: check the stop is open. 紙本地圖下方標「因施工封閉」，到了先確認。'},
+ {id:'s6',n:'African elephant',zh:'非洲象',wzh:'非洲動物區左側，靠鳥園廣場',go:{a:'african-elephant'}},
+ {id:'prize',n:'Prize desk',zh:'兌換完成禮',wzh:'面向舞台右側，靠出口處',go:{gate:1}}];
+const STAMP_CPS=STAMP_STOPS.filter(s=>s.id[0]==='s');
+try{const v=JSON.parse(localStorage.getItem(STAMP.key)||'[]');if(Array.isArray(v))v.forEach(x=>{if(STAMP_CPS.some(s=>s.id===x))STAMP.done.add(x)})}catch(e){}
+function stampSave(){try{localStorage.setItem(STAMP.key,JSON.stringify([...STAMP.done]))}catch(e){}}
+function stampCount(){return STAMP.done.size}
+function stampRow(s){const cp=s.id[0]==='s',on=STAMP.done.has(s.id),num=cp?s.id.slice(1):s.id==='meet'?'集':'兌';
+ return `<li class="stamp${on?' on':''}"><span class="sn${cp?'':' x'}">${on?'✓':num}</span><span class="st"><b>${s.zh}</b> <small>${s.n}</small><br><small>${s.wzh}</small>${s.warn?`<br><small class="sw">⚠ ${s.warn}</small>`:''}${s.tip?`<br><small>${s.tip}</small>`:''}</span><span class="sb"><button class="btn" type="button" data-go="${s.id}">Go</button>${cp?`<button class="btn${on?' primary':''}" type="button" data-st="${s.id}" aria-pressed="${on}" aria-label="Stamped · 已集章">${on?'☑':'☐'}</button>`:''}</span></li>`}
+function renderStamp(){openCard();const n=stampCount(),all=n===STAMP_CPS.length;
+ $('card').innerHTML=`<button class="close" id="cClose" type="button" aria-label="Close">✕</button><span class="zp">Event · 活動 · ${STAMP.date}</span><h2>Stamp rally · 今日集章</h2>
+ <p class="intro">Meet at the gate, collect a stamp at each of the six stops, then pick up your prize near the exit. Suggested order: the four stops by the gate first, then up the hill to the African Animal Area, then back down.<br>先在入口集合，集滿六個章再回出口兌換。建議順序：先蒐集入口附近四關，再上山到非洲動物區，最後走回出口。</p>
+ <div class="navsum"><b>${n} / ${STAMP_CPS.length}</b><span>${all?'All stamped — go get your prize! 集滿了，去兌換完成禮！':'stamps · 已集章'}</span></div>
+ <ol class="stamps">${STAMP_STOPS.map(stampRow).join('')}</ol>
+ <p class="note">The circled spots on the paper map are the real stops. This guide's park is simplified, so <b>Go</b> takes you to the nearest animal or area it has.<br>關卡以紙本地圖的圈圈為準；本導覽是簡化地圖，按 Go 會帶你到最接近的動物或區域。</p>
+ <div class="say"><button class="btn" id="stReset" type="button">Clear stamps · 清除紀錄</button></div>`;
+ $('cClose').onclick=()=>NAV?renderNav():renderWelcome(true);
+ $('card').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>stampGo(STAMP_STOPS.find(s=>s.id===b.dataset.go)));
+ $('card').querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{const id=b.dataset.st;if(STAMP.done.has(id))STAMP.done.delete(id);else STAMP.done.add(id);stampSave();renderStamp();
+  if(!STAMP.done.has(id))return;const s=STAMP_STOPS.find(x=>x.id===id);
+  if(stampCount()===STAMP_CPS.length)toast('🎉 <b>All six stamps!</b> Your prize is beside the stage, near the exit. <small>集滿六關！完成禮在面向舞台右側靠出口處。</small>',null,null,{label:'Go · 去兌換',fn:()=>stampGo(STAMP_STOPS[STAMP_STOPS.length-1])});
+  else toast(`✅ <b>${s.zh}</b> stamped · ${stampCount()} / ${STAMP_CPS.length} <small>已集章</small>`)});
+ $('stReset').onclick=()=>{if(!stampCount())return;if(!confirm('Clear all stamps? 清除全部集章紀錄？'))return;STAMP.done.clear();stampSave();renderStamp()}}
+function stampGo(s){if(!s)return;const g=s.go;
+ const back=()=>toast(`🎫 <b>${s.zh}</b> · ${s.wzh}`,null,null,{label:'Stamp list · 集章',fn:renderStamp,ms:9000});   // the route card replaces the list: offer the way back
+ if(g.a&&AI[g.a]){planRoute({a:AI[g.a]});back();return}
+ if(g.z&&ZI[g.z]){planRoute({z:ZI[g.z]});back();return}
+ exitArea();stopTour();if(RIDE)endRide(null,true);if(NAV)endRoute();cam.spin=false;meFollow=false;cam.hold=null;   // the gate stops have no walking route: drop the old one
+ flyTo(V(GATE.x,gy(GATE.x,GATE.z)+.6,GATE.z),16,1.0,cam.theta);renderStamp();if(isPhone())collapseCard();
+ toast(`📍 <b>${s.zh}</b> · ${s.n} <small>${s.wzh}</small>`,null,null,{label:'Stamp list · 集章',fn:renderStamp,ms:9000})}
 /* ============================ BUILDINGS ============================
    models/buildings-kit.glb (blender/make_buildings.py): original cartoon pieces drawn from public photos' features (not copies):
    the Pangolin House's branching white steel columns, glass lift and sky walk; the rainforest entrance sign and totem;
