@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!-- Content-Security-Policy: only this site, the two pinned three.js files and Google Fonts may load.
      The inline script is allowed by its sha256 hash, which tools/csp_hash.py updates (publish.sh runs it). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-NY+AoToIeN5FDzmpPs7CMVCYWYeYGoDjH+zSWc1lsOk=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-Xfa6pU0Tg0GTeIl4/UDnOycpYYA1xyS+f566k0bQ2Zk=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Taipei Zoo 3D English Guide</title>
@@ -1731,6 +1731,7 @@ function buildIndex(){A.forEach(a=>CANDS.push({kind:'a',id:a.id,al:[...new Set([
  CANDS.push({kind:'m',id:'me',al:['where am i','am i','my location','locate me','gps','我','我的位置','定位','位置','我在哪'].map(norm)});
  CANDS.push({kind:'r',id:'gondola',al:['gondola','cable car','maokong gondola','ropeway','纜車','貓空纜車','貓纜','空中纜車'].map(norm)});
  CANDS.push({kind:'r',id:'bus',al:['bus','safari bus','safari','巴士','遊園車','遊園巴士','草原巴士','公車'].map(norm)});
+ CANDS.push({kind:'r',id:'pwalk',al:['penguin walk','penguin parade','penguin outing','企鵝散步','企鵝走路','企鵝走路趣','企鵝遊行','黑腳企鵝散步'].map(norm)});
  CANDS.push({kind:'r',id:'dino',al:['dinosaur','topiary dinosaur','secret','恐龍','灌木恐龍','彩蛋'].map(norm)});
  CANDS.push({kind:'t',id:'train',al:['train','shuttle train','train times','timetable','schedule','列車','遊客列車','遊園列車','火車','小火車','時刻表','時刻','班次','發車','進站','列車時間'].map(norm)})}
 function scoreAlias(q,al){const qc=q.replace(/ /g,''),ac=al.replace(/ /g,'');const zh=/[㐀-鿿]/.test(ac);
@@ -1744,7 +1745,7 @@ function search(raw){const q=cleanQ(raw);if(!q)return[];const out=[];
  for(const c of CANDS){let s=0;for(const al of c.al)s=Math.max(s,scoreAlias(q,al));if(s>0)out.push({kind:c.kind,id:c.id,score:s-(c.kind==='z'?1:0)})}
  out.sort((a,b)=>b.score-a.score);return out.slice(0,10)}
 let resAct=-1;const qEl=$('q');
-function resRow(r){if(r.kind==='r'){const R0={gondola:['🚡 Ride the Maokong Gondola','搭乘貓空纜車','Fly over the zoo'],bus:['🚌 Ride the safari bus','搭乘非洲草原巴士','Meet the African animals'],dino:['🦖 A secret by the main gate','大門旁的祕密','Go and see']}[r.id];
+function resRow(r){if(r.kind==='r'){const R0={gondola:['🚡 Ride the Maokong Gondola','搭乘貓空纜車','Fly over the zoo'],bus:['🚌 Ride the safari bus','搭乘非洲草原巴士','Meet the African animals'],dino:['🦖 A secret by the main gate','大門旁的祕密','Go and see'],pwalk:['🐧 Penguin Walk','企鵝走路趣','African penguins take a stroll · 09:30']}[r.id];
   return `<button class="res zone" type="button" data-k="r" data-id="${r.id}"><span class="rt"><b>${R0[0]}</b> <small>${R0[1]}</small></span><span class="rs">${R0[2]}</span><span class="go">Go</span></button>`}
  if(r.kind==='m')return `<button class="res zone" type="button" data-k="m" data-id="me"><span class="rt"><b>Where am I?</b> <small>我的位置</small></span><span class="rs">${ME?'You are near '+the(ZI[ME.near]):'Show my spot on the map'}</span><span class="go">Open</span></button>`;if(r.kind==='t'){const m=simMin();const d=nextDep('gate',m);return `<button class="res zone" type="button" data-k="t" data-id="train"><span class="rt"><b>Shuttle train times</b> <small>遊客列車時刻</small></span><span class="rs">${d!=null?'Next from Train Station ~'+fmt(d):'Not running now · first train 09:00'}</span><span class="go">Open</span></button>`}if(r.kind==='a'){const a=AI[r.id],z=ZI[a.z];return `<button class="res" type="button" data-k="a" data-id="${a.id}"><span class="rt"><b>${a.n}</b> <small>${a.zh}</small></span><span class="rs">${ROUTE.indexOf(z.id)+1}. ${z.n}</span><span class="go">Go</span></button>`}
  const z=ZI[r.id];const n=A.filter(a=>a.z===z.id).length;return `<button class="res zone" type="button" data-k="z" data-id="${z.id}"><span class="rt"><b>${ROUTE.indexOf(z.id)+1}. ${z.n}</b> <small>${z.zh}</small></span><span class="rs">Area · ${n} animal${n>1?'s':''}</span><span class="go">View</span></button>`}
@@ -1756,7 +1757,7 @@ function renderResults(list,raw){const box=$('results');let html='';
   if(zs.length)html+=`<div class="res-h">Areas · see the block</div>`+zs.map(resRow).join('')}
  box.innerHTML=html;box.hidden=false;resAct=-1;
  box.querySelectorAll('.res').forEach(b=>b.onclick=()=>actResult({kind:b.dataset.k,id:b.dataset.id}))}
-function actResult(r){$('results').hidden=true;qEl.blur();if(r.kind==='r'){if(r.id==='dino'){exitArea();const p=DINO.g&&DINO.g.position;if(p)flyTo(V(p.x,p.y+3,p.z),16,1.05,cam.theta);else toast('The secret is not available right now. 彩蛋模型沒有載入。')}else startRide(r.id);return}if(r.kind==='m')openMe();else if(r.kind==='t')openTrain();else if(r.kind==='a')planRoute({a:AI[r.id]});else areaView(ZI[r.id])}
+function actResult(r){$('results').hidden=true;qEl.blur();if(r.kind==='r'){if(r.id==='pwalk'){renderPenguinWalk();goPenguinWalk();return}if(r.id==='dino'){exitArea();const p=DINO.g&&DINO.g.position;if(p)flyTo(V(p.x,p.y+3,p.z),16,1.05,cam.theta);else toast('The secret is not available right now. 彩蛋模型沒有載入。')}else startRide(r.id);return}if(r.kind==='m')openMe();else if(r.kind==='t')openTrain();else if(r.kind==='a')planRoute({a:AI[r.id]});else areaView(ZI[r.id])}
 function runQuery(raw,auto){const list=search(raw);renderResults(list,raw);
  if(auto&&list.length&&list[0].score>=90&&(list.length===1||list[1].score<=list[0].score-12)){actResult(list[0]);return true}return false}
 qEl.addEventListener('input',()=>runQuery(qEl.value,false));
@@ -2158,8 +2159,8 @@ $('meBtn').onclick=openMe;
 /* ============================ WALK WITH ARROW KEYS ============================ */
 const WALK={on:false,keys:{},auto:null,lastZone:null,lastAnimal:null,speed:8};
 let toastT=0;
-function toast(html,a,z){const t=$('toast');t.innerHTML=`<span>${html}</span>`+(a?`<button class="btn" id="toastGo" type="button">Learn more</button>`:z?`<button class="btn" id="toastGo" type="button">See animals</button>`:'');t.hidden=false;
- const g=$('toastGo');if(g)g.onclick=()=>{hideToast();if(a){select(a);openCard()}else{renderZone(z);openCard()}};clearTimeout(toastT);toastT=setTimeout(hideToast,6500)}
+function toast(html,a,z,act){const t=$('toast');t.innerHTML=`<span>${html}</span>`+(act?`<button class="btn" id="toastGo" type="button">${act.label}</button>`:a?`<button class="btn" id="toastGo" type="button">Learn more</button>`:z?`<button class="btn" id="toastGo" type="button">See animals</button>`:'');t.hidden=false;
+ const g=$('toastGo');if(g)g.onclick=()=>{hideToast();if(act){act.fn();return}if(a){select(a);openCard()}else{renderZone(z);openCard()}};clearTimeout(toastT);toastT=setTimeout(hideToast,act&&act.ms||6500)}
 function hideToast(){$('toast').hidden=true}
 function startWalk(){stopTour();stopSong();exitArea();if(NAV&&NAV.playing)toggleWalk();placing=false;canvas.classList.remove('placing');
  if(!ME)setMe(GATE.x+(ROAD[1].x-ROAD[0].x)*.1,GATE.z+(ROAD[1].z-ROAD[0].z)*.1,'walk',0,null);
@@ -2311,7 +2312,7 @@ function loop(){requestAnimationFrame(loop);const t=clock.getElapsedTime();const
  feedTick(dt,t);viewOffsetTick(dt);
  if(NAV)navTick(dt,t);
  if(WALK.on)walkTick(dt,t);
- behaviorTick(dt,t);weatherTick(dt,t);ridesTick(dt,t);targetHeightTick(dt);applyCam();scene.fog.near=Math.max(240,cam.dist+60);scene.fog.far=scene.fog.near+260;   /* fog starts beyond the zoo, however far out you zoom */perfTick(dt);habitatLodTick();
+ behaviorTick(dt,t);weatherTick(dt,t);ridesTick(dt,t);penguinWalkTick(dt);targetHeightTick(dt);applyCam();scene.fog.near=Math.max(240,cam.dist+60);scene.fog.far=scene.fog.near+260;   /* fog starts beyond the zoo, however far out you zoom */perfTick(dt);habitatLodTick();
  for(const a of A){const o=a.obj;if(!o.holder.parent.visible)continue;const near=camera.position.distanceTo(o.holder.getWorldPosition(tmpV));
   if(near<70||o.bounce>0)o.built.update(t,o.ph);          // far-away animals are too small to see moving
   const olOn=near<55||current===a;if(o.outlines&&o.olOn!==olOn){o.olOn=olOn;o.outlines.forEach(m=>m.visible=olOn)}   // outlines only up close
@@ -2672,9 +2673,94 @@ function renderRides(){openCard();
  <div class="say ridelist" style="flex-direction:column;align-items:stretch">
  <button class="btn primary" id="rdG" type="button">🚡 Maokong Gondola · 貓空纜車<br><small style="font-weight:600">Fly over the zoo from Taipei Zoo station to Zoo South station</small></button>
  <button class="btn sign" id="rdB" type="button">🚌 Safari bus · 非洲草原巴士<br><small style="font-weight:600">Drive through the African Animal Area and meet the animals</small></button>
+ <button class="btn sign" id="rdP" type="button">🐧 Penguin Walk · 企鵝走路趣<br><small style="font-weight:600">African penguins take a stroll (below 24°C)</small></button>
  <button class="btn" id="rdT" type="button">🚂 Shuttle train times · 遊園列車時刻</button></div>
  <p class="note">The gondola follows its real route (OpenStreetMap). The safari bus is a make-believe ride for this guide.<br>纜車照真實路線；草原巴士是這個導覽的想像設施。</p>`;
- $('cClose').onclick=()=>NAV?renderNav():renderWelcome();$('rdG').onclick=()=>startRide('gondola');$('rdB').onclick=()=>startRide('bus');$('rdT').onclick=openTrain}
+ $('cClose').onclick=()=>NAV?renderNav():renderWelcome();$('rdG').onclick=()=>startRide('gondola');$('rdB').onclick=()=>startRide('bus');$('rdT').onclick=openTrain;$('rdP').onclick=renderPenguinWalk}
+/* ============================ PENGUIN WALK · 企鵝走路趣 ============================
+   Taipei Zoo started this on 19 Nov 2026 (news reports): about 20 African (black-footed) penguins walk out of the Penguin House
+   for about 15 minutes along a short visitor path (from the exit towards the black bear window), with a keeper and a talk.
+   It only happens when it is below 24°C (otherwise: an indoor feeding talk), and dates are not fixed (announced on the zoo website).
+   In this guide: a sample session every day at 09:30 on the guide's clock, or "Watch now" for a short preview. */
+const PW={N:12,start:9*60+30,len:15,warn:10,warm:false,remind:true,sys:false,phase:-1,sent:{}};let PWALK=null;
+try{const v=JSON.parse(sessionStorage.getItem('taipeiZooGuide.pwSent')||'{}');PW.sent=v&&typeof v==='object'&&!Array.isArray(v)?v:{}}catch(e){PW.sent={}}   // reminders already shown in this tab (so a reload or the time slider does not repeat them)
+try{PW.remind=localStorage.getItem('taipeiZooGuide.pwRemind')!=='0';PW.sys=localStorage.getItem('taipeiZooGuide.pwNotify')==='1'}catch(e){}   // reminder settings stay on this device only
+function initPenguinWalk(){const z=ZI.penguin;if(!z||!z.ent||!AI['african-penguin'])return;
+ const i=z.iz,a=roadPts[Math.max(0,i-3)],b=roadPts[Math.min(roadPts.length-1,i+3)];const T=V(b.x-a.x,0,b.z-a.z).normalize();
+ const tz=ZI.temperate;if(tz&&T.dot(V(tz.x-z.x,0,tz.z-z.z))<0)T.negate();   // towards the Temperate Zone (the real walk heads for the black bear window)
+ const d=V(z.ent.x-z.x,0,z.ent.z-z.z).normalize(),er=zR(z,Math.atan2(d.z,d.x));
+ const P0=V(z.x+d.x*(er-.6),0,z.z+d.z*(er-.6)),P1=z.ent.clone(),P2=P1.clone().addScaledVector(T,3.4);   // house exit → walkway → about 15 m along it
+ const P=[P0,P1,P2];let L=0;P.forEach((p,k)=>{if(k)L+=p.distanceTo(P[k-1]);p.s=L});PW.P=P;PW.L=L;PW.T=T;PW.N2=V(-T.z,0,T.x);
+ // the rope line along the walkway (only shown during a walk) and a small sign
+ const rope=new THREE.Group();rope.visible=false;world.add(rope);PW.rope=rope;
+ for(const side of [1,-1]){let prev=null;for(let k=0;k<=6;k++){const p=P1.clone().addScaledVector(T,k*3.4/6).addScaledVector(PW.N2,side*1.25);p.y=gy(p.x,p.z)-.12;
+   limb(rope,V(p.x,p.y,p.z),V(p.x,p.y+.75,p.z),.05,'#8a6a45');if(prev)limb(rope,V(prev.x,prev.y+.6,prev.z),V(p.x,p.y+.6,p.z),.025,'#C0503A');prev=p}}
+ const sp=P2.clone().addScaledVector(PW.N2,-2.2);const lab=makeLabel('Penguin Walk','企鵝走路趣 09:30',{bg:'#2B5D8A',fg:'#ffffff',w:4.2,small:true,prio:2});lab.position.set(sp.x,gy(sp.x,sp.z)+2.6,sp.z);world.add(lab);PW.sign=lab}
+function pwPoint(s,w,out){const P=PW.P;let k=1;while(k<P.length-1&&P[k].s<s)k++;const a=P[k-1],b=P[k],f=THREE.MathUtils.clamp((s-a.s)/Math.max(1e-6,b.s-a.s),0,1);
+ out.copy(a).lerp(b,f);const spread=THREE.MathUtils.smoothstep(s,P[1].s-.2,P[1].s+.6);out.addScaledVector(PW.N2,w*spread);out.y=gy(out.x,out.z);return out}
+function startPenguinWalk(mode){if(!PW.P||PWALK)return;
+ const a=AI['african-penguin'],g=new THREE.Group();world.add(g);const R=rng(77),list=[];
+ for(let i=0;i<PW.N;i++){const built=(a.m.glb&&GLB[a.m.glb])?buildGLB(a.m):BUILD[a.m.b](a.m,rng(i+5));const m=built.g;m.scale.setScalar((a.m.s||1)*(.9+R()*.2));addOutline(m,1.1);
+  const roll=new THREE.Group();roll.add(m);const h=new THREE.Group();h.add(roll);h.visible=false;g.add(h);
+  list.push({h,roll,u:PW.P[1].s+.7+R()*(PW.L-PW.P[1].s-1),w:(R()-.5)*1.5,ph:R()*6.28,go:i*1.3,back:(PW.N-1-i)*.9,last:V(0,0,0)})}
+ const kp=new THREE.Group();limb(kp,V(0,0,0),V(0,.9,0),.22,'#2f6b4a',.26);E(kp,'#f2c9a0',.24,.26,.24,0,1.2,0);E(kp,'#2f6b4a',.28,.1,.28,0,1.42,0);addOutline(kp,1);kp.visible=false;g.add(kp);   // the keeper leads the way
+ g.traverse(o=>o.userData.ride=1);
+ PWALK={mode,g,list,kp,e:0,t0:performance.now(),dur:mode==='sched'?PW.len*60:80,out:22,inn:20};PW.rope.visible=true;
+ if(mode==='preview'){toast('🐧 <b>Penguin Walk preview.</b> Please keep quiet and no flash when you watch the real one. <small>企鵝走路趣預覽：看真的時請小聲、不開閃光燈。</small>');Speech.say('Here come the African penguins! Please keep quiet, and no flash photos.')}}
+function stopPenguinWalk(){if(!PWALK)return;world.remove(PWALK.g);PWALK=null;if(PW.rope)PW.rope.visible=false}
+const _pw=new THREE.Vector3();
+function pwPhase(md){return md<PW.start-PW.warn?0:md<PW.start?1:md<PW.start+PW.len?2:3}   // 0 before · 1 ten minutes before · 2 on now · 3 over
+function pwDay(m){if(SIM.base!=null)return 'sim:'+Math.floor(m/1440);try{return 'live:'+new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Taipei'})}catch(e){return 'live:'+new Date().toDateString()}}   // the zoo's own (Taipei) date
+function pwSave(){try{sessionStorage.setItem('taipeiZooGuide.pwSent',JSON.stringify(PW.sent))}catch(e){}}
+function pwNotify(phase,md,force){if(!PW.remind||(phase!==1&&phase!==2))return;const day=pwDay(simMin()),key=day+':'+phase;if(PW.sent[key]&&!force)return;
+ for(const k in PW.sent)if(!k.startsWith(day+':'))delete PW.sent[k];PW.sent[key]=1;pwSave();/* keep only today's record */const n=Math.max(1,Math.ceil(PW.start-md));
+ const msg=phase===1?(PW.warm?[`🐧 In ${n} min (09:30): it is 24°C or warmer, so the penguins have an <b>indoor feeding talk</b>.`,`${n} 分鐘後：今天 24°C 以上，改成室內「吃飯趣」餵食解說。`,`In ${n} minutes, the penguins have an indoor feeding talk.`]
+   :[`🐧 <b>Penguin Walk in ${n} minute${n>1?'s':''}</b> at the Penguin House!`,`${n} 分鐘後企鵝走路趣！`,`The penguin walk starts in ${n} minute${n>1?'s':''} at the Penguin House.`])
+  :(PW.warm?[`🌡️ <b>24°C or warmer:</b> indoor feeding talk at the Penguin House now.`,`今天 24°C 以上，企鵝館現在是室內「吃飯趣」。`,`It is too warm for the penguin walk. There is an indoor feeding talk now.`]
+   :[`🐧 <b>Penguin Walk is on now!</b> Please keep quiet, no flash.`,`企鵝走路趣開始了！請小聲、不開閃光燈。`,`The penguin walk is on now! Please keep quiet, and no flash photos.`]);
+ const show=()=>{toast(`${msg[0]} <small>${msg[1]}</small>`,null,null,{label:'Go see · 去看看',fn:()=>{goPenguinWalk();renderPenguinWalk()},ms:15000});Speech.say(msg[2])};
+ if(document.hidden)PW.later=show;else show();   // hidden page: show it when the person comes back
+ // a system notification too, only if the person turned it on and the page is in the background
+ if(PW.sys&&'Notification' in window&&Notification.permission==='granted'&&document.hidden){try{new Notification('Penguin Walk · 企鵝走路趣',{body:msg[2]+' '+msg[1],tag:'pwalk'})}catch(e){}}}
+function pwReminderCheck(){if(!PW.P)return;const m=simMin(),md=((m%1440)+1440)%1440,phase=pwPhase(md);PW.phase=phase;if(phase===1||phase===2)pwNotify(phase,md);return md}   // pwNotify skips what was already sent today   // reminders: ten minutes before, and when it starts
+setInterval(pwReminderCheck,15000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&PW.later){const f=PW.later;PW.later=null;f()}});   // also while the page is in the background, where the animation loop pauses
+function penguinWalkTick(dt){if(!PW.P)return;
+ const md=pwReminderCheck(),phase=PW.phase;
+ const want=phase===2&&!PW.warm;   // the 09:30 walk follows the clock: out whenever it is on and not too warm
+ if(PWALK&&PWALK.mode==='sched'&&!want)stopPenguinWalk();else if(want&&(!PWALK||PWALK.mode==='preview')){stopPenguinWalk();startPenguinWalk('sched')}   // the real session takes over from a preview
+ if(!PWALK)return;const W=PWALK;W.e=W.mode==='sched'?(md-PW.start)*60:(performance.now()-W.t0)/1000;const e=W.e;   // a preview runs on real seconds, even at a low frame rate
+ if(e>=W.dur||e<0){stopPenguinWalk();return}
+ if(!world.visible)return;let lead=0;
+ for(let i=0;i<W.list.length;i++){const p=W.list[i];let s,w,moving=false;
+  const tb=W.dur-W.inn+p.back*W.inn/(W.list.length*1.4);   // when this one heads home
+  if(e<p.go){p.h.visible=false;continue}
+  if(e<tb){s=Math.min(p.u,(e-p.go)*.32);moving=s<p.u;w=p.w*Math.min(1,s/p.u);if(!moving){s+=Math.sin(e*.45+p.ph)*.18;w+=Math.cos(e*.38+p.ph)*.14;moving=Math.sin(e*.6+p.ph)>.55}}
+  else{s=p.u-(e-tb)*.36;w=p.w*Math.max(0,s/p.u);moving=true;if(s<=.05){p.h.visible=false;continue}}
+  lead=Math.max(lead,s);pwPoint(s,w,_pw);p.h.visible=true;
+  const dx=_pw.x-p.h.position.x,dz=_pw.z-p.h.position.z;if(Math.hypot(dx,dz)>.004)p.h.rotation.y+=(Math.atan2(Math.sin(Math.atan2(-dz,dx)-p.h.rotation.y),Math.cos(Math.atan2(-dz,dx)-p.h.rotation.y)))*Math.min(1,dt*6);
+  p.h.position.copy(_pw);const wob=moving?1:.25;p.roll.rotation.x=Math.sin(e*9+p.ph)*.2*wob;p.roll.position.y=Math.abs(Math.sin(e*9+p.ph))*.05*wob}   // waddle
+ const ks=Math.min(PW.L,lead+.8);pwPoint(ks,-.9,_pw);W.kp.visible=e<W.dur-4;const kdx=_pw.x-W.kp.position.x,kdz=_pw.z-W.kp.position.z;if(Math.hypot(kdx,kdz)>.004)W.kp.rotation.y=Math.atan2(-kdz,kdx);W.kp.position.copy(_pw)}
+function renderPenguinWalk(){openCard();const now=fmt(((simMin()%1440)+1440)%1440);
+ $('card').innerHTML=`<button class="close" id="cClose" type="button" aria-label="Close">✕</button><span class="zp">Event · 活動</span><h2>Penguin Walk · 企鵝走路趣</h2>
+ <p class="intro">African (black-footed) penguins waddle out of the Penguin House for about 15 minutes, with a keeper and a short talk. They only come out when it is below 24°C.<br>黑腳企鵝走出企鵝館，在步道上散步約 15 分鐘，保育員會一邊解說。氣溫低於 24°C 才會出來。</p>
+ <dl class="facts"><dt>First walk</dt><dd>19 Nov 2026, 09:30 · about 20 penguins</dd><dt>Where</dt><dd>Penguin House exit → visitor path · 企鵝館出口步道</dd><dt>In this guide</dt><dd>Sample session every day at 09:30 (guide clock now ${now})</dd></dl>
+ <div class="say ridelist" style="flex-direction:column;align-items:stretch">
+ <button class="btn primary" id="pwNow" type="button">▶ Watch now (80-second preview) · 現在看</button>
+ <button class="btn" id="pwWarm" type="button" aria-pressed="${PW.warm}">${PW.warm?'☑':'☐'} It is 24°C or warmer today · 今天 24°C 以上</button>
+ <button class="btn" id="pwTime" type="button">🕘 Set the clock to 09:19 · 把時鐘撥到 09:19</button>
+ <button class="btn" id="pwRem" type="button" aria-pressed="${PW.remind}">${PW.remind?'☑':'☐'} 🔔 Remind me 10 minutes before · 開演前 10 分鐘提醒我</button>
+ ${'Notification' in window?`<button class="btn" id="pwSys" type="button" aria-pressed="${PW.sys}">${PW.sys?'☑':'☐'} 📣 Also a system notice when this page is in the background · 切到別的分頁也通知</button>`:''}</div>
+ <p class="note">Penguin rules: keep quiet, no chasing, touching or feeding, no flash, stay behind the rope.<br>愛企鵝守則：不喧嘩、不追逐、不觸摸、不餵食、不開閃光燈、不越過圍繩。<br>Real dates are not fixed — see the zoo website (最新消息 → 教育活動).<br>Reminders show inside this page; on iPad, keep the guide open. 提醒會顯示在導覽網頁裡（iPad 請保持網頁開著）。</p>`;
+ $('cClose').onclick=()=>NAV?renderNav():renderWelcome();
+ $('pwNow').onclick=()=>{if(isPhone())collapseCard();goPenguinWalk();if(PW.warm){toast('🌡️ <b>24°C or warmer today:</b> the penguins stay inside for a feeding talk. <small>今天 24°C 以上，企鵝在室內「吃飯趣」，不出來散步。</small>');return}if(PWALK&&PWALK.mode==='sched'){toast('🐧 The penguins are out right now — no preview needed! <small>企鵝現在就在外面散步！</small>');return}stopPenguinWalk();startPenguinWalk('preview')};
+ $('pwWarm').onclick=()=>{PW.warm=!PW.warm;if(PW.warm)stopPenguinWalk();hideToast();const md=((simMin()%1440)+1440)%1440,ph=pwPhase(md);   // the old reminder no longer matches: show the right one
+  if(ph===1||ph===2)pwNotify(ph,md,true);else if(PW.warm)toast('🌡️ <b>24°C or warmer:</b> no walk today, an indoor feeding talk instead. <small>24°C 以上：改成室內「吃飯趣」。</small>');renderPenguinWalk()};
+ $('pwTime').onclick=()=>{SIM.base=PW.start-PW.warn-1;SIM.start=performance.now();SIM.speed=1;for(const k in PW.sent)if(k.startsWith('sim:'))delete PW.sent[k];pwSave();goPenguinWalk();if(!PW.remind)toast('🕘 The guide clock is now 09:19. <small>時鐘撥到 09:19。</small>')};   // a minute later the 10-minute reminder pops up
+ $('pwRem').onclick=()=>{PW.remind=!PW.remind;try{localStorage.setItem('taipeiZooGuide.pwRemind',PW.remind?'1':'0')}catch(e){}renderPenguinWalk()};
+ const ps=$('pwSys');if(ps)ps.onclick=()=>{if(PW.sys){PW.sys=false;try{localStorage.setItem('taipeiZooGuide.pwNotify','0')}catch(e){}renderPenguinWalk();return}
+  Notification.requestPermission().then(r=>{PW.sys=r==='granted';try{localStorage.setItem('taipeiZooGuide.pwNotify',PW.sys?'1':'0')}catch(e){}if(!PW.sys)toast('Notifications are blocked in this browser. Reminders still show inside the page. <small>這個瀏覽器沒有允許通知，提醒仍會顯示在網頁裡。</small>');renderPenguinWalk()}).catch(()=>{})}}
+function goPenguinWalk(){if(!PW.P)return;exitArea();stopTour();if(RIDE)endRide(null,true);if(NAV&&NAV.playing&&NAV.follow){NAV.follow=false;updNavbar()}cam.spin=false;meFollow=false;const c=PW.P[1].clone().addScaledVector(PW.T,1.6);c.y=gy(c.x,c.z)+.6;cam.hold=null;flyTo(c,13,1.0,Math.atan2(PW.N2.x,PW.N2.z)+.5)}
 function optimizeScene(){let b=0,a=0;
  ZONES.forEach(z=>{const r=mergeStatic(z.group,o=>!!o.userData.zone);b+=r[0];a+=r[1]});
  const r=mergeStatic(world,o=>o===terrainMesh);b+=r[0];a+=r[1];
@@ -2684,10 +2770,10 @@ function perfTick(dt){if(dt<=0)return;Perf.acc+=dt;Perf.n++;if(Perf.acc<2)return
  const fps=Perf.n/Perf.acc;Perf.acc=0;Perf.n=0;const now=performance.now();if(now-Perf.last<3000)return;
  let pr=Perf.pr;if(fps<40&&pr>.75)pr=Math.max(.75,pr-.25);else if(fps>57&&pr<Perf.max)pr=Math.min(Perf.max,pr+.25);
  if(pr!==Perf.pr){Perf.pr=pr;Perf.last=now;renderer.setPixelRatio(pr);renderer.setSize(innerWidth,innerHeight,false)}}
-function init(){drawPaper();buildWorld();ZONES.forEach(buildZone);placeAnimals();initBehaviors();decorateHabitats();initWeather();initRides();buildTrain();initNav();buildTrainSystem();optimizeScene();initMe();buildIndex();buildList();buildSong();renderWelcome();
+function init(){drawPaper();buildWorld();ZONES.forEach(buildZone);placeAnimals();initBehaviors();decorateHabitats();initWeather();initRides();buildTrain();initNav();initPenguinWalk();buildTrainSystem();optimizeScene();initMe();buildIndex();buildList();buildSong();renderWelcome();
  Speech.load();if(Speech.browser)speechSynthesis.onvoiceschanged=()=>Speech.load();
  if(window.claude&&typeof window.claude.use==='function'){window.claude.use('tts').then(t=>{if(t){Speech.cl=t;Speech.load();if(!$('card').querySelector('#wFind'))return;renderWelcome()}}).catch(()=>{})}initDictation();
- if(isPhone())cam.dist=OV_D*1.45;resize();applyCam();$('loading').hidden=true;loop();setTimeout(()=>toast('Tap an animal to hear its English name · 點動物聽英文名字'),900)}
+ if(isPhone())cam.dist=OV_D*1.45;resize();applyCam();$('loading').hidden=true;loop();setTimeout(()=>{if($('toast').hidden)toast('Tap an animal to hear its English name · 點動物聽英文名字')},900)}   // not over a reminder
 const fontsReady=(document.fonts&&document.fonts.load)?Promise.race([Promise.all([document.fonts.load("400 40px 'Patrick Hand'"),document.fonts.ready]),new Promise(r=>setTimeout(r,2000))]):Promise.resolve();
 fontsReady.then(preloadGLB).catch(e=>console.warn('preload failed',e)).then(init);   // init runs exactly once
 </script>
