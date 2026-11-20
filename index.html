@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!-- Content-Security-Policy: only this site, the two pinned three.js files and Google Fonts may load.
      The inline script is allowed by its sha256 hash, which tools/csp_hash.py updates (publish.sh runs it). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-jcENYElhTDmXmtGsSXjBRPywyWDuZOUvINJdos+DoO8=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-Cu1WubVexYYzrBQjVKsa2I3/4rXW0hbFEinaYtMC8l0=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Taipei Zoo 3D English Guide</title>
@@ -1383,9 +1383,13 @@ function declutter(){_dl.length=0;const tv=Math.tan(THREE.MathUtils.degToRad(cam
   const x=(_sp.x+1)/2*W,y=(1-_sp.y)/2*H;if(x+pw/2<0||x-pw/2>W||y+ph/2<0||y-ph/2>H){s.material.opacity=op;continue}
   s.userData.rect=[x-pw/2,y-ph/2,x+pw/2,y+ph/2];s.userData.d=d;s.userData.p=(fa&&s===fa.obj.lab)?6:s.userData.prio;_dl.push(s)}
  _dl.sort((a,b)=>b.userData.p-a.userData.p||a.userData.d-b.userData.d);_dr.length=0;
- for(const s of _dl){const r=s.userData.rect,g=s.userData.dc<.5?8:2;   // a hidden sign needs a little extra room before it comes back (no flicker)
-  let hit=false;for(const q of _dr)if(r[0]-g<q[2]&&r[2]+g>q[0]&&r[1]-g<q[3]&&r[3]+g>q[1]){hit=true;break}
-  if(!hit)_dr.push(r);s.userData.dc+=((hit?0:1)-s.userData.dc)*.25;s.material.opacity=s.userData.op*s.userData.dc}}
+ for(const s of _dl){const r=s.userData.rect,g=s.userData.dc<.5?8:2,h=r[3]-r[1],prev=s.userData.nud||0;   // a hidden sign needs a little extra room before it comes back (no flicker)
+  // try where it is now first, then its normal place, then a little above or below; only fade it if none of these is free
+  let pick=null;for(const off of [0,prev,-1.15,1.15]){const y0=r[1]+off*h,y1=r[3]+off*h;if(off!==0&&(y0<0||y1>H))continue;const gg=off===0&&prev!==0?8:g;let hit=false;   // back home first when there is room; never pushed off screen
+   for(const q of _dr)if(r[0]-gg<q[2]&&r[2]+gg>q[0]&&y0-gg<q[3]&&y1+gg>q[1]){hit=true;break}
+   if(!hit){pick=off;_dr.push([r[0],y0,r[2],y1]);break}}
+  if(pick!==null&&pick!==prev){s.userData.nud=pick;s.center.y=.5+pick}   /* sprite pivot: a smaller center.y draws the sign higher on screen */
+  s.userData.dc+=((pick===null?0:1)-s.userData.dc)*.25;s.material.opacity=s.userData.op*s.userData.dc}}
 
 /* ---------- place animals ---------- */
 const pickables=[];
@@ -2241,7 +2245,7 @@ function startFeed(a){if(current!==a)select(a,{});cam.spin=false;updCloseBtns();
 /* ============================ LOOP ============================ */
 let train;function buildTrain(){train=new THREE.Group();scene.add(train);const cols=['#2f6b4a','#f5c531','#2f6b4a'];
  cols.forEach((c,i)=>{const car=new THREE.Mesh(new THREE.BoxGeometry(2.2,1.2,1.4),mat(c));car.position.set(-i*2.5,.9,0);train.add(car);const roof=new THREE.Mesh(new THREE.BoxGeometry(2.3,.15,1.6),mat('#ffffff'));roof.position.set(-i*2.5,1.6,0);train.add(roof)});addOutline(train,1)}
-let paperT=0;function resize(){const w=innerWidth,h=innerHeight;if(typeof cam!=='undefined'){const m=maxDist();if(cam.dist>m)cam.dist=m;if(cam.fly&&cam.fly.to.d>m)cam.fly.to.d=m}renderer.setSize(w,h,false);camera.aspect=w/h;camera.clearViewOffset();camera.updateProjectionMatrix();const tb=document.querySelector('.topbar');if(tb)document.documentElement.style.setProperty('--topH',Math.round(tb.getBoundingClientRect().bottom+8)+'px');clearTimeout(paperT);paperT=setTimeout(drawPaper,150)}
+let paperT=0;function resize(){const w=innerWidth,h=innerHeight;if(typeof cam!=='undefined'){const m=maxDist();if(cam.dist>m)cam.dist=m;if(cam.fly){if(cam.fly.to.d>m)cam.fly.to.d=m;if(cam.fly.from.d>m)cam.fly.from.d=m}}renderer.setSize(w,h,false);camera.aspect=w/h;camera.clearViewOffset();camera.updateProjectionMatrix();const tb=document.querySelector('.topbar');if(tb)document.documentElement.style.setProperty('--topH',Math.round(tb.getBoundingClientRect().bottom+8)+'px');clearTimeout(paperT);paperT=setTimeout(drawPaper,150)}
 addEventListener('resize',resize);
 const clock=new THREE.Clock();const tmpV=new THREE.Vector3();
 let lastT=0;
