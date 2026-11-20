@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!-- Content-Security-Policy: only this site, the two pinned three.js files and Google Fonts may load.
      The inline script is allowed by its sha256 hash, which tools/csp_hash.py updates (publish.sh runs it). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-oLnEXbFIGCjzOLI0yYTVILiKYQujUGQ+0AxSNrR/byM=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-CAJO9Aif7kYmK4b7p4+gJUyKUpxLkUUYDckmoOHWJlo=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Taipei Zoo 3D English Guide</title>
@@ -1137,10 +1137,13 @@ function preloadGLB(){
  const loader=new THREE.GLTFLoader();
  let dr=null;if(THREE.DRACOLoader){dr=new THREE.DRACOLoader();dr.setDecoderPath('vendor/draco/');dr.setDecoderConfig({type:'wasm'});loader.setDRACOLoader(dr)}   // models are Draco-compressed
  const urls=[...new Set(A.map(a=>a.m.glb).filter(Boolean).concat([HAB_URL,WX_URL]))];
- const all=Promise.all(urls.map(u=>new Promise(res=>loader.load(u,g=>{GLB[u]=g;res()},undefined,e=>{console.warn('GLB load failed, using built-in shape:',u,e);res()}))));
+ let settled=false;   // once the park is built, models that arrive late are ignored (the built-in shapes stay)
+ const all=Promise.all(urls.map(u=>new Promise(res=>loader.load(u,g=>{if(!settled)GLB[u]=g;res()},undefined,e=>{console.warn('GLB load failed, using built-in shape:',u,e);res()}))));
  // never wait forever: if the decoder or a file hangs, start with whatever loaded (the rest use built-in shapes)
- const limit=new Promise(res=>setTimeout(()=>{console.warn('Model loading took too long; continuing without the missing ones');res()},25000));
- return Promise.race([all,limit]).finally(()=>{if(dr)dr.dispose()})}   // free the decoder workers once loading is done
+ let timer;const limit=new Promise(res=>{timer=setTimeout(()=>{console.warn('Model loading took too long; continuing without the missing ones');res()},25000)});
+ const freeDecoder=()=>{if(!dr)return;dr.dispose();if(dr.workerSourceURL){URL.revokeObjectURL(dr.workerSourceURL);dr.workerSourceURL=''}};   // workers + blob URL
+ all.then(()=>{clearTimeout(timer);freeDecoder()});                    // also cleans up loads that finish after a timeout
+ return Promise.race([all,limit]).then(()=>{settled=true;clearTimeout(timer);freeDecoder()})}
 const HAB_URL='models/habitat-kit.glb',WX_URL='models/weather-kit.glb';
 function buildGLB(o){
  const src=GLB[o.glb];const g=new THREE.Group();const m=src.scene.clone(true);
@@ -1349,7 +1352,7 @@ function focusAnimal(a,close){const p=worldPos(a);const h=a.obj.h;
  flyTo(tgt,d,phi,th,close?900:1300)}
 const VB={};const _vr=new THREE.Raycaster();
 function viewBlockers(z){if(VB[z.id])return VB[z.id];const list=[];   // solid scenery in this area + the forest around it (not animals, glass domes, labels, floor)
- z.group.traverse(o=>{if((o.isMesh||o.isInstancedMesh)&&!o.userData.animal&&!o.userData.isOutline&&!o.userData.zone&&o.material&&!o.material.transparent&&o.material.type!=='MeshBasicMaterial')list.push(o)});
+ z.group.traverse(o=>{if((o.isMesh||o.isInstancedMesh)&&!o.userData.animal&&!o.userData.isOutline&&!o.userData.weather&&!o.userData.zone&&o.material&&!o.material.transparent&&o.material.type!=='MeshBasicMaterial')list.push(o)});
  world.children.forEach(o=>{if(o.isInstancedMesh)list.push(o)});return VB[z.id]=list}
 /* sight lines from 9 points on the animal (its box centre and 8 corners pulled 25% inward: head, tail, feet, back)
    to the camera; any hit = blocked. Returns how far the nearest obstacle is from the animal, or Infinity when clear. */
@@ -1362,7 +1365,7 @@ function viewHit(a,tgt,dir,d,objs){const cp=tgt.clone().addScaledVector(dir,d);_
  return first}
 function viewDir(phi,th){return V(Math.sin(phi)*Math.sin(th),Math.cos(phi),Math.sin(phi)*Math.cos(th))}
 function clearView(a,tgt,d,phi,th0){const objs=viewBlockers(ZI[a.z]);let best={th:th0,d:d,free:0};
- for(const dt of [0,.5,-.5,1,-1,1.6,-1.6,2.4,-2.4,3.14]){const th=th0+dt;const hit=viewHit(a,tgt,viewDir(phi,th),d,objs);
+ for(const dt of [0,.5,-.5,1,-1,1.8,-1.8]){const th=th0+dt;const hit=viewHit(a,tgt,viewDir(phi,th),d,objs);
   if(hit===Infinity)return {th,d};                           // nothing in the way
   if(hit>best.free)best={th,d:Math.max(1.6,hit-.6),free:hit}}
  return {th:best.th,d:best.d}}                               // every angle blocked: stand in front of the nearest obstacle
@@ -1484,12 +1487,12 @@ $('voiceSel').onchange=e=>{Speech.apply(e.target.value);Speech.say('Hello! Welco
 $('rateSel').onchange=e=>{Speech.rateIdx=+e.target.value};
 
 /* ============================ INPUT ============================ */
-const pointers=new Map();let drag=null,pinch0=0,twist0=null,downAt=null;
+const pointers=new Map();let drag=null,pinch0=0,twist0=null,downAt=null,multi=false;
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});downAt={x:e.clientX,y:e.clientY,t:performance.now()};
  // drag = move the map; right-drag or Shift/Ctrl/Alt-drag = turn. (Looking at one animal or one area: drag turns around it.)
  drag={x:e.clientX,y:e.clientY,rot:e.button===2||e.shiftKey||e.ctrlKey||e.altKey};
- if(pointers.size===2){const p=[...pointers.values()];pinch0=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);twist0=Math.atan2(p[1].y-p[0].y,p[1].x-p[0].x)}canvas.classList.add('grabbing')});
+ if(pointers.size===2){const p=[...pointers.values()];pinch0=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);twist0=Math.atan2(p[1].y-p[0].y,p[1].x-p[0].x);multi=true;drag=null}canvas.classList.add('grabbing')});
 canvas.addEventListener('pointermove',e=>{
  if(!pointers.has(e.pointerId)){hoverAt(e.clientX,e.clientY);return}
  const prev=pointers.get(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
@@ -1497,14 +1500,15 @@ canvas.addEventListener('pointermove',e=>{
   // two fingers: pinch = zoom, twist = turn, slide up/down together = tilt
   const a=Math.atan2(p[1].y-p[0].y,p[1].x-p[0].x);if(twist0!=null){let da=a-twist0;da=Math.atan2(Math.sin(da),Math.cos(da));cam.theta+=da}twist0=a;
   cam.phi=THREE.MathUtils.clamp(cam.phi-(e.clientY-prev.y)/2*.006,.2,1.42);cam.fly=null;autoRot=false;if(cam.spin){cam.spin=false;updCloseBtns()}return}
- if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;if(Math.abs(dx)+Math.abs(dy)>0)cam.fly=null;if(Math.abs(dx)+Math.abs(dy)>2){autoRot=false;meFollow=false;if(cam.spin){cam.spin=false;updCloseBtns()}if(NAV&&NAV.playing&&NAV.follow){NAV.follow=false;updNavbar()}}
+ if(!drag){if(pointers.size===1)drag={x:e.clientX,y:e.clientY,rot:false};return}   // back to one finger: restart from here (no jump)
+ const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;if(Math.abs(dx)+Math.abs(dy)>0)cam.fly=null;if(Math.abs(dx)+Math.abs(dy)>2){autoRot=false;meFollow=false;if(cam.spin){cam.spin=false;updCloseBtns()}if(NAV&&NAV.playing&&NAV.follow){NAV.follow=false;updNavbar()}}
  const turn=drag.rot||!!cam.hold||!!AREA;
  if(turn){cam.theta-=dx*.006;cam.phi=THREE.MathUtils.clamp(cam.phi-dy*.005,.2,1.42)}
  else{panBy(dx,dy);if(Math.abs(dx)+Math.abs(dy)>2)meFollow=false}});
 function panBy(dx,dy){const k=cam.dist*.0016;const sx=Math.cos(cam.theta),sz=-Math.sin(cam.theta);const fx=-Math.sin(cam.theta),fz=-Math.cos(cam.theta);
  cam.target.x+=(-dx*sx+dy*fx*-1)*k;cam.target.z+=(-dx*sz+dy*fz*-1)*k;cam.target.x=THREE.MathUtils.clamp(cam.target.x,PARK.min.x-25,PARK.max.x+25);cam.target.z=THREE.MathUtils.clamp(cam.target.z,PARK.min.z-25,PARK.max.z+25);cam.target.y=terrainH(cam.target.x,cam.target.z)+1}
-function endPtr(e){const wasTap=downAt&&pointers.size===1&&Math.hypot(e.clientX-downAt.x,e.clientY-downAt.y)<7&&performance.now()-downAt.t<600;
- pointers.delete(e.pointerId);if(pointers.size<2){pinch0=0;twist0=null}if(pointers.size===0){drag=null;canvas.classList.remove('grabbing')}
+function endPtr(e){const wasTap=!multi&&downAt&&pointers.size===1&&Math.hypot(e.clientX-downAt.x,e.clientY-downAt.y)<7&&performance.now()-downAt.t<600;
+ pointers.delete(e.pointerId);if(pointers.size<2){pinch0=0;twist0=null}if(pointers.size===0){drag=null;multi=false;canvas.classList.remove('grabbing')}
  if(wasTap&&e.type==='pointerup')pickAt(e.clientX,e.clientY)}
 canvas.addEventListener('pointerup',endPtr);canvas.addEventListener('pointercancel',endPtr);
 canvas.addEventListener('wheel',e=>{e.preventDefault();cam.fly=null;cam.dist=THREE.MathUtils.clamp(cam.dist*(1+Math.sign(e.deltaY)*Math.min(.25,Math.abs(e.deltaY)*.0015)),minDist(),260)},{passive:false});
@@ -1949,7 +1953,8 @@ function renderMe(){current=null;openCard();const nz=ME?ZI[ME.near]:null;
  if(ME){$('meCenter').onclick=centerOnMe;$('meFollow').onclick=()=>{meFollow=!meFollow;if(meFollow)centerOnMe();renderMe()};$('meClear').onclick=clearMe;
   $('card').querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>planRoute({a:AI[b.dataset.a]}))}
  $('mePhoto').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;
-  if(!/^image\/(jpeg|png|webp|gif|heic|heif)$/.test(f.type)||f.size>15*1024*1024){const m=$('meMsg');if(m)m.textContent='Please choose a photo under 15 MB (JPG, PNG, WebP or HEIC). 請選 15 MB 以下的照片。';e.target.value='';return}const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=c.height=220;const s=Math.min(img.width,img.height);c.getContext('2d').drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,220,220);
+  if(!/^image\/(jpeg|png|webp|gif|heic|heif)$/.test(f.type)||f.size>15*1024*1024){const m=$('meMsg');if(m)m.textContent='Please choose a photo under 15 MB (JPG, PNG, WebP or HEIC). 請選 15 MB 以下的照片。';e.target.value='';return}const bad=t=>{const m=$('meMsg');if(m)m.textContent=t||'This photo could not be opened. Try a JPG or PNG. 這張照片打不開，請改用 JPG 或 PNG。';e.target.value=''};
+  const r=new FileReader();r.onerror=()=>bad();r.onload=()=>{const img=new Image();img.onerror=()=>bad();img.onload=()=>{if(img.width*img.height>50e6){bad('This photo is too large (over 50 megapixels). 照片解析度太高（超過 5000 萬像素）。');return}const c=document.createElement('canvas');c.width=c.height=220;const s=Math.min(img.width,img.height);c.getContext('2d').drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,220,220);
    AVATAR=c.toDataURL('image/jpeg',.86);try{localStorage.setItem(KEY_AVATAR,AVATAR)}catch(err){}setAvatar(AVATAR);renderMe()};img.src=r.result};r.readAsDataURL(f)};
  const pr=$('mePhotoReset');if(pr)pr.onclick=()=>{AVATAR=AVATAR_DEFAULT;try{localStorage.removeItem(KEY_AVATAR)}catch(err){}setAvatar(AVATAR);renderMe()}}
 // GPS only starts when the person presses "Use GPS" (opening this card or a voice "where am I" never starts it)
@@ -2348,7 +2353,7 @@ function initWeather(){const g=GLB[WX_URL];if(!g)return;g.scene.updateMatrixWorl
   list.forEach(([id,count,kind])=>{const k=kit[id];if(!k)return;
    const m=kind==='mist'?new THREE.MeshBasicMaterial({color:'#ffffff',transparent:true,opacity:.28,depthWrite:false}):
      kind==='fireflies'?unlit('#F4FF6A'):kind==='snow'?unlit('#FFFFFF'):kind==='rain'?new THREE.MeshBasicMaterial({color:'#5E9CCB',transparent:true,opacity:.8,depthWrite:false}):toonFrom(k.mat,'weather');
-   const im=new THREE.InstancedMesh(k.geo,m,count);im.frustumCulled=false;im.renderOrder=kind==='mist'?5:0;z.group.add(im);
+   const im=new THREE.InstancedMesh(k.geo,m,count);im.frustumCulled=false;im.renderOrder=kind==='mist'?5:0;im.userData.weather=true;im.raycast=function(){};z.group.add(im);
    const ps=[];for(let i=0;i<count;i++){const a=R()*Math.PI*2,r=Math.sqrt(R())*rad;
     ps.push({x:Math.cos(a)*r,z:Math.sin(a)*r,y:kind==='mist'?.6+R()*1.2:kind==='fireflies'||kind==='dust'?.4+R()*2.2:.3+R()*H,ph:R()*6.28,v:.7+R()*.6,s:kind==='mist'?2+R()*2.5:.8+R()*.5,cx:0,cz:0})}
    if(kind==='dust')ps.forEach(p=>{p.cx=p.x;p.cz=p.z;p.rr=.6+R()*1.8});
