@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!-- Content-Security-Policy: only this site, the two pinned three.js files and Google Fonts may load.
      The inline script is allowed by its sha256 hash, which tools/csp_hash.py updates (publish.sh runs it). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-/Jd659b7/P2D3PeX38hXs4q89ph7F6YN5f5uBreCwk8=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-jcENYElhTDmXmtGsSXjBRPywyWDuZOUvINJdos+DoO8=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Taipei Zoo 3D English Guide</title>
@@ -833,8 +833,8 @@ renderer.outputEncoding=THREE.sRGBEncoding;
 const scene=new THREE.Scene();
 const paperCanvas=document.createElement('canvas');const paperTex=new THREE.CanvasTexture(paperCanvas);paperTex.encoding=THREE.sRGBEncoding;
 function drawPaper(){const w=Math.max(2,Math.round(innerWidth)),h=Math.max(2,Math.round(innerHeight));paperCanvas.width=w;paperCanvas.height=h;const c=paperCanvas.getContext('2d');
- c.fillStyle='#F4F0E6';c.fillRect(0,0,w,h);const Rn=rng(3);for(let i=0;i<w*h/90;i++){c.fillStyle='rgba(120,100,70,'+(Rn()*.06).toFixed(3)+')';c.fillRect(Rn()*w,Rn()*h,1.5,1.5)}
- c.strokeStyle='rgba(150,140,120,.30)';c.lineWidth=1;const g=34;c.beginPath();for(let x=.5;x<w;x+=g){c.moveTo(x,0);c.lineTo(x,h)}for(let y=.5;y<h;y+=g){c.moveTo(0,y);c.lineTo(w,y)}c.stroke();
+ const gr=c.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#D9E8EE');gr.addColorStop(.55,'#EEF0E6');gr.addColorStop(1,'#F4F0E6');c.fillStyle=gr;c.fillRect(0,0,w,h);   // soft sky, no grid
+const Rn=rng(3);for(let i=0;i<w*h/90;i++){c.fillStyle='rgba(120,100,70,'+(Rn()*.06).toFixed(3)+')';c.fillRect(Rn()*w,Rn()*h,1.5,1.5)}
  paperTex.dispose();paperTex.needsUpdate=true}
 scene.background=paperTex;
 scene.fog=new THREE.Fog('#F4F0E6',240,480);
@@ -1221,7 +1221,8 @@ let terrainMesh=null;
 function the(z){return z.id==='bird'?z.n:'the '+z.n}
 function The(z){return z.id==='bird'?z.n:'The '+z.n}
 /* ---------- terrain ---------- */
-function baseH(x,z){const dg=Math.hypot(x-GATE.x,z-GATE.z);return Math.min(13,dg*.075)+Math.sin(x*.06)*Math.cos(z*.08)*1.1+Math.max(0,nearestParkDist(x,z)-18)*.32}
+function hillH(t){return t<=0?0:t<=50?t*.32:16+30*(1-Math.exp(-(t-50)*.32/30))}   /* hills around the valley: same slope near the zoo, levelling off far away */
+function baseH(x,z){const dg=Math.hypot(x-GATE.x,z-GATE.z);return Math.min(13,dg*.075)+Math.sin(x*.06)*Math.cos(z*.08)*1.1+hillH(nearestParkDist(x,z)-18)}
 ZONES.forEach(z=>z.y=baseH(z.x,z.z));
 /* lakes and ponds from OSM: the ground inside is lowered so the water sits in a hollow, not in the air */
 const LAKES=LAYOUT.water.map(w=>{const pts=w.pts.map(p=>geoToMap(p[0],p[1]));const b=new THREE.Box2();pts.forEach(p=>b.expandByPoint(new THREE.Vector2(p.x,p.z)));
@@ -1233,9 +1234,14 @@ function terrainH(x,z){let h=baseH(x,z);{const l=inLake(x,z);if(l)h=Math.min(h,l
 function buildWorld(){
  const W=PARK_S.x+90,D=PARK_S.z+90,SX=Math.round(W/2),SZ=Math.round(D/2);const geo=new THREE.PlaneGeometry(W,D,SX,SZ);geo.rotateX(-Math.PI/2);geo.translate(PARK_C.x,0,PARK_C.z);
  const pos=geo.attributes.position;const col=new Float32Array(pos.count*3);const cA=new THREE.Color('#B9CF92'),cB=new THREE.Color('#93B577'),tmp=new THREE.Color();
- for(let i=0;i<pos.count;i++){const x=pos.getX(i),z=pos.getZ(i);const h=terrainH(x,z);pos.setY(i,h);const n=(Math.sin(x*.21)*Math.cos(z*.17)+1)/2;tmp.copy(cA).lerp(cB,n*.7+Math.min(1,Math.max(0,(nearestParkDist(x,z)-14)/12))*.3);col[i*3]=tmp.r;col[i*3+1]=tmp.g;col[i*3+2]=tmp.b}
+ const ex=W/2-.01,ez=D/2-.01;for(let i=0;i<pos.count;i++){const x=pos.getX(i),z=pos.getZ(i);const h=terrainH(x,z);pos.setY(i,Math.abs(x-PARK_C.x)>=ex||Math.abs(z-PARK_C.z)>=ez?h-3:h);   /* the outer edge tucks under the hills: no seam */const n=(Math.sin(x*.21)*Math.cos(z*.17)+1)/2;tmp.copy(cA).lerp(cB,n*.7+Math.min(1,Math.max(0,(nearestParkDist(x,z)-14)/12))*.3);col[i*3]=tmp.r;col[i*3+1]=tmp.g;col[i*3+2]=tmp.b}
  geo.setAttribute('color',new THREE.BufferAttribute(col,3));geo.computeVertexNormals();
  terrainMesh=new THREE.Mesh(geo,toon({vertexColors:true}));world.add(terrainMesh);
+ { // the hills beyond the detailed ground (coarse, a little lower so the detailed ground always wins where they overlap); fog hides the far edge
+  const R=1500,N=60,g2=new THREE.PlaneGeometry(R,R,N,N);g2.rotateX(-Math.PI/2);g2.translate(PARK_C.x,0,PARK_C.z);const p2=g2.attributes.position,c2=new Float32Array(p2.count*3),cF=new THREE.Color('#8FAE72'),cH=new THREE.Color('#A7BE8C');
+  const hx=W/2-26,hz=D/2-26;   /* well inside the detailed ground: sink out of sight (lakes there are lower than the hills) */
+  for(let i=0;i<p2.count;i++){const x=p2.getX(i),z=p2.getZ(i);const h=baseH(x,z);p2.setY(i,Math.abs(x-PARK_C.x)<hx&&Math.abs(z-PARK_C.z)<hz?h-30:h-.45);tmp.copy(cF).lerp(cH,Math.min(1,h/45)*.6+(Math.sin(x*.05)*Math.cos(z*.04)+1)*.15);c2[i*3]=tmp.r;c2[i*3+1]=tmp.g;c2[i*3+2]=tmp.b}
+  g2.setAttribute('color',new THREE.BufferAttribute(c2,3));g2.computeVertexNormals();const hills=new THREE.Mesh(g2,toon({vertexColors:true}));hills.userData.hills=1;world.add(hills)}
  // stream along the south valley
  const sZ=PARK.max.z+14;const sPts=[];for(let x=PARK.min.x-40;x<=PARK.max.x+40;x+=4)sPts.push(V(x,0,sZ+Math.sin(x*.05)*3));
  sPts.forEach((p,i)=>{if(i===sPts.length-1)return;const q=sPts[i+1];const m=new THREE.Mesh(new THREE.BoxGeometry(4.3,.2,3.2),mat('#9BCFDD',{roughness:.3}));m.position.set((p.x+q.x)/2,terrainH((p.x+q.x)/2,(p.z+q.z)/2)+.15,(p.z+q.z)/2);m.rotation.y=-Math.atan2(q.z-p.z,q.x-p.x);world.add(m)});
@@ -1263,7 +1269,7 @@ function buildWorld(){
  if(LAYOUT.mrt){const p=geoToMap(LAYOUT.mrt[0],LAYOUT.mrt[1]);const st=new THREE.Group();st.position.set(p.x,terrainH(p.x,p.z),p.z);world.add(st);
   const body=new THREE.Mesh(new THREE.BoxGeometry(9,2.6,4),mat('#E7E2D8'));body.position.y=1.3;st.add(body);
   const roof=new THREE.Mesh(new THREE.BoxGeometry(9.6,.4,4.6),mat('#4A7FB5'));roof.position.y=2.8;st.add(roof);addOutline(st,1);
-  const lab=makeLabel('MRT Taipei Zoo station','捷運動物園站',{bg:'#4A7FB5',fg:'#ffffff',w:7.5,small:true});lab.position.y=5;st.add(lab)}
+  const lab=makeLabel('MRT Taipei Zoo station','捷運動物園站',{bg:'#4A7FB5',fg:'#ffffff',w:7.5,small:true,prio:3});lab.position.y=5;st.add(lab)}
  // background forest
  const R=rng(7);const pines=[],broads=[];
  for(let i=0;i<2000&&pines.length+broads.length<700;i++){const x=PARK_C.x+(R()-.5)*(PARK_S.x+80),z=PARK_C.z+(R()-.5)*(PARK_S.z+80);if(Math.abs(z-sZ-Math.sin(x*.05)*3)<4)continue;
@@ -1278,11 +1284,11 @@ function buildWorld(){
  const gx=GATE.x,gz=GATE.z,gy=terrainH(gx,gz);const gate=new THREE.Group();gate.position.set(gx,gy,gz);gate.rotation.y=-Math.atan2(ROAD[1].z-ROAD[0].z,ROAD[1].x-ROAD[0].x);world.add(gate);
  limb(gate,V(0,0,-4),V(0,6,-4),.5,'#2f6b4a');limb(gate,V(0,0,4),V(0,6,4),.5,'#2f6b4a');
  const beam=new THREE.Mesh(new THREE.BoxGeometry(1.2,1.6,10),mat('#2f6b4a'));beam.position.set(0,6.4,0);gate.add(beam);addOutline(gate,1);
- const gl=makeLabel('MAIN GATE','臺北市立動物園 正門',{bg:'#2f6b4a',fg:'#ffffff',w:9});gl.position.set(0,9,0);gate.add(gl);
+ const gl=makeLabel('MAIN GATE','臺北市立動物園 正門',{bg:'#2f6b4a',fg:'#ffffff',w:9,prio:5});gl.position.set(-6,7.5,0);gate.add(gl);   /* on the outside of the gate (towards the MRT), so it does not sit on the Koala House sign */
  // train stations
  [[ST_GATE,'Train station · 列車總站'],[ST_BIRD,'Bird World station · 鳥園站']].forEach(([sp,t])=>{const ii=nearestRoadIdx(sp.x,sp.z);const tdir=travelDir(ii,1);const nx=-tdir.z,nz=tdir.x,nl=Math.hypot(nx,nz)||1;const x=sp.x+nx/nl*3.6,z=sp.z+nz/nl*3.6;const y=terrainH(x,z);const st=new THREE.Group();st.position.set(x,y,z);world.add(st);
   const roof=new THREE.Mesh(new THREE.BoxGeometry(5,.4,2.6),mat('#c0392b'));roof.position.y=2.6;st.add(roof);[[-2,-1],[2,-1],[-2,1],[2,1]].forEach(([a,b])=>limb(st,V(a,0,b),V(a,2.5,b),.12,'#ece4d4'));
-  const l=makeLabel(t,null,{bg:'#ffffff',fg:'#16382A',w:6.5,small:true});l.position.y=4.3;st.add(l)});
+  const l=makeLabel(t,null,{bg:'#ffffff',fg:'#16382A',w:6.5,small:true,prio:2});l.position.y=4.3;st.add(l)});
 }
 
 /* ---------- zone decor ---------- */
@@ -1318,7 +1324,7 @@ function buildZone(z){
   case 'rainforest':rimTree('palm',6,.9,1.3);rimTree('jungle',5,.9,1.2);pond(g,z.r*.25,z.r*.45,2.6);
    {const dome=new THREE.Mesh(new THREE.SphereGeometry(4.2,20,12,0,Math.PI*2,0,Math.PI/2),new THREE.MeshStandardMaterial({color:'#b98a4a',transparent:true,opacity:.28,roughness:.4,side:THREE.DoubleSide,depthWrite:false}));dome.position.set(-z.r*.42,.2,-z.r*.4);g.add(dome);
     const ring=new THREE.Mesh(new THREE.TorusGeometry(4.2,.12,4,32),mat('#8a6a45'));ring.rotation.x=Math.PI/2;ring.position.set(-z.r*.42,.3,-z.r*.4);g.add(ring);
-    const dl=makeLabel('Pangolin Dome','穿山甲館',{bg:'#8a6a45',fg:'#fff',w:4.6,small:true});dl.position.set(-z.r*.42,5.6,-z.r*.4);g.add(dl)}break;
+    const dl=makeLabel('Pangolin Dome','穿山甲館',{bg:'#8a6a45',fg:'#fff',w:4.6,small:true,prio:2});dl.position.set(-z.r*.42,5.6,-z.r*.4);g.add(dl)}break;
   case 'desert':rimTree('cactus',6,.8,1.2);rimTree('rock',6,.8,1.6);for(let i=0;i<4;i++)E(g,'#e6c88f',2.4,.5,1.6,(R()-.5)*z.r,.2,(R()-.5)*z.r,GSL);break;
   case 'outback':rimTree('euc',5,.9,1.2);rimTree('rock',3,.8,1.2);break;
   case 'savanna':rimTree('acacia',7,1.1,1.5);rimTree('rock',4,1,1.6);pond(g,0,0,3.4);break;
@@ -1334,7 +1340,7 @@ function buildZone(z){
   if(z.id==='insect')for(let i=0;i<4;i++){const a=i/4*Math.PI*2+.5;treeAt(g,'broad',Math.cos(a)*z.r*.75,Math.sin(a)*z.r*.75,.55,R)}
   if(z.id==='reptile'){rimTree('rock',4,.6,.9);pond(g,0,0,1.4,'#5aa69a')}
  }
- const label=makeLabel(z.n,z.zh,{bg:'#EBC45E',fg:'#2B2420',w:Math.max(9,z.r*.9),num:ROUTE.indexOf(z.id)+1});
+ const label=makeLabel(z.n,z.zh,{prio:4,bg:'#EBC45E',fg:'#2B2420',w:Math.max(9,z.r*.9),num:ROUTE.indexOf(z.id)+1});
  label.position.set(0,(indoor?z.r*.7:4)+4.5,0);g.add(label);z.label=label;
 }
 
@@ -1348,7 +1354,7 @@ function makeLabel(text,sub,o){o=o||{};const c=document.createElement('canvas');
  ctx.fillStyle=o.fg||'#16382A';ctx.textBaseline='top';ctx.font=`400 ${fs*1.08}px 'Patrick Hand', 'Comic Sans MS', cursive`;ctx.fillText(text,x0,pad*.55);
  if(sub){ctx.globalAlpha=.85;ctx.font=`700 ${fs2}px Nunito, sans-serif`;ctx.fillText(sub,x0,pad*.55+fs*1.2);ctx.globalAlpha=1}
  const tex=new THREE.CanvasTexture(c);tex.encoding=THREE.sRGBEncoding;tex.anisotropy=4;
- const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,depthTest:false,transparent:true}));const w=o.w||6;sp.scale.set(w,w*H/W,1);sp.renderOrder=10;sp.userData.baseScale=sp.scale.clone();LABELS.push(sp);return sp}
+ const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,depthTest:false,transparent:true}));const w=o.w||6;sp.scale.set(w,w*H/W,1);sp.renderOrder=10;sp.userData.baseScale=sp.scale.clone();sp.userData.prio=o.prio||1;sp.userData.dc=1;LABELS.push(sp);return sp}
 /* labels draw on top of everything, so fade them out when the camera gets right up to one
    (otherwise a nearby sign can cover the whole screen in close-ups) */
 const LABELS=[];const _lp=new THREE.Vector3();
@@ -1365,7 +1371,21 @@ function labelFadeTick(){
  if(fa&&op>.12&&d<ad){_sp.copy(_lp).project(camera);const px=w*innerHeight/(2*d*tv),py=px*s.scale.y/s.scale.x;
   const sx=(_sp.x+1)/2*innerWidth,sy=(1-_sp.y)/2*innerHeight;if(Math.abs(sx-ax)<px/2+30&&Math.abs(sy-ay)<py/2+30)op=.12}
  if(fa&&s.userData.animalLabel&&s!==fa.obj.lab&&d<9)op=Math.min(op,Math.max(0,(d-4)/5));   // other animals' name signs near the camera step back
- s.material.opacity=op}}
+ s.userData.op=op}
+ declutter()}
+/* signs that overlap on screen: keep the more important one (gate > areas > stations > animals; the animal you are looking at wins),
+   fade the others; they come back as you zoom in and they stop overlapping */
+const _dl=[],_dr=[],_vp=new THREE.Vector3();
+function declutter(){_dl.length=0;const tv=Math.tan(THREE.MathUtils.degToRad(camera.fov/2)),W=innerWidth,H=innerHeight,fa=cam.hold;
+ for(const s of LABELS){const op=s.userData.op;s.userData.rect=null;   /* only signs on screen this frame get a box */if(op<.05||!visChain(s)){s.userData.dc=1;s.material.opacity=op;continue}
+  s.getWorldPosition(_lp);_vp.copy(_lp).applyMatrix4(camera.matrixWorldInverse);const d=-_vp.z;if(d<=.1){s.material.opacity=op;continue}_sp.copy(_lp).project(camera);   /* size on screen depends on depth along the view, not straight-line distance */
+  const ws=Math.abs(s.scale.x*(s.parent&&s.parent.scale?s.parent.scale.x:1));const pw=ws*H/(2*d*tv),ph=pw*s.scale.y/s.scale.x;
+  const x=(_sp.x+1)/2*W,y=(1-_sp.y)/2*H;if(x+pw/2<0||x-pw/2>W||y+ph/2<0||y-ph/2>H){s.material.opacity=op;continue}
+  s.userData.rect=[x-pw/2,y-ph/2,x+pw/2,y+ph/2];s.userData.d=d;s.userData.p=(fa&&s===fa.obj.lab)?6:s.userData.prio;_dl.push(s)}
+ _dl.sort((a,b)=>b.userData.p-a.userData.p||a.userData.d-b.userData.d);_dr.length=0;
+ for(const s of _dl){const r=s.userData.rect,g=s.userData.dc<.5?8:2;   // a hidden sign needs a little extra room before it comes back (no flicker)
+  let hit=false;for(const q of _dr)if(r[0]-g<q[2]&&r[2]+g>q[0]&&r[1]-g<q[3]&&r[3]+g>q[1]){hit=true;break}
+  if(!hit)_dr.push(r);s.userData.dc+=((hit?0:1)-s.userData.dc)*.25;s.material.opacity=s.userData.op*s.userData.dc}}
 
 /* ---------- place animals ---------- */
 const pickables=[];
@@ -1442,7 +1462,9 @@ let voffN=0;
 function viewOffsetTick(dt){if(++voffN%12===0)updViewOffset();const k=1-Math.exp(-dt*6);const nx=VOFF.x+(VOFF.tx-VOFF.x)*k,ny=VOFF.y+(VOFF.ty-VOFF.y)*k;
  if(Math.abs(nx-VOFF.x)+Math.abs(ny-VOFF.y)>.05||!(camera.view&&camera.view.enabled)){VOFF.x=nx;VOFF.y=ny;camera.setViewOffset(innerWidth,innerHeight,VOFF.x,VOFF.y,innerWidth,innerHeight)}}
 function minDist(){return current?Math.max(1.4,current.obj.h*.7):5}
-function zoomBy(f){const d=THREE.MathUtils.clamp(cam.dist*f,minDist(),260);flyTo(cam.target,d,cam.phi,cam.theta,350)}
+function maxDist(){return OV_D*(isPhone()?1.6:1.25)}
+function phiMax(d){d=d==null?cam.dist:d;return 1.42-.42*THREE.MathUtils.clamp((d-60)/(maxDist()-60),0,1)}   /* the farther out, the more top-down: no empty horizon */   /* zoomed out just enough to see the whole zoo */
+function zoomBy(f){const d=THREE.MathUtils.clamp(cam.dist*f,minDist(),maxDist());flyTo(cam.target,d,Math.min(cam.phi,phiMax(d)),cam.theta,350)}
 function closeUp(a){if(cam.spin){cam.spin=false;focusAnimal(a)}else{focusAnimal(a,true);cam.spin=!reduced}updCloseBtns()}
 function updCloseBtns(){const t=cam.spin?'Stop turning':'Close-up 360°';['lbZoom','sZoom'].forEach(id=>{const b=$(id);if(b)b.textContent=t})}
 function focusZone(z){flyTo(V(z.x,z.y+1,z.z),z.r*2.4+14,.9,0)}
@@ -1561,22 +1583,30 @@ canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);
 canvas.addEventListener('pointermove',e=>{
  if(!pointers.has(e.pointerId)){hoverAt(e.clientX,e.clientY);return}
  const prev=pointers.get(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size>2)return;   // three or more fingers: ignore
- if(pointers.size===2){const p=[...pointers.values()];const d=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);if(pinch0){cam.dist=THREE.MathUtils.clamp(cam.dist*pinch0/d,minDist(),260);pinch0=d}
+ if(pointers.size===2){const p=[...pointers.values()];const d=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);if(pinch0){cam.dist=THREE.MathUtils.clamp(cam.dist*pinch0/d,minDist(),maxDist());cam.phi=Math.min(cam.phi,phiMax());pinch0=d}
   // two fingers: pinch = zoom, twist = turn, slide up/down together = tilt
   const a=Math.atan2(p[1].y-p[0].y,p[1].x-p[0].x);if(twist0!=null){let da=a-twist0;da=Math.atan2(Math.sin(da),Math.cos(da));cam.theta+=da}twist0=a;
-  cam.phi=THREE.MathUtils.clamp(cam.phi-(e.clientY-prev.y)/2*.006,.2,1.42);cam.fly=null;autoRot=false;if(cam.spin){cam.spin=false;updCloseBtns()}return}
+  cam.phi=THREE.MathUtils.clamp(cam.phi-(e.clientY-prev.y)/2*.006,.2,phiMax());cam.fly=null;autoRot=false;if(cam.spin){cam.spin=false;updCloseBtns()}return}
  if(!drag){if(pointers.size===1)drag={x:e.clientX,y:e.clientY,rot:false};return}   // back to one finger: restart from here (no jump)
  const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;if(Math.abs(dx)+Math.abs(dy)>0)cam.fly=null;if(Math.abs(dx)+Math.abs(dy)>2){autoRot=false;meFollow=false;if(cam.spin){cam.spin=false;updCloseBtns()}if(NAV&&NAV.playing&&NAV.follow){NAV.follow=false;updNavbar()}}
  const turn=drag.rot||!!cam.hold||!!AREA;
- if(turn){cam.theta-=dx*.006;cam.phi=THREE.MathUtils.clamp(cam.phi-dy*.005,.2,1.42)}
- else{panBy(dx,dy);if(Math.abs(dx)+Math.abs(dy)>2)meFollow=false}});
-function panBy(dx,dy){const k=cam.dist*.0016;const sx=Math.cos(cam.theta),sz=-Math.sin(cam.theta);const fx=-Math.sin(cam.theta),fz=-Math.cos(cam.theta);
- cam.target.x+=(-dx*sx+dy*fx*-1)*k;cam.target.z+=(-dx*sz+dy*fz*-1)*k;cam.target.x=THREE.MathUtils.clamp(cam.target.x,PARK.min.x-25,PARK.max.x+25);cam.target.z=THREE.MathUtils.clamp(cam.target.z,PARK.min.z-25,PARK.max.z+25);cam.target.y=terrainH(cam.target.x,cam.target.z)+1}
+ if(turn){cam.theta-=dx*.006;cam.phi=THREE.MathUtils.clamp(cam.phi-dy*.005,.2,phiMax())}
+ else{panBy(dx,dy,e.clientX,e.clientY);if(Math.abs(dx)+Math.abs(dy)>2)meFollow=false}});
+const _pp=new THREE.Plane(),_pr=new THREE.Raycaster(),_pn=new THREE.Vector2(),_ph1=new THREE.Vector3(),_ph2=new THREE.Vector3();
+function groundAtScreen(x,y,out){const r=canvas.getBoundingClientRect();_pn.set((x-r.left)/r.width*2-1,-(y-r.top)/r.height*2+1);_pr.setFromCamera(_pn,camera);return _pr.ray.intersectPlane(_pp,out)}
+/* drag = grab the ground: the spot under your finger stays under your finger (like a paper map or Google Maps) */
+function panBy(dx,dy,x,y){const r=canvas.getBoundingClientRect();if(x==null){x=r.left+r.width/2;y=r.top+r.height/2}
+ _pp.set(UP,-cam.target.y);const a=groundAtScreen(x-dx,y-dy,_ph1),b=a&&groundAtScreen(x,y,_ph2);
+ if(a&&b){a.sub(b);const m=cam.dist*.5,l=Math.hypot(a.x,a.z);if(l>m)a.multiplyScalar(m/l);cam.target.x+=a.x;cam.target.z+=a.z}   // looking at the horizon: limit the jump
+ else{const k=cam.dist*.0016,sx=Math.cos(cam.theta),sz=-Math.sin(cam.theta),fx=-Math.sin(cam.theta),fz=-Math.cos(cam.theta);cam.target.x+=(-dx*sx+dy*fx)*k;cam.target.z+=(-dx*sz+dy*fz)*k}
+ panDirty=true;clampTarget()}
+function clampTarget(){cam.target.x=THREE.MathUtils.clamp(cam.target.x,PARK.min.x-6,PARK.max.x+6);cam.target.z=THREE.MathUtils.clamp(cam.target.z,PARK.min.z-6,PARK.max.z+6)}
+let panDirty=false;function targetHeightTick(dt){if(!panDirty||cam.fly||cam.hold||pointers.size>0)return;const y=terrainH(cam.target.x,cam.target.z)+1,d=y-cam.target.y;if(Math.abs(d)<.02){cam.target.y=y;panDirty=false;return}cam.target.y+=d*Math.min(1,dt*2.5)}   /* after a drag the view height follows the ground gently, not during the finger move */   /* the middle of the screen always stays over the zoo */
 function endPtr(e){const wasTap=!multi&&downAt&&pointers.size===1&&Math.hypot(e.clientX-downAt.x,e.clientY-downAt.y)<7&&performance.now()-downAt.t<600;
  pointers.delete(e.pointerId);if(pointers.size<2){pinch0=0;twist0=null}else if(pointers.size===2){const p=[...pointers.values()];pinch0=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);twist0=Math.atan2(p[1].y-p[0].y,p[1].x-p[0].x)}   /* 3 fingers -> 2: start the pinch from where the fingers are now (no jump) */if(pointers.size===0){drag=null;multi=false;canvas.classList.remove('grabbing')}
  if(wasTap&&e.type==='pointerup')pickAt(e.clientX,e.clientY)}
 canvas.addEventListener('pointerup',endPtr);canvas.addEventListener('pointercancel',endPtr);
-canvas.addEventListener('wheel',e=>{e.preventDefault();cam.fly=null;cam.dist=THREE.MathUtils.clamp(cam.dist*(1+Math.sign(e.deltaY)*Math.min(.25,Math.abs(e.deltaY)*.0015)),minDist(),260)},{passive:false});
+canvas.addEventListener('wheel',e=>{e.preventDefault();cam.fly=null;cam.dist=THREE.MathUtils.clamp(cam.dist*(1+Math.sign(e.deltaY)*Math.min(.25,Math.abs(e.deltaY)*.0015)),minDist(),maxDist());cam.phi=Math.min(cam.phi,phiMax())},{passive:false});
 /* tap tolerance: small animals are hard to hit, so a tap within a few dozen pixels of one counts */
 const tmpP=new THREE.Vector3();
 function nearAnimalAt(x,y){const r=canvas.getBoundingClientRect();const tol=isPhone()?46:34;let best=null,bd=tol;
@@ -1935,7 +1965,7 @@ function buildTrainSystem(){
  const sx=ST_SOUTH.x+3.2,sz=ST_SOUTH.z,sy=terrainH(sx,sz);const st=new THREE.Group();st.position.set(sx,sy,sz);world.add(st);
  const roof=new THREE.Mesh(new THREE.BoxGeometry(5,.4,2.6),mat('#C0503A'));roof.position.y=2.6;st.add(roof);[[-2,-1],[2,-1],[-2,1],[2,1]].forEach(([a,b])=>limb(st,V(a,0,b),V(a,2.5,b),.12,'#ece4d4'));addOutline(st,1);
  limb(st,V(3,0,0),V(3,9,0),.18,'#8a8478');limb(st,V(3,9,0),V(22,16,-10),.04,'#2B2420');const cab=new THREE.Mesh(new THREE.BoxGeometry(1.2,1,1.2),mat('#3E7B4F'));cab.position.set(10,10.6,-4);st.add(cab);limb(st,V(10,11.1,-4),V(10,11.9,-4),.03,'#2B2420');addOutline(cab,1);
- const l=makeLabel('Zoo South station · 動物園南站',null,{bg:'#ffffff',fg:'#16382A',w:7.5,small:true});l.position.y=4.3;st.add(l);
+ const l=makeLabel('Zoo South station · 動物園南站',null,{bg:'#ffffff',fg:'#16382A',w:7.5,small:true,prio:3});l.position.y=4.3;st.add(l);
  for(let i=0;i<8;i++){const t=new THREE.Group();[['#2f6b4a',0],['#EBC45E',-2.2],['#2f6b4a',-4.4]].forEach(([c,x])=>{const car=new THREE.Mesh(new THREE.BoxGeometry(2,1.1,1.3),mat(c));car.position.set(x,.85,0);t.add(car);const rf=new THREE.Mesh(new THREE.BoxGeometry(2.1,.14,1.5),mat('#FFFDF7'));rf.position.set(x,1.5,0);t.add(rf)});addOutline(t,1);t.visible=false;world.add(t);simPool.push(t)}
  updStationLabels(true)}
 function updSimTrains(){if(!LINES)return;const m=simMin();let k=0;
@@ -1949,7 +1979,7 @@ let signCache={};
 function updStationLabels(force){if(!LINES)return;const m=simMin();
  [['gate',ST_GATE],['bird',ST_BIRD],['south',ST_SOUTH]].forEach(([st,p])=>{const [t,zh]=stationSign(st,m);const key=t+zh;if(!force&&signCache[st]===key)return;signCache[st]=key;
   if(stLabels[st]){world.remove(stLabels[st]);stLabels[st].material.map.dispose();stLabels[st].material.dispose()}
-  const lab=makeLabel(t,zh,{bg:'#EBC45E',fg:'#2B2420',w:st==='bird'?11:7.5,small:true});lab.position.set(p.x,terrainH(p.x,p.z)+6.8,p.z);world.add(lab);stLabels[st]=lab})}
+  const lab=makeLabel(t,zh,{bg:'#EBC45E',fg:'#2B2420',w:st==='bird'?11:7.5,small:true,prio:3});lab.position.set(p.x,terrainH(p.x,p.z)+6.8,p.z);world.add(lab);stLabels[st]=lab})}
 $('trainBtn').onclick=openTrain;$('ridesBtn').onclick=()=>{stopTour();exitArea();renderRides()};$('rbEnd').onclick=()=>endRide();
 
 /* ============================ MY LOCATION ============================ */
@@ -2211,7 +2241,7 @@ function startFeed(a){if(current!==a)select(a,{});cam.spin=false;updCloseBtns();
 /* ============================ LOOP ============================ */
 let train;function buildTrain(){train=new THREE.Group();scene.add(train);const cols=['#2f6b4a','#f5c531','#2f6b4a'];
  cols.forEach((c,i)=>{const car=new THREE.Mesh(new THREE.BoxGeometry(2.2,1.2,1.4),mat(c));car.position.set(-i*2.5,.9,0);train.add(car);const roof=new THREE.Mesh(new THREE.BoxGeometry(2.3,.15,1.6),mat('#ffffff'));roof.position.set(-i*2.5,1.6,0);train.add(roof)});addOutline(train,1)}
-let paperT=0;function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.clearViewOffset();camera.updateProjectionMatrix();const tb=document.querySelector('.topbar');if(tb)document.documentElement.style.setProperty('--topH',Math.round(tb.getBoundingClientRect().bottom+8)+'px');clearTimeout(paperT);paperT=setTimeout(drawPaper,150)}
+let paperT=0;function resize(){const w=innerWidth,h=innerHeight;if(typeof cam!=='undefined'){const m=maxDist();if(cam.dist>m)cam.dist=m;if(cam.fly&&cam.fly.to.d>m)cam.fly.to.d=m}renderer.setSize(w,h,false);camera.aspect=w/h;camera.clearViewOffset();camera.updateProjectionMatrix();const tb=document.querySelector('.topbar');if(tb)document.documentElement.style.setProperty('--topH',Math.round(tb.getBoundingClientRect().bottom+8)+'px');clearTimeout(paperT);paperT=setTimeout(drawPaper,150)}
 addEventListener('resize',resize);
 const clock=new THREE.Clock();const tmpV=new THREE.Vector3();
 let lastT=0;
@@ -2223,7 +2253,7 @@ function loop(){requestAnimationFrame(loop);const t=clock.getElapsedTime();const
  feedTick(dt,t);viewOffsetTick(dt);
  if(NAV)navTick(dt,t);
  if(WALK.on)walkTick(dt,t);
- behaviorTick(dt,t);weatherTick(dt,t);ridesTick(dt,t);applyCam();perfTick(dt);habitatLodTick();
+ behaviorTick(dt,t);weatherTick(dt,t);ridesTick(dt,t);targetHeightTick(dt);applyCam();scene.fog.near=Math.max(240,cam.dist+60);scene.fog.far=scene.fog.near+260;   /* fog starts beyond the zoo, however far out you zoom */perfTick(dt);habitatLodTick();
  for(const a of A){const o=a.obj;if(!o.holder.parent.visible)continue;const near=camera.position.distanceTo(o.holder.getWorldPosition(tmpV));
   if(near<70||o.bounce>0)o.built.update(t,o.ph);          // far-away animals are too small to see moving
   const olOn=near<55||current===a;if(o.outlines&&o.olOn!==olOn){o.olOn=olOn;o.outlines.forEach(m=>m.visible=olOn)}   // outlines only up close
@@ -2496,7 +2526,7 @@ function initGondola(kit){const pts=LAYOUT.gondola,st=LAYOUT.gondolaStations;if(
  [[P[0],'Maokong Gondola · Taipei Zoo station','貓空纜車 動物園站'],[P[P.length-1],'Maokong Gondola · Zoo South station','貓空纜車 動物園南站']].forEach(([p,en,zh])=>{
   const g=new THREE.Group();g.position.set(p.x,terrainH(p.x,p.z),p.z);grp.add(g);const b=new THREE.Mesh(new THREE.BoxGeometry(5,2.6,4),mat('#E9E4D8'));b.position.y=1.3;g.add(b);
   const r=new THREE.Mesh(new THREE.BoxGeometry(5.6,.4,4.6),mat('#2F7D6B'));r.position.y=2.8;g.add(r);addOutline(g,1);
-  const lab=makeLabel(en,zh,{bg:'#2F7D6B',fg:'#ffffff',w:7.5,small:true});lab.position.y=5.2;g.add(lab)});
+  const lab=makeLabel(en,zh,{bg:'#2F7D6B',fg:'#ffffff',w:7.5,small:true,prio:3});lab.position.y=5.2;g.add(lab)});
  // cabins: one InstancedMesh per part, half going down the line and half coming back
  const N=14;G.N=N;G.tOff=0;G.ims=kit.gondola_cabin.map(pt=>{const im=new THREE.InstancedMesh(pt.geo,toonFrom(pt.mat,'ride'),N*2);im.frustumCulled=false;im.userData.ride=1;grp.add(im);return im});
  G.speed=3.2;grp.traverse(o=>o.userData.ride=1);world.add(grp);G.grp=grp;Object.assign(GONDOLA,G);   /* only now is the gondola 'ready' */
@@ -2531,7 +2561,7 @@ function initDino(kit){if(!kit.topiary_dino)return;const d0=V(ROAD[1].x-ROAD[0].
  const core=new THREE.Mesh(new THREE.CylinderGeometry(.2,.12,1,12,1,true),new THREE.MeshBasicMaterial({color:'#BFEFFF',transparent:true,opacity:.8,blending:THREE.AdditiveBlending,depthWrite:false}));
  [glow,core].forEach(m=>{m.position.y=.5;beam.add(m)});beam.visible=false;DINO.beam=beam;
  DINO.pick=DINO.extra.slice();body.traverse(o=>{if(o.isMesh&&!o.userData.isOutline)DINO.pick.push(o)});
- const lab=makeLabel('?','',{bg:'#EBC45E',fg:'#2B2420',w:1.4,small:true});lab.position.set(0,5.4,0);g.add(lab);DINO.lab=lab}
+ const lab=makeLabel('?','',{bg:'#EBC45E',fg:'#2B2420',w:1.4,small:true,prio:2});lab.position.set(0,5.4,0);g.add(lab);DINO.lab=lab}
 function dinoHit(x,y){if(!DINO.g||!world.visible)return false;const r=canvas.getBoundingClientRect();ndc.set((x-r.left)/r.width*2-1,-(y-r.top)/r.height*2+1);ray.setFromCamera(ndc,camera);
  if(!ray.intersectObjects(DINO.pick,false).length)return false;
  // the first solid thing on that line must be part of the dinosaur (body, lights or crystals), not a tree or a sign in front of it
