@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!-- Content-Security-Policy: only this site, the two pinned three.js files and Google Fonts may load.
      The inline script is allowed by its sha256 hash, which tools/csp_hash.py updates (publish.sh runs it). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-Xfa6pU0Tg0GTeIl4/UDnOycpYYA1xyS+f566k0bQ2Zk=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-dVAed+PiHjmJT4UGMe6b2wT8ptcGlErHBjxprpOTUKQ=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Taipei Zoo 3D English Guide</title>
@@ -231,6 +231,10 @@ button{cursor:pointer}
 .m.last{border-color:#D9573F;color:#B3412C}
 
 .me-photo{display:flex;gap:12px;align-items:center}
+.avpick{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:4px 0 10px}
+.avpick button{border:2px solid var(--line);border-radius:50%;background:#fff;padding:2px;aspect-ratio:1;cursor:pointer}
+.avpick button[aria-pressed="true"]{border-color:#2F7DE1;box-shadow:0 0 0 2px #2F7DE1}
+.avpick img{width:100%;height:100%;border-radius:50%;display:block}
 .me-photo img{width:76px;height:76px;border-radius:50%;object-fit:cover;border:3px solid #2F7DE1;box-shadow:0 0 0 2px var(--ink);flex:none}
 .me-photo h2{margin-top:6px}
 #scene.placing{cursor:crosshair}
@@ -803,10 +807,18 @@ const Speech={browser:'speechSynthesis' in window&&'SpeechSynthesisUtterance' in
  saySlow(t,cb){const r=this.rateIdx;this.rateIdx=3;this.say(t,cb);this.rateIdx=r},
  get ok(){return !!this.cl||this.browser},
  load(){const sel=document.getElementById('voiceSel');const keep=sel.value;sel.innerHTML='';
-  if(this.cl)[['buttery','Claude · Buttery'],['airy','Claude · Airy'],['glassy','Claude · Glassy'],['rounded','Claude · Rounded']].forEach(([v,t])=>{const o=document.createElement('option');o.value='c:'+v;o.textContent=t;sel.appendChild(o)});
-  if(this.browser){const all=speechSynthesis.getVoices()||[];const en=all.filter(v=>/^en/i.test(v.lang));this.voices=(en.length?en:all).slice();
-   const pref=[/Samantha/i,/Google US English/i,/Aria/i,/Jenny/i,/Ava/i,/Allison/i,/Zira/i];const sc=v=>{let s=0;pref.forEach((p,i)=>{if(p.test(v.name))s+=10-i});if(/en-US/i.test(v.lang))s+=3;return s};
-   this.voices.sort((a,b)=>sc(b)-sc(a));this.voices.forEach((v,i)=>{const o=document.createElement('option');o.value='b:'+i;o.textContent=v.name.replace(/Microsoft |Google /,'')+' ('+v.lang+')';sel.appendChild(o)})}
+  if(this.cl)[['buttery','Claude · Buttery'],['airy','Claude · Airy']].forEach(([v,t])=>{const o=document.createElement('option');o.value='c:'+v;o.textContent=t;sel.appendChild(o)});
+  if(this.browser){const all=speechSynthesis.getVoices()||[];   // a short list: the best natural voice, a man's voice and another accent (devices can have dozens, incl. joke voices)
+   const FUNNY=/Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Good News|Jester|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Junior|Ralph|Kathy|Fred|Eddy|Flo|Grandma|Grandpa|Reed|Rocko|Sandy|Shelley|Princess|Deranged|Hysterical/i;
+   const MAN=/Daniel|Alex\b|Aaron|Arthur|Gordon|Rishi|Guy|Davis|Tony|Christopher|Eric|Ryan|Thomas|George|Oliver|\bTom\b|David|Mark|James|\bMale\b/i;
+   const good=all.filter(v=>!FUNNY.test(v.name));let en=good.filter(v=>/^en/i.test(v.lang));if(!en.length)en=good.length?good:all;
+   const pref=[/Samantha/i,/Google US English/i,/Aria/i,/Jenny/i,/Ava/i,/Allison/i,/Zira/i];const sc=v=>{let s=0;pref.forEach((p,i)=>{if(p.test(v.name))s+=10-i});if(/en-US/i.test(v.lang))s+=3;if(/Enhanced|Premium|Natural|Neural/i.test(v.name))s+=2;return s};
+   en.sort((a,b)=>sc(b)-sc(a));const pick=[];const add=v=>{if(v&&!pick.includes(v))pick.push(v)};
+   add(en.find(v=>!MAN.test(v.name))||en[0]);add(en.find(v=>MAN.test(v.name)));add(en.find(v=>!/en[-_]US/i.test(v.lang)&&!pick.includes(v)));
+   const room=this.cl?1:3;for(const v of en.concat(good)){if(pick.length>=room)break;add(v)}pick.length=Math.min(pick.length,room);   // three in all: fill with the next best (only one when the two Claude voices are there)
+   const REG={US:'American',GB:'British',AU:'Australian',IN:'Indian',IE:'Irish',ZA:'South African',NZ:'New Zealand',CA:'Canadian'};
+   this.voices=pick;pick.forEach((v,i)=>{const r=(v.lang.split(/[-_]/)[1]||'').toUpperCase();const o=document.createElement('option');o.value='b:'+i;
+    o.textContent=(MAN.test(v.name)?'Man':i===0?'Woman':'Voice')+' · '+(REG[r]||v.lang)+' ('+v.name.replace(/Microsoft |Google | Online.*$/g,'').split(' ')[0]+')';sel.appendChild(o)})}
   if(!sel.options.length){sel.innerHTML='<option>Not available</option>';sel.disabled=true;return}sel.disabled=false;
   if(keep&&[...sel.options].some(o=>o.value===keep))sel.value=keep;this.apply(sel.value)},
  apply(v){if(!v)return;if(v.startsWith('c:')){this.engine='claude';this.clVoice=v.slice(2)}else if(v.startsWith('b:')){this.engine='browser';this.voice=this.voices[+v.slice(2)]||null}},
@@ -1179,8 +1191,12 @@ function buildGLB(o){
  if(o.glbH){const box=new THREE.Box3().setFromObject(m);const h=box.max.y-box.min.y||1;const k=o.glbH/h;m.scale.setScalar(k);m.position.y=-box.min.y*k}
  g.add(m);   // without glbH the model is already in the page's units (same as the hand-built shapes)
  const mixer=new THREE.AnimationMixer(m);src.animations.forEach(c=>mixer.clipAction(c).play());
+ const legs=[];m.traverse(n=>{const k=/^leg_(FL|FR|BL|BR|L|R)$/.exec(n.name);if(k)legs.push({n,tag:k[1],q0:n.quaternion.clone()})});   /* walking legs (blender/make_animals.py leg_group()) */
+ let legLOD=null;if(legs.length){m.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(m.matrixWorld).invert(),by=new Map();   /* far away: all legs as one standing mesh (fewer draw calls on the iPad) */
+  for(const L of legs)L.n.traverse(o=>{if(!o.isMesh)return;const k=o.material.uuid;if(!by.has(k))by.set(k,{mat:o.material,items:[]});by.get(k).items.push({geo:o.geometry,m:new THREE.Matrix4().multiplyMatrices(inv,o.matrixWorld)})});
+  legLOD=new THREE.Group();legLOD.name='legs_far';for(const g of by.values())legLOD.add(new THREE.Mesh(mergeGeos(g.items),g.mat));m.add(legLOD);legLOD.visible=false}
  let last=null;
- return {g,head:m,mixer,update(t,ph){const dt=last==null?ph%4:Math.min(.1,Math.max(0,t-last));last=t;mixer.update(dt)}}}
+ return {g,head:m,mixer,legs,legLOD,baseY:m.position.y,update(t,ph){const dt=last==null?ph%4:Math.min(.1,Math.max(0,t-last));last=t;mixer.update(dt)}}}
 
 /* ---------- real geography from OpenStreetMap (osm/layout.json, made by osm/build_layout.py), 7 m per map unit ----------
    Area positions: OSM, or for the areas visible in the owner's Google Maps screenshot, that screenshot's pins calibrated
@@ -2060,11 +2076,17 @@ function imageSize(v){try{   // [width,height] read from the file header (PNG, J
   if(m>=0xC0&&m<=0xCF&&m!==0xC4&&m!==0xC8&&m!==0xCC)return len>=8&&i+2+len<=n?[v.getUint16(i+7),v.getUint16(i+5)]:null;if(m===0xDA||len<2)return null;i+=2+len}return null}
 }catch(e){}return null}
 function safeAvatar(s){return typeof s==='string'&&s.length<120000&&/^data:image\/jpeg;base64,[A-Za-z0-9+/]+=*$/.test(s)?s:null}
-let photoGen=0;let AVATAR=AVATAR_DEFAULT;try{const s=safeAvatar(localStorage.getItem(KEY_AVATAR));if(s)AVATAR=s;localStorage.removeItem('zooAvatar')}catch(e){}
+/* 10 original cartoon avatars (blender/make_avatar.py --set); no. 0 is the default, kept inside the page so it also works offline */
+const AVATAR_SET=['','avatars/a1.png','avatars/a2.png','avatars/a3.png','avatars/a4.png','avatars/a5.png','avatars/a6.png','avatars/a7.png','avatars/a8.png','avatars/a9.png'];
+const AVATAR_NAMES=['Explorer hat','Baseball cap','Headband','Safari helmet','Bear beanie','Glasses','Sun hat','Grandpa','Panda ears','Penguin hood'];
+const KEY_AVATAR_PICK='taipeiZooGuide.avatarPick';
+function avatarSrc(i){return i===0?AVATAR_DEFAULT:AVATAR_SET[i]}
+function isPhoto(src){return typeof src==='string'&&src.startsWith('data:image/jpeg')}   // the person's own photo (not one of the 10)
+let photoGen=0;let AVATAR=AVATAR_DEFAULT,AVATAR_PICK=0;try{const k=localStorage.getItem(KEY_AVATAR_PICK);if(/^[0-9]$/.test(k||''))AVATAR_PICK=+k;AVATAR=avatarSrc(AVATAR_PICK);const s=safeAvatar(localStorage.getItem(KEY_AVATAR));if(s)AVATAR=s;localStorage.removeItem('zooAvatar')}catch(e){}   // your own photo wins; the pick is remembered for when you remove it
 let ME=null,ME_ERR=null,ME_OUT=null,geoWatch=null,placing=false,meFollow=false,firstFix=true;
 const mePin=new THREE.Group();scene.add(mePin);mePin.visible=false;let meSprite=null,accDisc=null,mePulse=null;
-function avatarTexture(src,cb){const img=new Image();
- img.onerror=()=>{if(src!==AVATAR_DEFAULT){AVATAR=AVATAR_DEFAULT;try{localStorage.removeItem(KEY_AVATAR)}catch(e){}avatarTexture(AVATAR_DEFAULT,cb)}};   // broken saved photo → default avatar
+function avatarTexture(src,cb,live){const img=new Image();
+ img.onerror=()=>{if(live&&!live())return;if(src!==AVATAR_DEFAULT){AVATAR=AVATAR_DEFAULT;try{localStorage.removeItem(KEY_AVATAR)}catch(e){}avatarTexture(AVATAR_DEFAULT,cb,live)}};   // broken saved photo → default avatar
  img.onload=()=>{const N=256,c=document.createElement('canvas');c.width=N;c.height=N+48;const x=c.getContext('2d');
   x.fillStyle='#2F7DE1';x.beginPath();x.moveTo(N/2-26,N-24);x.lineTo(N/2,N+44);x.lineTo(N/2+26,N-24);x.closePath();x.fill();
   x.beginPath();x.arc(N/2,N/2,N/2-2,0,Math.PI*2);x.fillStyle='#2F7DE1';x.fill();x.beginPath();x.arc(N/2,N/2,N/2-16,0,Math.PI*2);x.fillStyle='#fff';x.fill();
@@ -2075,9 +2097,11 @@ function initMe(){limb(mePin,V(0,0,0),V(0,2.2,0),.07,'#2F7DE1');
  mePulse=new THREE.Mesh(new THREE.TorusGeometry(1.2,.12,6,36),new THREE.MeshBasicMaterial({color:'#2F7DE1',transparent:true,opacity:.8}));mePulse.rotation.x=Math.PI/2;mePulse.position.y=.36;mePin.add(mePulse);
  const dot=new THREE.Mesh(new THREE.CircleGeometry(.55,24),new THREE.MeshBasicMaterial({color:'#2F7DE1'}));dot.rotation.x=-Math.PI/2;dot.position.y=.4;mePin.add(dot);
  setAvatar(AVATAR)}
-function setAvatar(src){avatarTexture(src,(t,ar)=>{if(meSprite){mePin.remove(meSprite);meSprite.material.map.dispose();meSprite.material.dispose()}
+let avTok=0;
+function setAvatar(src){const my=++avTok,live=()=>my===avTok;avatarTexture(src,(t,ar)=>{if(!live()){t.dispose();return}   // an older pick finished loading late: ignore it
+ if(meSprite){mePin.remove(meSprite);meSprite.material.map.dispose();meSprite.material.dispose()}
  meSprite=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthTest:false,transparent:true}));meSprite.renderOrder=12;meSprite.scale.set(4.6,4.6*ar,1);meSprite.position.y=2.2+4.6*ar/2;meSprite.center.set(.5,.5);mePin.add(meSprite);
- const im=document.querySelector('.me-photo img');if(im)im.src=src})}
+ const im=document.querySelector('.me-photo img');if(im)im.src=src},live)}
 function nearestZone(x,z){let b=null,bd=1e9;for(const zn of ZONES){const d=zEdge(zn,x,z);if(d<bd){bd=d;b=zn}}return{z:b,d:Math.max(0,bd)}}
 function setMe(x,z,src,acc,ll){const nz=nearestZone(x,z);ME={x,z,src,acc:acc||0,ll,near:nz.z.id,inside:nz.d<=0,dist:nz.d};here=ME.near;
  mePin.position.set(x,gy(x,z),z);mePin.visible=!AREA;accDisc.visible=src==='gps'&&acc>0;accDisc.scale.setScalar(Math.max(.6,(acc||0)/M_GEO));
@@ -2115,9 +2139,12 @@ function renderMe(){current=null;openCard();const nz=ME?ZI[ME.near]:null;
  <label class="field" for="meZone">Or choose the area you're in · 選擇你所在的展區<select id="meZone"><option value="">Choose an area…</option>${ROUTE.map((id,i)=>`<option value="${id}"${ME&&ME.src==='manual'&&ME.near===id&&ME.inside?' selected':''}>${i+1}. ${ZI[id].n} · ${ZI[id].zh}</option>`).join('')}</select></label>
  ${ME?`<div class="say"><button class="btn" id="meCenter" type="button">Show me</button><button class="btn" id="meFollow" type="button" aria-pressed="${meFollow}">${meFollow?'Following me':'Follow me'}</button><button class="btn" id="meClear" type="button">Clear</button></div>
  <h4 class="res-h" style="padding-left:0">Closest animals · 附近的動物</h4><div class="alist" style="padding-left:0">${closestAnimals(6).map(({a,d})=>`<button type="button" data-a="${a.id}">${a.n}<small>${a.zh} · ${Math.max(10,Math.round(d/10)*10)} m</small></button>`).join('')}</div>`:''}
- <div class="say"><label class="btn" for="mePhoto">Change photo</label><input type="file" id="mePhoto" accept="image/jpeg,image/png,image/webp,image/gif" hidden>${AVATAR!==AVATAR_DEFAULT?'<button class="btn" id="mePhotoReset" type="button">Remove my photo · 移除我的照片</button>':''}</div>
+ <h4 class="res-h" style="padding-left:0">Pick an avatar · 選頭像</h4><div class="avpick" id="avPick">${AVATAR_NAMES.map((n,i)=>`<button type="button" data-av="${i}" aria-label="${n}" aria-pressed="${!isPhoto(AVATAR)&&AVATAR_PICK===i}"><img alt=""></button>`).join('')}</div>
+ <div class="say"><label class="btn" for="mePhoto">Use my own photo · 用自己的照片</label><input type="file" id="mePhoto" accept="image/jpeg,image/png,image/webp,image/gif" hidden>${isPhoto(AVATAR)?'<button class="btn" id="mePhotoReset" type="button">Remove my photo · 移除我的照片</button>':''}</div>
  <p class="sci" style="font-style:normal">This page never sends your photo or GPS coordinates anywhere. A photo is remembered in this browser until you remove it. (Read-aloud may use your device's speech service, which only hears the area name.)<br>這個網頁不會把你的照片或 GPS 座標傳到任何地方；照片會記在這個瀏覽器裡，可以隨時移除。（朗讀功能可能使用裝置的語音服務，只會用到展區名稱。）</p>`;
  {const im=$('card').querySelector('.me-photo img');im.onerror=()=>{im.onerror=null;im.src=AVATAR_DEFAULT};im.src=AVATAR}   // set as a property, never inside the HTML string
+ $('avPick').querySelectorAll('button').forEach(b=>{const i=+b.dataset.av;b.querySelector('img').src=avatarSrc(i);
+  b.onclick=()=>{photoGen++;AVATAR_PICK=i;AVATAR=avatarSrc(i);try{localStorage.removeItem(KEY_AVATAR);localStorage.setItem(KEY_AVATAR_PICK,String(i))}catch(e){}setAvatar(AVATAR);renderMe()}});   // picking one replaces your own photo
  $('cClose').onclick=()=>{placing=false;canvas.classList.remove('placing');NAV?renderNav():renderWelcome()};
  $('meGps').onclick=()=>{if(geoWatch!=null)stopGPS();else startGPS()};$('meWalk').onclick=startWalk;
  $('meTap').onclick=()=>{placing=!placing;canvas.classList.toggle('placing',placing);exitArea();if(placing){overview();if(isPhone())collapseCard()}renderMe()};
@@ -2131,7 +2158,7 @@ function renderMe(){current=null;openCard();const nz=ME?ZI[ME.near]:null;
   f.arrayBuffer().then(buf=>{const wh=imageSize(new DataView(buf));if(!wh||!(wh[0]*wh[1]>0)){bad();return}if(wh[0]*wh[1]>50e6){bad(tooBig);return}   /* size unknown = not decoded at all (fail closed) */
   const r=new FileReader();r.onerror=()=>bad();r.onload=()=>{const img=new Image();img.onerror=()=>bad();img.onload=()=>{if(gen!==photoGen)return;if(img.width*img.height>50e6){bad(tooBig);return}const c=document.createElement('canvas');c.width=c.height=220;const s=Math.min(img.width,img.height);c.getContext('2d').drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,220,220);
    AVATAR=c.toDataURL('image/jpeg',.86);try{localStorage.setItem(KEY_AVATAR,AVATAR)}catch(err){}setAvatar(AVATAR);renderMe()};img.src=r.result};r.readAsDataURL(f)}).catch(()=>bad())};
- const pr=$('mePhotoReset');if(pr)pr.onclick=()=>{photoGen++;AVATAR=AVATAR_DEFAULT;try{localStorage.removeItem(KEY_AVATAR)}catch(err){}setAvatar(AVATAR);renderMe()}}
+ const pr=$('mePhotoReset');if(pr)pr.onclick=()=>{photoGen++;AVATAR=avatarSrc(AVATAR_PICK);try{localStorage.removeItem(KEY_AVATAR)}catch(err){}setAvatar(AVATAR);renderMe()}}
 // GPS only starts when the person presses "Use GPS" (opening this card or a voice "where am I" never starts it)
 function openMe(){stopTour();exitArea();renderMe();if(ME)centerOnMe();if(isPhone())$('side').classList.remove('open')}
 function stopGPS(){if(geoWatch!=null){try{navigator.geolocation.clearWatch(geoWatch)}catch(e){}geoWatch=null}
@@ -2314,7 +2341,8 @@ function loop(){requestAnimationFrame(loop);const t=clock.getElapsedTime();const
  if(WALK.on)walkTick(dt,t);
  behaviorTick(dt,t);weatherTick(dt,t);ridesTick(dt,t);penguinWalkTick(dt);targetHeightTick(dt);applyCam();scene.fog.near=Math.max(240,cam.dist+60);scene.fog.far=scene.fog.near+260;   /* fog starts beyond the zoo, however far out you zoom */perfTick(dt);habitatLodTick();
  for(const a of A){const o=a.obj;if(!o.holder.parent.visible)continue;const near=camera.position.distanceTo(o.holder.getWorldPosition(tmpV));
-  if(near<70||o.bounce>0)o.built.update(t,o.ph);          // far-away animals are too small to see moving
+  if(near<70||o.bounce>0)o.built.update(t,o.ph);
+  {const lf=near>=70&&!(o.bounce>0);if(o.built.legLOD&&o.legFar!==lf){o.legFar=lf;o.built.legLOD.visible=lf;o.built.legs.forEach(L=>L.n.visible=!lf)}}   /* far: the merged standing legs */          // far-away animals are too small to see moving
   const olOn=near<55||current===a;if(o.outlines&&o.olOn!==olOn){o.olOn=olOn;o.outlines.forEach(m=>m.visible=olOn)}   // outlines only up close
   o.lab.visible=AREA?true:(near<(isPhone()?26:32)||current===a||!!(NAV&&NAV.dest.a===a));
   if(cam.hold===a&&near<14)o.lab.visible=false;   // close-up: the name is already in the bar below
@@ -2469,6 +2497,21 @@ function turnTo(o,dx,dz,dt,rate){if(Math.abs(dx)+Math.abs(dz)<1e-4)return 0;cons
  const k=Math.min(1,dt*(rate||3));o.holder.rotation.y+=d*k;return d}
 function stepTo(o,tx,tz,speed,dt){const h=o.holder.position,dx=tx-h.x,dz=tz-h.z,d=Math.hypot(dx,dz);if(d<.12)return true;
  const bend=turnTo(o,dx,dz,dt,4);const v=Math.min(d,speed*dt*(Math.abs(bend)>1.2?.3:1));h.x+=dx/d*v;h.z+=dz/d*v;return false}
+/* walking instead of gliding: the legs swing with the real ground speed (diagonal pairs for four legs, left/right for two),
+   the body bobs a little with each step, penguins waddle side to side; nothing moves on the spot or in the air */
+const _gaQ=new THREE.Quaternion(),_gaZ=new THREE.Vector3(0,0,1);
+const GAIT={FL:0,BR:0,FR:.5,BL:.5,L:0,R:.5};
+function gaitTick(a,o,dt,st){const b=o.built,h=o.holder.position;if(!b||!b.head||b.baseY==null||dt<=0)return;   /* only Blender models (the built-in fallback has no legs) */
+ const dx=h.x-(o.gx==null?h.x:o.gx),dz=h.z-(o.gz==null?h.z:o.gz);o.gx=h.x;o.gz=h.z;
+ const wet=(ZI[a.z].group.userData.ponds||[]).some(p=>Math.hypot(h.x-p.x,h.z-p.z)<p.r);   // in a pond: swimming, not walking
+ const air=h.y>.6||(st.mode==='fly')||st.kind==='hop'||wet;const v=air?0:Math.hypot(dx,dz)/dt;   // ground speed in map units per second
+ o.gv=(o.gv||0)+((v>.05?v:0)-(o.gv||0))*Math.min(1,dt*8);const w=Math.min(1,o.gv/.5);   // 0 standing … 1 walking
+ const s=a.m.s||1,stride=Math.max(.25,(o.h||1)*.45);o.gph=((o.gph||0)+dt*o.gv/stride)%1;
+ for(const L of b.legs||[]){const ang=Math.sin((o.gph+GAIT[L.tag])*Math.PI*2)*.5*w;   // swing forward/back about the hip
+  _gaQ.setFromAxisAngle(_gaZ,ang);L.n.quaternion.copy(L.q0).multiply(_gaQ)}
+ const step=Math.abs(Math.sin(o.gph*Math.PI*2));
+ b.head.position.y=b.baseY+step*.035*w*Math.max(.4,(o.h||1)*.5)/s;   // a little bob with every step
+ if(a.m.b==='penguin')b.head.rotation.x=Math.sin(o.gph*Math.PI*2)*.16*w}   // penguin waddle
 function behaviorTick(dt,t){
  for(const a of A){const o=a.obj,st=o.beh;if(!st)continue;const z=ZI[a.z];if(!z.group.visible)continue;
   const near=AREA===z||camera.position.distanceTo(tmpV.set(z.x,z.y,z.z))<z.r+75;if(!near)continue;
@@ -2508,6 +2551,7 @@ function behaviorTick(dt,t){
      if(!moving){st.mode='idle';st.timer=8+R()*8}}}}
   h.y+=(yWant-h.y)*Math.min(1,dt*(st.kind==='hop'?20:4));o.holder.rotation.x+=(roll-o.holder.rotation.x)*Math.min(1,dt*3);
   if(o.built.mixer)o.built.mixer.timeScale=(st.kind==='perch'||st.kind==='soar')&&st.mode==='fly'?3:1;   // flap faster in the air
+  gaitTick(a,o,dt,st);
   // name sign, selection ring and shadow follow the animal
   const up=h.y-.25;o.lab.position.set(h.x,h.y+o.h+.9,h.z);o.ring.position.set(h.x,Math.max(.32,h.y+.07),h.z);
   o.sh.position.set(h.x,(st.kind==='swim'||st.kind==='wade')&&h.y<.3?POND_Y+.01:.27,h.z);o.sh.material.opacity=.16/(1+up*.6);
