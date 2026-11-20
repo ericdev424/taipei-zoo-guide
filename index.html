@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!-- Content-Security-Policy: only this site, the two pinned three.js files and Google Fonts may load.
      The inline script is allowed by its sha256 hash, which tools/csp_hash.py updates (publish.sh runs it). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-ch1KTPatvtyptjps6atX8dy9urwJL7IpMXuffcfBrGc=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js 'sha256-RFRn8sfBzv/bF+zHLu17OZxxMp/3YjIiN2CSnty+w9E=' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Taipei Zoo 3D English Guide</title>
@@ -469,7 +469,7 @@ const ZONES=[
  {id:'australian',n:'Australian Animal Area',zh:'澳洲動物區',kind:'Outdoor',biome:'outback',x:12,z:26,r:7.5,
   blurb:"Animals from Australia, the land of pouches and big hops."},
  {id:'african',n:'African Animal Area',zh:'非洲動物區',kind:'Outdoor',biome:'savanna',x:6,z:-13,r:16,
-  blurb:"A 6-hectare East African savanna with a central pond and shade trees, big enough for groups of large animals."},
+  blurb:"A 6-hectare East African savanna. Animals rest in the shade of the trees and shrubs by the pond, and the lion waits in the long grass."},
  {id:'penguin',n:'Penguin House',zh:'企鵝館',kind:'Indoor',biome:'indoor-ice',x:28,z:11,r:6,
   blurb:"King penguins and African penguins, birds that are built for life in the water."},
  {id:'temperate',n:'Temperate Zone Animal Area',zh:'溫帶動物區',kind:'Outdoor',biome:'temperate',x:40,z:-16,r:12,
@@ -616,7 +616,7 @@ const A=[
 {id:'oryx',z:'african',n:"Beisa oryx",zh:'東非劍羚',sci:'Oryx',st:'NA',
  i:"Oryx have very long, thin horns and a black and white face. They can go a long time without drinking because they get water from the plants they eat.",
  h:'Deserts and dry grasslands',d:'Grass, leaves, roots',sz:'About 1.2 m tall at the shoulder',
- m:{b:'quad',s:1.5,L:.5,H:.24,W:.18,leg:.55,legR:.045,neck:.28,neckA:.5,hs:.14,snout:.75,ear:'point',tail:'tuft',horn:'long',c:'#e6dccb',c2:'#ffffff',faceBand:'#2a2420'}},
+ m:{sp:'oryx',b:'quad',s:1.45,L:.5,H:.24,W:.18,leg:.55,legR:.045,neck:.28,neckA:.5,hs:.14,snout:.75,ear:'point',tail:'tuft',horn:'long',c:'#e6dccb',c2:'#ffffff',faceBand:'#2a2420'}},
 {id:'addax',z:'desert',n:"Addax",zh:'弓角羚羊',sci:'Addax nasomaculatus',st:'CR',
  i:"The addax has long, twisted horns. Its coat turns almost white in summer to reflect the hot sun. Very few are left in the wild.",
  h:'Sandy deserts of the Sahara',d:'Desert grass and shrubs',sz:'About 1 m tall at the shoulder',
@@ -634,39 +634,39 @@ const A=[
 {id:'african-elephant',z:'african',n:'African elephant',zh:'非洲象',sci:'Loxodonta africana',st:'EN',
  i:"The African elephant is the largest land animal. It flaps its huge ears to cool down. Its trunk can smell, drink, lift and even give hugs.",
  h:'Savannas and forests of Africa',d:'Grass, leaves, bark, fruit',sz:'Up to about 3.5 m tall',
- m:{b:'quad',s:3.0,L:.8,H:.62,W:.5,leg:.72,legR:.2,neck:0,hs:.46,snout:.25,ear:'big',tail:'tuft',trunk:'long',tusk:true,c:'#8c8a86'}},
+ m:{sp:'elephant',b:'quad',s:3.6,L:.8,H:.62,W:.5,leg:.72,legR:.2,neck:0,hs:.46,snout:.25,ear:'big',tail:'tuft',trunk:'long',tusk:true,c:'#8c8a86'}},
 {id:'somali-giraffe',z:'african',n:"Reticulated giraffe",zh:'網紋長頸鹿',sci:'Giraffa camelopardalis reticulata',st:'EN',
  i:"The giraffe is the tallest animal in the world. The Somali giraffe, also called the reticulated giraffe, has brown patches with neat white lines between them. Its dark tongue is about 45 centimeters long.",
  h:'Dry savannas of Kenya, Somalia and Ethiopia',d:'Acacia leaves',sz:'Up to about 5.5 m tall',
- m:{b:'quad',s:2.3,L:.52,H:.3,W:.2,leg:1.25,legR:.045,neck:1.45,neckA:.28,hs:.14,snout:.9,ear:'point',tail:'tuft',horn:'ossicone',c:'#f0e2c4',spot:'#8a4a22',spotN:30,spotS:1.7,neckSpots:true}},
+ m:{sp:'giraffe',b:'quad',s:2.6,L:.52,H:.3,W:.2,leg:1.25,legR:.045,neck:1.45,neckA:.28,hs:.14,snout:.9,ear:'point',tail:'tuft',horn:'ossicone',c:'#f0e2c4',spot:'#8a4a22',spotN:30,spotS:1.7,neckSpots:true}},
 {id:'pygmy-hippopotamus',z:'african',n:'Pygmy hippopotamus',zh:'侏儒河馬',sci:'Choeropsis liberiensis',st:'EN',
  i:"The pygmy hippo is much smaller than the common hippo. It lives alone in the forests of West Africa and hides in rivers and swamps.",
  h:'Forests and swamps of West Africa',d:'Ferns, leaves, fruit',sz:'About 1.5 to 1.75 m long',
- m:{b:'quad',s:1.45,L:.55,H:.32,W:.3,leg:.2,legR:.09,neck:0,hs:.27,snout:.9,snoutW:1.3,ear:'tiny',tail:'short',c:'#3f3a3e',c2:'#7c6a66'}},
+ m:{sp:'pygmyhippo',b:'quad',s:1.55,L:.55,H:.32,W:.3,leg:.2,legR:.09,neck:0,hs:.27,snout:.9,snoutW:1.3,ear:'tiny',tail:'short',c:'#3f3a3e',c2:'#7c6a66'}},
 {id:'western-lowland-gorilla',z:'african',n:'Western lowland gorilla',zh:'西部低地大猩猩',sci:'Gorilla gorilla gorilla',st:'CR',
  i:"Gorillas are the largest primates. They live in family groups led by a big male called a silverback. They mostly eat leaves, stems and fruit.",
  h:'Rainforests of Central Africa',d:'Leaves, stems, fruit',sz:'Males up to about 1.7 m standing',
- m:{b:'primate',pose:'knuckle',s:1.5,c:'#2a2826',face:'#141312',silver:'#9b9a96'}},
+ m:{sp:'gorilla',b:'primate',pose:'knuckle',s:1.56,c:'#2a2826',face:'#141312',silver:'#9b9a96'}},
 {id:'lion',z:'african',n:'Lion',zh:'獅子',sci:'Panthera leo',st:'VU',
  i:"Lions are the only cats that live in groups, called prides. Male lions have a big mane, and a lion's roar can be heard about 8 kilometers away.",
  h:'Savannas of Africa',d:'Zebras, antelopes, buffalo',sz:'About 2.5 to 3 m long with tail',
- m:{b:'quad',s:1.75,L:.58,H:.25,W:.2,leg:.44,legR:.065,neck:.12,neckA:1.0,hs:.2,snout:.42,ear:'round',tail:'tuft',mane:'#6b3f1c',c:'#c99a5b',c2:'#ead6b5',snoutC:'#e7d2b0'}},
+ m:{sp:'lion',b:'quad',s:1.75,L:.58,H:.25,W:.2,leg:.44,legR:.065,neck:.12,neckA:1.0,hs:.2,snout:.42,ear:'round',tail:'tuft',mane:'#6b3f1c',c:'#c99a5b',c2:'#ead6b5',snoutC:'#e7d2b0'}},
 {id:'grants-zebra',z:'african',n:"Chapman's zebra",zh:'查普曼斑馬',sci:'Equus quagga boehmi',st:'NT',
  i:"No two zebras have the same stripes. Living in a big striped herd can make it hard for a lion to pick out just one zebra.",
  h:'Grasslands of East Africa',d:'Grass',sz:'About 1.2 to 1.4 m tall at the shoulder',
- m:{b:'quad',s:1.45,L:.52,H:.27,W:.2,leg:.6,legR:.055,neck:.38,neckA:.55,hs:.17,snout:.9,ear:'point',tail:'tuft',ridge:'#1a1a1a',c:'#f5f3ee',stripe:'#1a1a1a',stripeN:11,snoutC:'#2a2a2a',legStripe:'#1a1a1a'}},
+ m:{sp:'zebra',b:'quad',s:1.57,L:.52,H:.27,W:.2,leg:.6,legR:.055,neck:.38,neckA:.55,hs:.17,snout:.9,ear:'point',tail:'tuft',ridge:'#1a1a1a',c:'#f5f3ee',stripe:'#1a1a1a',stripeN:11,snoutC:'#2a2a2a',legStripe:'#1a1a1a'}},
 {id:'white-rhinoceros',z:'african',n:'White rhinoceros',zh:'白犀牛',sci:'Ceratotherium simum',st:'NT',
  i:"The white rhino is actually gray. It has a wide, square mouth for eating grass, and two horns on its nose.",
  h:'Grasslands of southern Africa',d:'Grass',sz:'About 3.5 to 4 m long',
- m:{b:'quad',s:2.4,L:.75,H:.42,W:.36,leg:.38,legR:.14,neck:.05,neckA:1.4,hs:.3,snout:.8,snoutW:1.25,ear:'point',tail:'thin',horn:'rhino',c:'#9a948a'}},
+ m:{sp:'rhino',b:'quad',s:2.6,L:.75,H:.42,W:.36,leg:.38,legR:.14,neck:.05,neckA:1.4,hs:.3,snout:.8,snoutW:1.25,ear:'point',tail:'thin',horn:'rhino',c:'#9a948a'}},
 {id:'chimpanzee',z:'african',n:'Chimpanzee',zh:'黑猩猩',sci:'Pan troglodytes',st:'EN',
  i:"Chimpanzees are among our closest animal relatives. They use sticks as tools to fish termites out of their mounds.",
  h:'Forests of West and Central Africa',d:'Fruit, leaves, insects',sz:'About 1 to 1.7 m standing',
- m:{b:'primate',pose:'knuckle',s:1.1,c:'#1f1c1a',face:'#c9a586'}},
+ m:{sp:'chimp',b:'primate',pose:'knuckle',s:1.55,c:'#1f1c1a',face:'#c9a586'}},
 {id:'hippopotamus',z:'african',n:'Hippopotamus',zh:'河馬',sci:'Hippopotamus amphibius',st:'VU',
  i:"Hippos spend the hot day in the water to stay cool, then come out at night to eat grass. Their name means river horse.",
  h:'Rivers and lakes of Africa',d:'Grass',sz:'About 3 to 5 m long',
- m:{b:'quad',s:2.2,L:.75,H:.42,W:.4,leg:.24,legR:.13,neck:0,hs:.33,snout:1.0,snoutW:1.35,ear:'tiny',tail:'short',c:'#6f6266',c2:'#b48c88'}},
+ m:{sp:'hippo',b:'quad',s:2.5,L:.75,H:.42,W:.4,leg:.24,legR:.13,neck:0,hs:.33,snout:1.0,snoutW:1.35,ear:'tiny',tail:'short',c:'#6f6266',c2:'#b48c88'}},
 /* Penguin */
 {id:'king-penguin',z:'penguin',n:'King penguin',zh:'國王企鵝',sci:'Aptenodytes patagonicus',st:'LC',
  i:"The king penguin is the second-largest penguin. It has bright orange patches on its head and chest. Parents keep the egg warm on their feet, under a fold of skin.",
@@ -896,39 +896,39 @@ const A=[
 {id:'spotted-hyena',z:'african',n:"Spotted hyena",zh:"斑點鬣狗",sci:"Crocuta crocuta",st:'LC',
  i:"Spotted hyenas are skilled hunters, not just scavengers. In a hyena group, called a clan, the females are the bosses.",
  h:"Savannas of Africa",d:"Antelopes, zebras, leftovers from other hunters",sz:"About 1.2 to 1.8 m long",
- m:{b:"quad",s:1.5,L:0.5,H:0.25,W:0.19,leg:0.5,legR:0.055,neck:0.2,neckA:0.8,hs:0.17,snout:0.55,ear:"round",tail:"tuft",ridge:"#2a2018",c:"#b89a6e",c2:"#d6c4a2",snoutC:"#2e2620",spot:"#3a2a1c",spotN:28,spotS:0.8}},
+ m:{sp:'hyena',b:"quad",s:1.7,L:0.5,H:0.25,W:0.19,leg:0.5,legR:0.055,neck:0.2,neckA:0.8,hs:0.17,snout:0.55,ear:"round",tail:"tuft",ridge:"#2a2018",c:"#b89a6e",c2:"#d6c4a2",snoutC:"#2e2620",spot:"#3a2a1c",spotN:28,spotS:0.8}},
 {id:'common-brown-lemur',z:'african',n:"Common brown lemur",zh:"褐狐猴",sci:"Eulemur fulvus",st:'VU',
  i:"Like all lemurs, it comes from Madagascar. Brown lemurs can be awake in the day or at night, taking naps in between.",
  h:"Forests of Madagascar",d:"Fruit, leaves, flowers",sz:"About 40 to 50 cm, plus tail",
- m:{b:"primate",pose:"sit",s:0.85,c:"#8a6a4a",c2:"#bfa486",face:"#2a2420",eyeC:"#d88a2a",tail:"bushy"}},
+ m:{sp:'brownlemur',b:"primate",pose:"sit",s:1.4,c:"#8a6a4a",c2:"#bfa486",face:"#2a2420",eyeC:"#d88a2a",tail:"bushy"}},
 {id:'patas-monkey',z:'african',n:"Patas monkey",zh:"紅猴",sci:"Erythrocebus patas",st:'NT',
  i:"The patas monkey is the fastest runner of all monkeys. It has long legs and can sprint at about 55 km per hour.",
  h:"Dry savannas of Africa",d:"Insects, seeds, tree gum, fruit",sz:"About 60 to 85 cm, plus tail",
- m:{b:"primate",pose:"sit",s:1.0,c:"#b8582e",c2:"#e8ddd0",face:"#2a2420",tail:"long"}},
+ m:{sp:'patas',b:"primate",pose:"sit",s:1.3,c:"#b8582e",c2:"#e8ddd0",face:"#2a2420",tail:"long"}},
 {id:'olive-baboon',z:'african',n:"Olive baboon",zh:"東非狒狒",sci:"Papio anubis",st:'LC',
  i:"Olive baboons live in big troops that can have more than 100 members. From far away, their gray-green fur looks the color of olives.",
  h:"Savannas and forests of Africa",d:"Grass, roots, fruit, small animals",sz:"About 60 cm to 1 m, plus tail",
- m:{b:"primate",pose:"knuckle",s:0.95,c:"#7a7454",face:"#2b2723"}},
+ m:{sp:'baboon',b:"primate",pose:"knuckle",s:1.5,c:"#7a7454",face:"#2b2723"}},
 {id:'barbary-sheep',z:'african',n:"Barbary sheep",zh:"北非髯羊",sci:"Ammotragus lervia",st:'VU',
  i:"This wild sheep can go a long time without drinking, getting water from plants and morning dew. Long hair hangs from its throat and chest like a beard.",
  h:"Dry rocky mountains of North Africa",d:"Grass, shrubs, leaves",sz:"About 80 cm to 1 m tall at the shoulder",
- m:{b:"quad",s:1.35,L:0.48,H:0.25,W:0.19,leg:0.45,legR:0.05,neck:0.24,neckA:0.6,hs:0.15,snout:0.65,ear:"point",tail:"short",horn:"curve",beard:true,c:"#b07a45",c2:"#d8b88a"}},
+ m:{sp:'aoudad',b:"quad",s:1.37,L:0.48,H:0.25,W:0.19,leg:0.45,legR:0.05,neck:0.24,neckA:0.6,hs:0.15,snout:0.65,ear:"point",tail:"short",horn:"curve",beard:true,c:"#b07a45",c2:"#d8b88a"}},
 {id:'mountain-bongo',z:'african',n:"Mountain bongo",zh:"山地斑哥條紋羚",sci:"Tragelaphus eurycerus isaaci",st:'CR',
  i:"The bongo is a shy forest antelope with bright white stripes on a red-brown coat. Only about a hundred mountain bongos are left in the wild, in the mountain forests of Kenya.",
  h:"Mountain forests of Kenya",d:"Leaves, shoots, roots",sz:"About 1.1 to 1.3 m tall at the shoulder",note:"The bongo as a whole species is Near Threatened, but the mountain bongo is Critically Endangered.",
- m:{b:"quad",s:1.55,L:0.55,H:0.29,W:0.21,leg:0.52,legR:0.055,neck:0.3,neckA:0.6,hs:0.17,snout:0.85,ear:"long",tail:"tuft",horn:"spiral",ridge:"#2a1d14",c:"#a8461f",stripe:"#f6f1e6",stripeN:12,blaze:"#f6f1e6",legC:"#4a2a18",legStripe:"#f6f1e6"}},
+ m:{sp:'bongo',b:"quad",s:1.7,L:0.55,H:0.29,W:0.21,leg:0.52,legR:0.055,neck:0.3,neckA:0.6,hs:0.17,snout:0.85,ear:"long",tail:"tuft",horn:"spiral",ridge:"#2a1d14",c:"#a8461f",stripe:"#f6f1e6",stripeN:12,blaze:"#f6f1e6",legC:"#4a2a18",legStripe:"#f6f1e6"}},
 {id:'black-and-white-ruffed-lemur',z:'african',n:"Black-and-white ruffed lemur",zh:"白頸狐猴",sci:"Varecia variegata",st:'CR',
  i:"This lemur has a fluffy white ruff of fur around its face. Mother ruffed lemurs build nests for their babies, which is rare for primates.",
  h:"Rainforests of eastern Madagascar",d:"Fruit, nectar, leaves",sz:"About 50 to 55 cm, plus a longer tail",
- m:{b:"primate",pose:"sit",s:0.9,c:"#1c1b1a",c2:"#f0eee8",face:"#2a2826",eyeC:"#d8b030",crest:"#f0eee8",tail:"bushy"}},
+ m:{sp:'ruffed',b:"primate",pose:"sit",s:1.4,c:"#1c1b1a",c2:"#f0eee8",face:"#2a2826",eyeC:"#d8b030",crest:"#f0eee8",tail:"bushy"}},
 {id:'ring-tailed-lemur',z:'african',n:"Ring-tailed lemur",zh:"環尾狐猴",sci:"Lemur catta",st:'EN',
  i:"Its long tail has black and white rings. In the morning, ring-tailed lemurs sit up with their arms open to sunbathe.",
  h:"Dry forests and scrub of southern Madagascar",d:"Fruit, leaves, flowers",sz:"About 40 to 45 cm, plus a longer tail",
- m:{b:"primate",pose:"sit",s:0.85,c:"#9a948e",c2:"#f0ece6",face:"#efece6",eyeC:"#e8a020",tail:"ring",ringC:"#1a1918"}},
+ m:{sp:'ringtail',b:"primate",pose:"sit",s:1.4,c:"#9a948e",c2:"#f0ece6",face:"#efece6",eyeC:"#e8a020",tail:"ring",ringC:"#1a1918"}},
 {id:'common-eland',z:'african',n:"Common eland",zh:"伊蘭羚羊",sci:"Taurotragus oryx",st:'LC',
  i:"The eland is one of the biggest antelopes in the world. Even though it is large and heavy, it can jump over 2 m high from a standstill.",
  h:"Savannas and grasslands of eastern and southern Africa",d:"Leaves, grass, fruit",sz:"About 1.3 to 1.8 m tall at the shoulder",
- m:{b:"quad",s:1.85,L:0.62,H:0.34,W:0.25,leg:0.6,legR:0.07,neck:0.3,neckA:0.6,hs:0.17,snout:0.9,ear:"point",tail:"tuft",horn:"spiral",ridge:"#4a3426",c:"#c09468",c2:"#e3cfb0"}},
+ m:{sp:'eland',b:"quad",s:2.14,L:0.62,H:0.34,W:0.25,leg:0.6,legR:0.07,neck:0.3,neckA:0.6,hs:0.17,snout:0.9,ear:"point",tail:"tuft",horn:"spiral",ridge:"#4a3426",c:"#c09468",c2:"#e3cfb0"}},
 {id:'formosan-sambar',z:'formosan',n:"Formosan sambar",zh:"臺灣水鹿",sci:"Rusa unicolor swinhoii",st:'VU',
  i:"It is the largest deer in Taiwan and lives high in the mountains. Its Chinese name means water deer, because it loves to cool off in mud and water.",
  h:"Mountain forests of Taiwan",d:"Grass, leaves, bark",sz:"About 1 to 1.2 m tall at the shoulder",note:"Vulnerable worldwide, but in the mountains of Taiwan its numbers have grown.",
@@ -1931,7 +1931,8 @@ function treeAt(p,type,x,z,s,R){const y=0;const g=new THREE.Group();g.position.s
   case 'palm':{const pts=[V(0,0,0),V(.2,1.2,0),V(.5,2.4,0),V(.6,3.2,0)];for(let i=0;i<3;i++)limb(g,pts[i],pts[i+1],.14,'#8a6a45',.12);
    for(let i=0;i<6;i++){const a=i/6*Math.PI*2;const l=E(g,'#2f8a3c',1.1,.06,.25,.6+Math.cos(a)*.8,3.05,Math.sin(a)*.8);l.rotation.y=-a;l.rotation.z=-.35}break}
   case 'jungle':limb(g,V(0,0,0),V(0,2.2,0),.22,'#5a4430',.3);E(g,'#2e7a35',1.4,1.0,1.4,0,3.0,0,GSL);E(g,'#256a2e',1.0,.8,1.0,-.6,3.6,.4,GSL);break;
-  case 'acacia':limb(g,V(0,0,0),V(.3,2.2,0),.13,'#6b5235',.16);E(g,'#7a9a3c',1.8,.35,1.6,.3,2.5,0,GSL);break;
+  case 'acacia':{limb(g,V(0,0,0),V(.15,1.7,0),.12,'#6b5235',.16);const tops=[[1.0,3.0,.3],[-.7,2.8,.6],[.1,3.1,-.85]];   /* umbrella thorn tree: forked trunk, flat layered crown */
+   for(const [tx,ty,tz] of tops){limb(g,V(.15,1.7,0),V(tx*.7,ty-.15,tz*.7),.07,'#6b5235',.09);E(g,'#6f9a3a',.75,.18,.68,tx*.8,ty,tz*.8,GSL)}E(g,'#82a845',1.05,.2,.95,.15,3.25,0,GSL);break}
   case 'euc':limb(g,V(0,0,0),V(0,2.2,0),.13,'#e8e2d4',.18);E(g,'#7e9a6a',.8,.7,.8,.2,2.6,0,GSL);E(g,'#869f72',.6,.5,.6,-.4,2.2,.3,GSL);break;
   case 'cactus':limb(g,V(0,0,0),V(0,1.6,0),.2,'#5a8a4a',.2);E(g,'#5a8a4a',.2,.2,.2,0,1.6,0);limb(g,V(0,.8,0),V(.45,.9,0),.12,'#5a8a4a');limb(g,V(.45,.9,0),V(.45,1.3,0),.12,'#5a8a4a');break;
   case 'bamboo':for(let i=0;i<5;i++){const bx=(R()-.5)*.6,bz=(R()-.5)*.6;limb(g,V(bx,0,bz),V(bx,2.6+R(),bz),.06,'#7aa64a');E(g,'#6a9a3a',.3,.12,.3,bx,2.6,bz,GSL)}break;
@@ -1969,7 +1970,7 @@ function buildZone(z){
   case 'rainforest':rimTree('palm',6,.9,1.3);rimTree('jungle',5,.9,1.2);pond(g,z.r*.25,z.r*.45,2.6);break;
   case 'desert':rimTree('cactus',6,.8,1.2);rimTree('rock',6,.8,1.6);for(let i=0;i<4;i++)E(g,'#e6c88f',2.4,.5,1.6,(R()-.5)*z.r,.2,(R()-.5)*z.r,GSL);break;
   case 'outback':rimTree('euc',5,.9,1.2);rimTree('rock',3,.8,1.2);break;
-  case 'savanna':rimTree('acacia',7,1.1,1.5);rimTree('rock',4,1,1.6);pond(g,0,0,3.4);break;
+  case 'savanna':rimTree('acacia',4,1.0,1.25);rimTree('rock',4,1,1.6);pond(g,0,0,3.4);break;   /* East African savanna: a pond with shrubs beside it (decorateHabitats), long grass for the lion */
   case 'temperate':rimTree('pine',5,.9,1.2);rimTree('broad',5,.9,1.1);pond(g,-z.r*.3,z.r*.4,2.2);break;
   case 'aviary':rimTree('broad',5,.9,1.2);pond(g,z.r*.15,z.r*.3,3.2,'#6ab0c8');
    break;
@@ -1994,7 +1995,7 @@ function buildZone(z){
   for(let i=0;i<nRib;i++){const a=i/nRib*Math.PI*2,ra=zR(z,a);const pts=[];for(let k=0;k<=8;k++){const t=k/8*Math.PI/2;pts.push(V(Math.cos(a)*Math.cos(t)*ra,Math.sin(t)*z.r*.7,Math.sin(a)*Math.cos(t)*ra))}for(let k=0;k<8;k++)limb(g,pts[k],pts[k+1],.06,ribC)}
   if(z.id==='pangolin')for(const t of [Math.PI/7,Math.PI/3.6,Math.PI/2.5]){const ring=new THREE.Mesh(shapeTube(z,0,0,.05),mat('#eef0ec'));ring.scale.set(Math.cos(t),1,Math.cos(t));ring.position.y=Math.sin(t)*z.r*.7;g.add(ring)}}
  const label=makeLabel(z.n,z.zh,{prio:4,bg:'#EBC45E',fg:'#2B2420',w:Math.max(9,z.r*.9),num:ROUTE.indexOf(z.id)+1});
- label.position.set(0,(indoor?z.r*.7:4)+4.5,0);g.add(label);z.label=label;
+ label.position.set(0,(indoor?z.r*.7+7:12.5),0);g.add(label);z.label=label;   /* high above the area, so it never covers an animal */
 }
 
 /* ---------- labels ---------- */
@@ -2038,7 +2039,7 @@ function declutter(){_dl.length=0;const tv=Math.tan(THREE.MathUtils.degToRad(cam
  _dl.sort((a,b)=>b.userData.p-a.userData.p||a.userData.d-b.userData.d);_dr.length=0;
  for(const s of _dl){const r=s.userData.rect,g=s.userData.dc<.5?8:2,h=r[3]-r[1],prev=s.userData.nud||0;   // a hidden sign needs a little extra room before it comes back (no flicker)
   // try where it is now first, then its normal place, then a little above or below; only fade it if none of these is free
-  let pick=null;for(const off of [0,prev,-1.15,1.15]){const y0=r[1]+off*h,y1=r[3]+off*h;if(off!==0&&(y0<0||y1>H))continue;const gg=off===0&&prev!==0?8:g;let hit=false;   // back home first when there is room; never pushed off screen
+  let pick=null;for(const off of [0,prev,-1.15,1.15,-2.3,2.3]){   /* two steps away if one is not enough (the higher area signs) */const y0=r[1]+off*h,y1=r[3]+off*h;if(off!==0&&(y0<0||y1>H))continue;const gg=off===0&&prev!==0?8:g;let hit=false;   // back home first when there is room; never pushed off screen
    for(const q of _dr)if(r[0]-gg<q[2]&&r[2]+gg>q[0]&&y0-gg<q[3]&&y1+gg>q[1]){hit=true;break}
    if(!hit){pick=off;_dr.push([r[0],y0,r[2],y1]);break}}
   if(pick!==null&&pick!==prev){s.userData.nud=pick;s.center.y=.5+pick}   /* sprite pivot: a smaller center.y draws the sign higher on screen */
@@ -2056,6 +2057,7 @@ function placeAnimals(){
    }
    /* (the rainforest animals used to make room for the Pangolin Dome; it is its own area now) */
    if(!a.inDome){const w=zWarp(z,px,pz);px=w[0];pz=w[1]}   // into the real shape
+   if(a.id==='lion'&&z.biome==='savanna'){const lg=longGrass(z);px=lg.x;pz=lg.z}   /* the lion waits in the long grass */
    const R2=rng(hashStr(a.id));const built=(a.m.glb&&GLB[a.m.glb])?buildGLB(a.m):BUILD[a.m.b](a.m,R2);const g=built.g;g.scale.setScalar(a.m.s||1);addOutline(g,1.1);
    const holder=new THREE.Group();holder.position.set(px,.25,pz);holder.rotation.y=-Math.PI/2+(R()-.5)*1.4+(a.m.b==='butterfly'?0:0);holder.add(g);z.group.add(holder);
    const box=new THREE.Box3().setFromObject(holder);const h=box.max.y-box.min.y;const fr=Math.max(box.max.x-box.min.x,box.max.z-box.min.z)/2;
@@ -2124,7 +2126,8 @@ function viewHit(a,tgt,dir,d,objs){const cp=tgt.clone().addScaledVector(dir,d);_
   const hit=_vr.intersectObjects(objs,false).find(h=>h.distance>.15&&visChain(h.object)&&!_abx.containsPoint(h.point));/* hidden things (an area's pedestal after you leave it) never block */if(hit)first=Math.min(first,hit.distance+s.distanceTo(tgt)*.5)}
  return first}
 function viewDir(phi,th){return V(Math.sin(phi)*Math.sin(th),Math.cos(phi),Math.sin(phi)*Math.cos(th))}
-function clearView(a,tgt,d,phi,th0){const objs=viewBlockers(ZI[a.z]);let best={th:th0,d:d,free:0};
+function animalBlockers(a){const list=[];for(const b of A){if(b===a||b.z!==a.z||!b.obj)continue;b.obj.holder.traverse(o=>{if(o.isMesh&&!o.userData.isOutline&&visChain(o))list.push(o)})}return list}   /* only what is drawn now (not the hidden far-away legs) */   /* the other animals there right now (a big elephant can hide a zebra) */
+function clearView(a,tgt,d,phi,th0){const objs=viewBlockers(ZI[a.z]).concat(animalBlockers(a));let best={th:th0,d:d,free:0};
  for(const dt of [0,.5,-.5,1,-1,1.8,-1.8]){const th=th0+dt;const hit=viewHit(a,tgt,viewDir(phi,th),d,objs);
   if(hit===Infinity)return {th,d};                           // nothing in the way
   if(hit>best.free)best={th,d:Math.max(1.6,hit-.6),free:hit}}
@@ -2964,7 +2967,7 @@ function loop(){requestAnimationFrame(loop);const t=clock.getElapsedTime();const
   if(o.bounce>0){o.bounce=Math.max(0,o.bounce-.025);o.g.position.y=Math.abs(Math.sin(o.bounce*Math.PI*3))*.6*o.bounce}
   if(o.shake>0){o.shake=Math.max(0,o.shake-dt*1.2);o.g.rotation.y=Math.sin(o.shake*Math.PI*8)*.35*o.shake}
   if(o.ring.visible)o.ring.material.color.setHSL(.12,.75,.55+Math.sin(t*5)*.1)}
- for(const z of ZONES){const d=camera.position.distanceTo(tmpV.set(z.x,z.y,z.z));z.label.visible=!AREA&&d>z.r*1.5+16}
+ for(const z of ZONES)z.label.visible=(!AREA||AREA===z)&&!(current&&current.z===z.id&&camera.position.distanceTo(tmpV.set(z.x,z.y,z.z))<z.r+40);   /* the big yellow area signs always show (high up); inside an area only its own; not while you look at one of its animals */
  if(train)train.visible=!!(NAV&&NAV.onTrain)&&!AREA;
  labelFadeTick();
  if(mePin.visible&&mePulse){const k=(t*.7)%1;mePulse.scale.setScalar(1+k*2.2);mePulse.material.opacity=.8*(1-k)}
@@ -3056,6 +3059,9 @@ function decorateHabitats(){const kit=habKit();if(!kit)return;let n=0,draws=0;
     else if(kind!=='ground')z.cover.push(im)});
    n+=ms.length};
   rec.forEach(([id,dens,kind])=>place(id,Math.round(dens*area),kind));
+  if(z.biome==='savanna'){const lg=longGrass(z);   /* the long-grass area (lions wait here) and shrubs by the pond */
+   place('grass_tall',70,'',R=>{const a=R()*Math.PI*2,rr=Math.sqrt(R())*lg.r;return{x:lg.x+Math.cos(a)*rr,z:lg.z+Math.sin(a)*rr,y:.25}});
+   place('bush',7,'big',R=>{const a=R()*Math.PI*2,rr=3.4+1.1+R()*.8;return{x:Math.cos(a)*rr,z:Math.sin(a)*rr,y:.25}})}
   if(!['desert','outback','indoor-ice'].includes(z.biome))ponds.forEach(p=>{   // water plants
    place('lilypad',Math.max(2,Math.round(p.r*p.r*.5)),'',R=>{const a=R()*Math.PI*2,rr=Math.sqrt(R())*Math.max(.2,p.r-.45);return{x:p.x+Math.cos(a)*rr,z:p.z+Math.sin(a)*rr,y:.315}});
    place('reeds',Math.round(p.r*2.2),'',R=>{const a=R()*Math.PI*2,rr=p.r+.1+R()*.3;return{x:p.x+Math.cos(a)*rr,z:p.z+Math.sin(a)*rr,y:.25}})})});
@@ -3085,7 +3091,9 @@ const BEH={
  'african-spurred-tortoise':["wander", 0.12],'guenthers-frog':["hop", 0.3, 0.15, [3, 8]],'la-touches-frog':["hop", 0.3, 0.15, [3, 8]],'fujian-large-headed-frog':["hop", 0.3, 0.15, [3, 8]],'central-formosan-toad':["hop", 0.3, 0.15, [3, 8]],'chinese-fire-bellied-newt':["swim", 0.25, 0.5],'hong-kong-warty-newt':["swim", 0.25, 0.5],'red-eyed-treefrog':["hop", 0.3, 0.15, [3, 8]],'vietnamese-mossy-frog':["hop", 0.3, 0.15, [3, 8]],'green-and-black-poison-dart-frog':["hop", 0.3, 0.15, [3, 8]],'golden-poison-frog':["hop", 0.3, 0.15, [3, 8]],'yellow-banded-poison-dart-frog':["hop", 0.3, 0.15, [3, 8]],'blue-poison-dart-frog':["hop", 0.3, 0.15, [3, 8]],'green-basilisk':["dart", 1.2],'rhinoceros-iguana':["wander", 0.2],'taiwan-beauty-snake':["wander", 0.15, 0, [6, 14]],'burmese-python':["wander", 0.08, 0, [8, 16]],'emerald-green-treefrog':["hop", 0.3, 0.15, [3, 8]],'green-iguana':["wander", 0.2],'chinese-water-dragon':["wander", 0.25],'olive-frog':["hop", 0.3, 0.15, [3, 8]],'asian-common-toad':["hop", 0.3, 0.15, [3, 8]],'swinhoes-tree-lizard':["dart", 1.0],'swinhoes-frog':["hop", 0.3, 0.15, [3, 8]],'chinese-cobra':["wander", 0.12, 0, [6, 14]],'veiled-chameleon':["wander", 0.08, 0, [6, 14]],'banded-water-snake':["swim", 0.4, 0.5],'hundred-pace-viper':["wander", 0.06, 0, [8, 16]],'tokay-gecko':["dart", 0.9],'yuchi-music-frog':["hop", 0.3, 0.15, [3, 8]],'roti-island-snake-necked-turtle':["swim", 0.35, 0.5],'chinese-alligator':["swim", 0.3, 0.6],'radiated-tortoise':["wander", 0.12],'solomon-islands-skink':["wander", 0.15],'yellow-pond-turtle':["swim", 0.4, 0.5],'gila-monster':["wander", 0.1, 0, [6, 14]],'chinese-stripe-necked-turtle':["swim", 0.4, 0.5],'pearl-stingray':["swim", 0.3, 0.5],'julliens-golden-carp':["swim", 0.5, 0.5],'red-bellied-pacu':["swim", 0.5, 0.5],'yellowfin-chalceus':["swim", 0.5, 0.5],'arapaima':["swim", 0.35, 0.5],'golden-moon-moth':["wander", 0.1],'cockscomb-stag-beetle':["wander", 0.1],'ceylon-tree-ant':["wander", 0.1],'tiny-snap-jaw-ant':["wander", 0.1],'giant-asian-mantis':["wander", 0.1],'taipei-carpenter-ant':["wander", 0.1],'green-bean-stick-insect':["wander", 0.1],'question-mark-cockroach':["wander", 0.1],'autumn-leaf-insect':["wander", 0.1],'spiny-leaf-insect':["wander", 0.1],'orange-isopod':["wander", 0.1],'orange-spotted-diving-beetle':["swim", 0.3, 0.4],'water-walking-stick':["swim", 0.3, 0.4],'atlas-moth':["wander", 0.1],'two-spined-hard-ant':["wander", 0.1],'siemssens-carpenter-ant':["wander", 0.1],'taiwan-long-legged-ant':["wander", 0.1],'beetle-cockroach':["wander", 0.1],'mountain-trap-jaw-ant':["wander", 0.1],'big-headed-ant':["wander", 0.1],'kaohsiung-carpenter-ant':["wander", 0.1],'smelly-carpenter-ant':["wander", 0.1],'long-tailed-stick-insect':["wander", 0.1],'six-spotted-stick-insect':["wander", 0.1],'giant-leaf-insect':["wander", 0.1],'thai-red-winged-stick-insect':["wander", 0.1],'long-winged-katydid':["wander", 0.1],'two-spotted-cricket':["wander", 0.1],'giant-walking-stick':["wander", 0.1],'giant-spiny-stick-insect':["wander", 0.1],'malaysian-jungle-nymph':["wander", 0.1],'three-lined-diving-beetle':["swim", 0.3, 0.4],'six-spotted-cockroach':["wander", 0.1],'brown-water-bug':["swim", 0.3, 0.4],'redknee-tarantula':["wander", 0.1],'emperor-scorpion':["wander", 0.1],'red-headed-centipede':["wander", 0.1],'yellow-edged-firefly':["wander", 0.15],'lanyu-giant-katydid':["wander", 0.1],'round-spotted-weevil':["wander", 0.1],'long-fanged-stag-beetle':["wander", 0.1],'water-scorpion':["swim", 0.3, 0.4],'lanyu-giant-walking-stick':["wander", 0.1]};
 const DOME_ANIMALS=[];   /* (the Pangolin House is its own area now) */   // live inside the Pangolin Dome
 const POND_Y=.31;   // water surface (ponds are at y .26, .1 thick)
-function behArea(a){const z=ZI[a.z];if(z.id==='rainforest'&&DOME_ANIMALS.includes(a.id))return{x:z.pango[0],z:z.pango[1],r:2.4*z.pangoS};
+function longGrass(z){if(z.longGrass)return z.longGrass;const a=Math.PI*.7,w=zWarp(z,Math.cos(a)*z.r*.55,Math.sin(a)*z.r*.55);   /* a fixed spot (the area entrance is not known yet when animals are placed) */
+ return z.longGrass={x:w[0],z:w[1],r:Math.min(3.2,z.r*.22)}}   /* a patch of long grass at one side of the savanna, in view from the default area camera */
+function behArea(a){const z=ZI[a.z];if(a.id==='lion'&&z.biome==='savanna'){const lg=longGrass(z);return{x:lg.x,z:lg.z,r:lg.r}}if(z.id==='rainforest'&&DOME_ANIMALS.includes(a.id))return{x:z.pango[0],z:z.pango[1],r:2.4*z.pangoS};
  return{x:0,z:0,r:z.r*(z.biome.startsWith('indoor')?.55:.72),warp:true}}   // warp: spots are moved into the real shape
 function landPoint(a,R){const z=ZI[a.z],ar=behArea(a),ponds=z.group.userData.ponds||[],fr=a.obj.fr||1;
  for(let i=0;i<30;i++){const t=R()*Math.PI*2,r=Math.sqrt(R())*Math.max(.3,ar.r-fr*.5);let x=ar.x+Math.cos(t)*r,zz=ar.z+Math.sin(t)*r;if(ar.warp)[x,zz]=zWarp(z,x,zz);
